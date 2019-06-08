@@ -26,7 +26,7 @@ __copyright__ = (
 import logging
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from qgis.core import QgsProject
-from qgis.gui import QgsMapCanvasLayer
+from qgis.gui import QgsMapCanvas
 LOGGER = logging.getLogger('QGIS')
 
 
@@ -37,7 +37,7 @@ class QgisInterface(QObject):
     This class is here for enabling us to run unit tests only,
     so most methods are simply stubs.
     """
-    currentLayerChanged = pyqtSignal(QgsMapCanvasLayer)
+    currentLayerChanged = pyqtSignal(QgsMapCanvas)
 
     def __init__(self, canvas):
         """Constructor
@@ -71,9 +71,9 @@ class QgisInterface(QObject):
         current_layers = self.canvas.layers()
         final_layers = []
         for layer in current_layers:
-            final_layers.append(QgsMapCanvasLayer(layer))
+            final_layers.append(layer)
         for layer in layers:
-            final_layers.append(QgsMapCanvasLayer(layer))
+            final_layers.append(layer)
 
         self.canvas.setLayerSet(final_layers)
         #LOGGER.debug('Layer Count After: %s' % len(self.canvas.layers()))
