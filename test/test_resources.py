@@ -17,7 +17,6 @@ import unittest
 from PyQt5.QtGui import QIcon
 
 
-
 class GuidedOfflineEditingPluginDialogTest(unittest.TestCase):
     """Test rerources work."""
 
@@ -35,10 +34,8 @@ class GuidedOfflineEditingPluginDialogTest(unittest.TestCase):
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
+
 if __name__ == "__main__":
-    suite = unittest.makeSuite(GuidedOfflineEditingPluginResourcesTest)
+    suite = unittest.makeSuite(GuidedOfflineEditingPluginDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
-
-
