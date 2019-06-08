@@ -17,7 +17,7 @@ echo "QGIS PATH: $QGIS_PREFIX_PATH"
 export QGIS_DEBUG=0
 export QGIS_LOG_FILE=/tmp/inasafe/realtime/logs/qgis.log
 
-export PATH=${QGIS_PREFIX_PATH}/bin:$PATH
+export PATH=$PATH:${QGIS_PREFIX_PATH}/bin
 
 echo "This script is intended to be sourced to set up your shell to"
 echo "use a QGIS 2.0 built in $QGIS_PREFIX_PATH"
