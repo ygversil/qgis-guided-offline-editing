@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import QDialogButtonBox, QDialog
 
 from guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 
-from utilities import get_qgis_app
+from .utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
 
