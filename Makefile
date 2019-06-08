@@ -33,6 +33,7 @@ LOCALES =
 # lrelease
 #LRELEASE = lrelease
 #LRELEASE = lrelease-qt4
+LRELEASE = lrelease
 
 
 # translation
