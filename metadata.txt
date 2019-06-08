@@ -26,7 +26,7 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=attribute table, attribute, attribute edit, csv, database, digitizing, editing, feature, field, vector, layers, python, qgis, gis, offline, synchronize
+tags=attribute table,attribute,attribute edit,csv,database,digitizing,editing,feature,field,vector,layers,python,qgis,gis,offline,synchronize
 
 homepage=https://github.com/ygversil/qgis-guided-offline-editing
 category=Database
