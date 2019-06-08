@@ -56,7 +56,7 @@ class QgisInterface(QObject):
         # For processing module
         self.destCrs = None
 
-    @pyqtSlot('QStringList')
+    @pyqtSlot('QList<QgsMapLayer*>')
     def addLayers(self, layers):
         """Handle layers being added to the registry so they show up in canvas.
 
