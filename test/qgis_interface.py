@@ -51,8 +51,6 @@ class QgisInterface(QObject):
         # noinspection PyArgumentList
         QgsMapLayerRegistry.instance().layersAdded.connect(self.addLayers)
         # noinspection PyArgumentList
-        QgsMapLayerRegistry.instance().layerWasAdded.connect(self.addLayer)
-        # noinspection PyArgumentList
         QgsMapLayerRegistry.instance().removeAll.connect(self.removeAllLayers)
 
         # For processing module
@@ -79,20 +77,6 @@ class QgisInterface(QObject):
 
         self.canvas.setLayerSet(final_layers)
         #LOGGER.debug('Layer Count After: %s' % len(self.canvas.layers()))
-
-    @pyqtSlot('QgsMapLayer')
-    def addLayer(self, layer):
-        """Handle a layer being added to the registry so it shows up in canvas.
-
-        :param layer: list<QgsMapLayer> list of map layers that were added
-
-        .. note: The QgsInterface api does not include this method, it is added
-                 here as a helper to facilitate testing.
-
-        .. note: The addLayer method was deprecated in QGIS 1.8 so you should
-                 not need this method much.
-        """
-        pass
 
     @pyqtSlot()
     def removeAllLayers(self):
