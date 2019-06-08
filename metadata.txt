@@ -30,7 +30,7 @@ tags=attribute table,attribute,attribute edit,csv,database,digitizing,editing,fe
 
 homepage=https://github.com/ygversil/qgis-guided-offline-editing
 category=Database
-icon=icon.png
+icon=guided_offline_editing_copy.png
 # experimental flag
 experimental=True
 

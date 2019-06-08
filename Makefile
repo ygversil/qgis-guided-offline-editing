@@ -49,7 +49,7 @@ PY_FILES = \
 
 UI_FILES = guided_offline_editing_dialog_base.ui
 
-EXTRAS = metadata.txt icon.png
+EXTRAS = metadata.txt guided_offline_editing_copy.png
 
 EXTRA_DIRS =
 
