@@ -75,13 +75,13 @@ class QgisInterface(QObject):
         for layer in layers:
             final_layers.append(layer)
 
-        self.canvas.setLayerSet(final_layers)
+        self.canvas.setLayers(final_layers)
         #LOGGER.debug('Layer Count After: %s' % len(self.canvas.layers()))
 
     @pyqtSlot()
     def removeAllLayers(self):
         """Remove layers from the canvas before they get deleted."""
-        self.canvas.setLayerSet([])
+        self.canvas.setLayers([])
 
     def newProject(self):
         """Create new project."""
