@@ -14,7 +14,7 @@ __copyright__ = 'Copyright 2019, Yann Voté'
 
 import unittest
 
-from PyQt5.QtGui import QDialogButtonBox, QDialog
+from PyQt5.QtWidgets import QDialogButtonBox, QDialog
 
 from guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 
