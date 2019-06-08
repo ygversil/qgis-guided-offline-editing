@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Guided Offline Editing Plugin
+qgisMinimumVersion=3.4
+description=Extend the built-in Offline Editing Plugin providing automated processes
+version=0.1
+author=Yann Voté
+email=ygversil@lilo.org
+
+about=This QGIS plugin extend the built-in Offline Editing Plugin by providing some automated processes. As a side effect, it also restricts what can be done when converting a project for offline editing. Features: * copy styles and input form to offline layer when converting for offline editing, * check for valid geometries before going back online.
+
+tracker=https://github.com/ygversil/qgis-guided-offline-editing/issues
+repository=https://github.com/ygversil/qgis-guided-offline-editing
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=attribute table, attribute, attribute edit, csv, database, digitizing, editing, feature, field, vector, layers, python, qgis, gis, offline, synchronize
+
+homepage=https://github.com/ygversil/qgis-guided-offline-editing
+category=Database
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
