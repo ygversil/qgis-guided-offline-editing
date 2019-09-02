@@ -30,10 +30,14 @@ from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
 _LAYER_TABLE_HEADERS = OrderedDict((
     ('title', 'Title'),
     ('comments', 'Comments'),
+    ('schema_name', None),  # None means: do not show in dialog
+    ('table_name', None),
+    ('geometry_column', None),
     ('geometry_srid', 'SRID'),
     ('geometry_type', 'Geometry Type'),
 ))
 LAYER_ATTRS = tuple(_LAYER_TABLE_HEADERS.keys())
+_DISPLAYED_ATTRS = tuple(k for k, v in _LAYER_TABLE_HEADERS.items() if v)
 
 
 EditableLayer = namedtuple('Layer', LAYER_ATTRS)
@@ -53,7 +57,7 @@ class EditableLayerTableModel(QAbstractTableModel):
     def columnCount(self, parent=None):
         """Returns the number of columns for the children of the given
         parent."""
-        return len(LAYER_ATTRS)
+        return len(_DISPLAYED_ATTRS)
 
     def data(self, index, role=Qt.DisplayRole):
         """Returns the data stored under the given role for the item referred
@@ -63,7 +67,7 @@ class EditableLayerTableModel(QAbstractTableModel):
         else:
             return QVariant(
                 getattr(self.available_layers[index.row()],
-                        LAYER_ATTRS[index.column()])
+                        _DISPLAYED_ATTRS[index.column()])
             )
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
@@ -73,7 +77,7 @@ class EditableLayerTableModel(QAbstractTableModel):
             return QVariant()
         if orientation == Qt.Horizontal:
             try:
-                return self.tr(_LAYER_TABLE_HEADERS[LAYER_ATTRS[section]])
+                return self.tr(_LAYER_TABLE_HEADERS[_DISPLAYED_ATTRS[section]])
             except IndexError:
                 return QVariant()
         else:
