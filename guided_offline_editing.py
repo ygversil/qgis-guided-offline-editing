@@ -29,6 +29,7 @@ from PyQt5.QtWidgets import QAction
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
+from .layer_model import EditableLayer, EditableLayerTableModel
 import os.path
 
 
@@ -190,6 +191,7 @@ class GuidedOfflineEditingPlugin:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
 
+        self.refreshLayerList()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -199,3 +201,20 @@ class GuidedOfflineEditingPlugin:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def refreshLayerList(self):
+        """Refresh the layer table."""
+        layer_model = EditableLayerTableModel()
+        lyr1 = EditableLayer(title='Observations (test)',
+                             comments=('Observations fictives pour tests avec '
+                                       'QGIS'),
+                             geometry_srid=2154,
+                             geometry_type='POINT')
+        lyr2 = EditableLayer(title='Autres observations (test)',
+                             comments=('Autres observations fictives pour '
+                                       'tests avec QGIS'),
+                             geometry_srid=2154,
+                             geometry_type='LINESTRING')
+        layer_model.addLayer(lyr1)
+        layer_model.addLayer(lyr2)
+        self.dlg.refresh_layer_table(layer_model)
