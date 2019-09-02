@@ -33,10 +33,10 @@ _LAYER_TABLE_HEADERS = OrderedDict((
     ('geometry_srid', 'SRID'),
     ('geometry_type', 'Geometry Type'),
 ))
-_LAYER_ATTRS = list(_LAYER_TABLE_HEADERS.keys())
+LAYER_ATTRS = list(_LAYER_TABLE_HEADERS.keys())
 
 
-EditableLayer = namedtuple('Layer', _LAYER_ATTRS)
+EditableLayer = namedtuple('Layer', LAYER_ATTRS)
 
 
 class EditableLayerTableModel(QAbstractTableModel):
@@ -53,7 +53,7 @@ class EditableLayerTableModel(QAbstractTableModel):
     def columnCount(self, parent=None):
         """Returns the number of columns for the children of the given
         parent."""
-        return len(_LAYER_ATTRS)
+        return len(LAYER_ATTRS)
 
     def data(self, index, role=Qt.DisplayRole):
         """Returns the data stored under the given role for the item referred
@@ -63,7 +63,7 @@ class EditableLayerTableModel(QAbstractTableModel):
         else:
             return QVariant(
                 getattr(self.available_layers[index.row()],
-                        _LAYER_ATTRS[index.column()])
+                        LAYER_ATTRS[index.column()])
             )
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
@@ -73,7 +73,7 @@ class EditableLayerTableModel(QAbstractTableModel):
             return QVariant()
         if orientation == Qt.Horizontal:
             try:
-                return self.tr(_LAYER_TABLE_HEADERS[_LAYER_ATTRS[section]])
+                return self.tr(_LAYER_TABLE_HEADERS[LAYER_ATTRS[section]])
             except IndexError:
                 return QVariant()
         else:
