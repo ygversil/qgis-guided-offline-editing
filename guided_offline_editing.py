@@ -25,11 +25,12 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
+from .db_manager import EditableLayerDownloader
 # Initialize Qt resources from file resources.py
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
-from .layer_model import EditableLayer, EditableLayerTableModel
+from .layer_model import EditableLayer, EditableLayerTableModel, LAYER_ATTRS
 import os.path
 
 
@@ -205,16 +206,14 @@ class GuidedOfflineEditingPlugin:
     def refreshLayerList(self):
         """Refresh the layer table."""
         layer_model = EditableLayerTableModel()
-        lyr1 = EditableLayer(title='Observations (test)',
-                             comments=('Observations fictives pour tests avec '
-                                       'QGIS'),
-                             geometry_srid=2154,
-                             geometry_type='POINT')
-        lyr2 = EditableLayer(title='Autres observations (test)',
-                             comments=('Autres observations fictives pour '
-                                       'tests avec QGIS'),
-                             geometry_srid=2154,
-                             geometry_type='LINESTRING')
-        layer_model.addLayer(lyr1)
-        layer_model.addLayer(lyr2)
+        fetch_layers = EditableLayerDownloader(host='db.priv.ariegenature.fr',
+                                               port=5432,
+                                               dbname='ana',
+                                               schema='common',
+                                               authcfg='ldapana')
+        for layer_dict in fetch_layers():
+            layer_model.addLayer(
+                EditableLayer(**{k: v for k, v in layer_dict.items()
+                                 if k in LAYER_ATTRS})
+            )
         self.dlg.refresh_layer_table(layer_model)
