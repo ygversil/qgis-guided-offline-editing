@@ -33,7 +33,7 @@ _LAYER_TABLE_HEADERS = OrderedDict((
     ('geometry_srid', 'SRID'),
     ('geometry_type', 'Geometry Type'),
 ))
-LAYER_ATTRS = list(_LAYER_TABLE_HEADERS.keys())
+LAYER_ATTRS = tuple(_LAYER_TABLE_HEADERS.keys())
 
 
 EditableLayer = namedtuple('Layer', LAYER_ATTRS)
