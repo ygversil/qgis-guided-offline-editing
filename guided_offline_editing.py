@@ -21,6 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+import uuid
+
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
@@ -197,6 +200,7 @@ class GuidedOfflineEditingPlugin:
         if self.first_start is True:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
+            self.clock_seq = 0
         self.dlg.okCancelButtonBox.accepted.connect(
             self.add_selected_layers
         )
@@ -238,6 +242,7 @@ class GuidedOfflineEditingPlugin:
 
     def add_selected_layers(self):
         """Add the selected layers to the project legend."""
+        self.clock_seq += 1
         offline_layer_ids = []
         with transactional_project(self.iface) as proj:
             for i in self.dlg.selected_row_indices():
@@ -267,7 +272,9 @@ class GuidedOfflineEditingPlugin:
                 offline_layer_ids.append(added_layer.id())
             self.offliner.convertToOfflineProject(
                 proj.absolutePath(),
-                'offline.gpkg',
+                'offline-{id_}.gpkg'.format(
+                    id_=uuid.uuid1(clock_seq=self.clock_seq)
+                ),
                 offline_layer_ids,
                 containerType=QgsOfflineEditing.GPKG
             )
