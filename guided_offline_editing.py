@@ -271,6 +271,11 @@ class GuidedOfflineEditingPlugin:
                     raise RuntimeError('Cannot add layer '
                                        '"{}"'.format(layer.title))
                 offline_layer_ids.append(added_layer.id())
+            # XXX: if called multiple times for the same QGIS project, this
+            # works because, as of QGIS 3.8, the convertToOfflineProject
+            # method does not check if the project is already an offline
+            # project. So new layers can be converted offline although the
+            # project is already offline himself.
             self.offliner.convertToOfflineProject(
                 proj.absolutePath(),
                 'offline-{id_}.gpkg'.format(
