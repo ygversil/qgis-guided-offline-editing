@@ -23,8 +23,9 @@
 """
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
-from qgis.core import QgsProject, QgsVectorLayer
+from PyQt5.QtWidgets import QAction, QMessageBox
+from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
+
 
 from .db_manager import EditableLayerDownloader
 # Initialize Qt resources from file resources.py
@@ -32,7 +33,11 @@ from .db_manager import EditableLayerDownloader
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .layer_model import EditableLayer, EditableLayerTableModel, LAYER_ATTRS
+from .project_context_manager import transactional_project
 import os.path
+
+
+_IS_OFFLINE_EDITABLE = 'isOfflineEditable'
 
 
 class GuidedOfflineEditingPlugin:
@@ -192,18 +197,26 @@ class GuidedOfflineEditingPlugin:
         if self.first_start is True:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
-
+        self.dlg.okCancelButtonBox.accepted.connect(
+            self.add_selected_layers
+        )
+        proj = QgsProject.instance()
+        if (proj.projectStorage() is None and proj.fileName() == ''):
+            QMessageBox.critical(self.iface.mainWindow(),
+                                 self.tr('No project file'),
+                                 self.tr('Please save the project to a '
+                                         'file first.'))
         self.layer_model = EditableLayerTableModel()
+        self.offliner = QgsOfflineEditing()
         self.refreshLayerList()
         # show the dialog
         self.dlg.show()
-        self.dlg.okCancelButtonBox.accepted.connect(self.add_selected_layers)
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
+            # Do something useful here - delete the line containing pass
+            # and substitute with your code.
             pass
 
     def refreshLayerList(self):
@@ -222,18 +235,41 @@ class GuidedOfflineEditingPlugin:
 
     def add_selected_layers(self):
         """Add the selected layers to the project legend."""
-        for i in self.dlg.selected_row_indices():
-            layer = self.layer_model.available_layers[i]
-            qgs_lyr = QgsVectorLayer(
-                "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
-                'table="{schema}"."{table}" ({geom})'
-                "authcfg=ldapana estimatedmetadata=true "
-                "checkPrimaryKeyUnicity='0' sql=".format(
-                    schema=layer.schema_name,
-                    table=layer.table_name,
-                    geom=layer.geometry_column
-                ),
-                layer.title,
-                'postgres'
-            )
-            QgsProject.instance().addMapLayer(qgs_lyr)
+        is_offline_project = self.offliner.isOfflineProject()
+        offline_layer_ids = []
+        with transactional_project(self.iface) as proj:
+            for i in self.dlg.selected_row_indices():
+                layer = self.layer_model.available_layers[i]
+                qgs_lyr = QgsVectorLayer(
+                    "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
+                    'table="{schema}"."{table}" ({geom})'
+                    "authcfg=ldapana estimatedmetadata=true "
+                    "checkPrimaryKeyUnicity='0' sql=".format(
+                        schema=layer.schema_name,
+                        table=layer.table_name,
+                        geom=layer.geometry_column
+                    ),
+                    layer.title,
+                    'postgres'
+                )
+                if is_offline_project:
+                    qgs_lyr.setCustomProperty(_IS_OFFLINE_EDITABLE, True)
+                added_layer = proj.addMapLayer(qgs_lyr)
+                if added_layer is None:
+                    self.iface.messageBar().pushMessage(
+                        'Layer not added',
+                        'Cannot add layer "{}"'.format(layer.title),
+                        Qgis.Critical,
+                        10
+                    )
+                    raise RuntimeError('Cannot add layer '
+                                       '"{}"'.format(layer.title))
+                if not is_offline_project:
+                    offline_layer_ids.append(added_layer.id())
+            if not is_offline_project:
+                self.offliner.convertToOfflineProject(
+                    proj.absolutePath(),
+                    'offline.gpkg',
+                    offline_layer_ids,
+                    containerType=QgsOfflineEditing.GPKG
+                )
