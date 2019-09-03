@@ -25,10 +25,12 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
+from .db_manager import EditableLayerDownloader
 # Initialize Qt resources from file resources.py
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
+from .layer_model import EditableLayer, EditableLayerTableModel, LAYER_ATTRS
 import os.path
 
 
@@ -190,6 +192,7 @@ class GuidedOfflineEditingPlugin:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
 
+        self.refreshLayerList()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -199,3 +202,18 @@ class GuidedOfflineEditingPlugin:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def refreshLayerList(self):
+        """Refresh the layer table."""
+        layer_model = EditableLayerTableModel()
+        fetch_layers = EditableLayerDownloader(host='db.priv.ariegenature.fr',
+                                               port=5432,
+                                               dbname='ana',
+                                               schema='common',
+                                               authcfg='ldapana')
+        for layer_dict in fetch_layers():
+            layer_model.addLayer(
+                EditableLayer(**{k: v for k, v in layer_dict.items()
+                                 if k in LAYER_ATTRS})
+            )
+        self.dlg.refresh_layer_table(layer_model)
