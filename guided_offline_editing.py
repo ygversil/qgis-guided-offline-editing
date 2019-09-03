@@ -245,6 +245,7 @@ class GuidedOfflineEditingPlugin:
         self.clock_seq += 1
         offline_layer_ids = []
         with transactional_project(self.iface) as proj:
+            proj.setTitle(proj.title().replace(' (offline)', ''))
             for i in self.dlg.selected_row_indices():
                 layer = self.layer_model.available_layers[i]
                 qgs_lyr = QgsVectorLayer(
