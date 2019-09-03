@@ -21,6 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+import uuid
+
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
@@ -197,6 +200,7 @@ class GuidedOfflineEditingPlugin:
         if self.first_start is True:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
+            self.clock_seq = 0
         self.dlg.okCancelButtonBox.accepted.connect(
             self.add_selected_layers
         )
@@ -238,9 +242,10 @@ class GuidedOfflineEditingPlugin:
 
     def add_selected_layers(self):
         """Add the selected layers to the project legend."""
-        is_offline_project = self.offliner.isOfflineProject()
+        self.clock_seq += 1
         offline_layer_ids = []
         with transactional_project(self.iface) as proj:
+            proj.setTitle(proj.title().replace(' (offline)', ''))
             for i in self.dlg.selected_row_indices():
                 layer = self.layer_model.available_layers[i]
                 qgs_lyr = QgsVectorLayer(
@@ -255,8 +260,6 @@ class GuidedOfflineEditingPlugin:
                     layer.title,
                     'postgres'
                 )
-                if is_offline_project:
-                    qgs_lyr.setCustomProperty(_IS_OFFLINE_EDITABLE, True)
                 added_layer = proj.addMapLayer(qgs_lyr)
                 if added_layer is None:
                     self.iface.messageBar().pushMessage(
@@ -267,12 +270,17 @@ class GuidedOfflineEditingPlugin:
                     )
                     raise RuntimeError('Cannot add layer '
                                        '"{}"'.format(layer.title))
-                if not is_offline_project:
-                    offline_layer_ids.append(added_layer.id())
-            if not is_offline_project:
-                self.offliner.convertToOfflineProject(
-                    proj.absolutePath(),
-                    'offline.gpkg',
-                    offline_layer_ids,
-                    containerType=QgsOfflineEditing.GPKG
-                )
+                offline_layer_ids.append(added_layer.id())
+            # XXX: if called multiple times for the same QGIS project, this
+            # works because, as of QGIS 3.8, the convertToOfflineProject
+            # method does not check if the project is already an offline
+            # project. So new layers can be converted offline although the
+            # project is already offline himself.
+            self.offliner.convertToOfflineProject(
+                proj.absolutePath(),
+                'offline-{id_}.gpkg'.format(
+                    id_=uuid.uuid1(clock_seq=self.clock_seq)
+                ),
+                offline_layer_ids,
+                containerType=QgsOfflineEditing.GPKG
+            )
