@@ -218,6 +218,9 @@ class GuidedOfflineEditingPlugin:
             # Do something useful here - delete the line containing pass
             # and substitute with your code.
             pass
+        self.dlg.okCancelButtonBox.accepted.disconnect(
+            self.add_selected_layers
+        )
 
     def refreshLayerList(self):
         """Refresh the layer table."""
