@@ -48,3 +48,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.layerTable.setModel(model)
         self.layerTable.resizeColumnsToContents()
         self.layerTable.resizeRowsToContents()
+
+    def selected_row_indices(self):
+        """Yield each selected editable layer."""
+        yield from (
+            index.row()
+            for index in self.layerTable.selectionModel().selectedRows()
+        )
