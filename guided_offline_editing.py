@@ -192,6 +192,7 @@ class GuidedOfflineEditingPlugin:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
 
+        self.layer_model = EditableLayerTableModel()
         self.refreshLayerList()
         # show the dialog
         self.dlg.show()
@@ -205,15 +206,14 @@ class GuidedOfflineEditingPlugin:
 
     def refreshLayerList(self):
         """Refresh the layer table."""
-        layer_model = EditableLayerTableModel()
         fetch_layers = EditableLayerDownloader(host='db.priv.ariegenature.fr',
                                                port=5432,
                                                dbname='ana',
                                                schema='common',
                                                authcfg='ldapana')
         for layer_dict in fetch_layers():
-            layer_model.addLayer(
+            self.layer_model.addLayer(
                 EditableLayer(**{k: v for k, v in layer_dict.items()
                                  if k in LAYER_ATTRS})
             )
-        self.dlg.refresh_layer_table(layer_model)
+        self.dlg.refresh_layer_table(self.layer_model)
