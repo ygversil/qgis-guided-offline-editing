@@ -28,9 +28,10 @@ from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
 
 
 _LAYER_TABLE_HEADERS = OrderedDict((
+    ('lid', None),  # None means: do not show in dialog
     ('title', 'Title'),
     ('comments', 'Comments'),
-    ('schema_name', None),  # None means: do not show in dialog
+    ('schema_name', None),
     ('table_name', None),
     ('geometry_column', None),
     ('geometry_srid', 'SRID'),

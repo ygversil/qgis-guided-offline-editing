@@ -45,7 +45,8 @@ class EditableLayerDownloader(Callable):
         with psycopg2.connect(self.conn_info) as conn, \
                 conn.cursor(cursor_factory=DictCursor) as cur:
             cur.execute(
-                "select lyr.legend_title as title, "
+                "select lyr.lid, "
+                "lyr.legend_title as title, "
                 "obj_description("
                 "format('%s.%s', lyr.schema_name, lyr.table_name)::regclass"
                 ") as comments, "
