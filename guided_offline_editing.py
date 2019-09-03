@@ -238,7 +238,6 @@ class GuidedOfflineEditingPlugin:
 
     def add_selected_layers(self):
         """Add the selected layers to the project legend."""
-        is_offline_project = self.offliner.isOfflineProject()
         offline_layer_ids = []
         with transactional_project(self.iface) as proj:
             for i in self.dlg.selected_row_indices():
@@ -255,8 +254,6 @@ class GuidedOfflineEditingPlugin:
                     layer.title,
                     'postgres'
                 )
-                if is_offline_project:
-                    qgs_lyr.setCustomProperty(_IS_OFFLINE_EDITABLE, True)
                 added_layer = proj.addMapLayer(qgs_lyr)
                 if added_layer is None:
                     self.iface.messageBar().pushMessage(
@@ -267,12 +264,10 @@ class GuidedOfflineEditingPlugin:
                     )
                     raise RuntimeError('Cannot add layer '
                                        '"{}"'.format(layer.title))
-                if not is_offline_project:
-                    offline_layer_ids.append(added_layer.id())
-            if not is_offline_project:
-                self.offliner.convertToOfflineProject(
-                    proj.absolutePath(),
-                    'offline.gpkg',
-                    offline_layer_ids,
-                    containerType=QgsOfflineEditing.GPKG
-                )
+                offline_layer_ids.append(added_layer.id())
+            self.offliner.convertToOfflineProject(
+                proj.absolutePath(),
+                'offline.gpkg',
+                offline_layer_ids,
+                containerType=QgsOfflineEditing.GPKG
+            )
