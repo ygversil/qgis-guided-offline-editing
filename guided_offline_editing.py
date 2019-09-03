@@ -24,6 +24,7 @@
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
+from qgis.core import QgsProject, QgsVectorLayer
 
 from .db_manager import EditableLayerDownloader
 # Initialize Qt resources from file resources.py
@@ -192,9 +193,11 @@ class GuidedOfflineEditingPlugin:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
 
+        self.layer_model = EditableLayerTableModel()
         self.refreshLayerList()
         # show the dialog
         self.dlg.show()
+        self.dlg.okCancelButtonBox.accepted.connect(self.add_selected_layers)
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
@@ -205,15 +208,32 @@ class GuidedOfflineEditingPlugin:
 
     def refreshLayerList(self):
         """Refresh the layer table."""
-        layer_model = EditableLayerTableModel()
         fetch_layers = EditableLayerDownloader(host='db.priv.ariegenature.fr',
                                                port=5432,
                                                dbname='ana',
                                                schema='common',
                                                authcfg='ldapana')
         for layer_dict in fetch_layers():
-            layer_model.addLayer(
+            self.layer_model.addLayer(
                 EditableLayer(**{k: v for k, v in layer_dict.items()
                                  if k in LAYER_ATTRS})
             )
-        self.dlg.refresh_layer_table(layer_model)
+        self.dlg.refresh_layer_table(self.layer_model)
+
+    def add_selected_layers(self):
+        """Add the selected layers to the project legend."""
+        for i in self.dlg.selected_row_indices():
+            layer = self.layer_model.available_layers[i]
+            qgs_lyr = QgsVectorLayer(
+                "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
+                'table="{schema}"."{table}" ({geom})'
+                "authcfg=ldapana estimatedmetadata=true "
+                "checkPrimaryKeyUnicity='0' sql=".format(
+                    schema=layer.schema_name,
+                    table=layer.table_name,
+                    geom=layer.geometry_column
+                ),
+                layer.title,
+                'postgres'
+            )
+            QgsProject.instance().addMapLayer(qgs_lyr)
