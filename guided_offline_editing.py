@@ -244,29 +244,29 @@ class GuidedOfflineEditingPlugin:
         """Add the selected layers to the project legend."""
         added_layer_ids = []
         for i in self.dlg.selected_row_indices():
-            layer = self.layer_model.available_layers[i]
+            pg_layer = self.layer_model.available_layers[i]
             qgs_layer = QgsVectorLayer(
                 "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
                 'table="{schema}"."{table}" ({geom})'
                 "authcfg=ldapana estimatedmetadata=true "
                 "checkPrimaryKeyUnicity='0' sql=".format(
-                    schema=layer.schema_name,
-                    table=layer.table_name,
-                    geom=layer.geometry_column
+                    schema=pg_layer.schema_name,
+                    table=pg_layer.table_name,
+                    geom=pg_layer.geometry_column
                 ),
-                layer.title,
+                pg_layer.title,
                 'postgres'
             )
             added_layer = proj.addMapLayer(qgs_layer)
             if added_layer is None:
                 self.iface.messageBar().pushMessage(
                     'Layer not added',
-                    'Cannot add layer "{}"'.format(layer.title),
+                    'Cannot add layer "{}"'.format(pg_layer.title),
                     Qgis.Critical,
                     10
                 )
                 raise RuntimeError('Cannot add layer '
-                                   '"{}"'.format(layer.title))
+                                   '"{}"'.format(pg_layer.title))
             added_layer_ids.append(added_layer.id())
         return added_layer_ids
 
