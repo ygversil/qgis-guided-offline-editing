@@ -275,7 +275,7 @@ class GuidedOfflineEditingPlugin:
         self.clock_seq += 1
         with transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
-            offline_layer_ids = self.add_selected_layers(proj)
+            added_layer_ids = self.add_selected_layers(proj)
             # XXX: if called multiple times for the same QGIS project, this
             # works because, as of QGIS 3.8, the convertToOfflineProject
             # method does not check if the project is already an offline
@@ -286,6 +286,6 @@ class GuidedOfflineEditingPlugin:
                 'offline-{id_}.gpkg'.format(
                     id_=uuid.uuid1(clock_seq=self.clock_seq)
                 ),
-                offline_layer_ids,
+                added_layer_ids,
                 containerType=QgsOfflineEditing.GPKG
             )
