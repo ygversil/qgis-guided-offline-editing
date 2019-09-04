@@ -245,7 +245,7 @@ class GuidedOfflineEditingPlugin:
         added_layer_ids = []
         for i in self.dlg.selected_row_indices():
             layer = self.layer_model.available_layers[i]
-            qgs_lyr = QgsVectorLayer(
+            qgs_layer = QgsVectorLayer(
                 "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
                 'table="{schema}"."{table}" ({geom})'
                 "authcfg=ldapana estimatedmetadata=true "
@@ -257,7 +257,7 @@ class GuidedOfflineEditingPlugin:
                 layer.title,
                 'postgres'
             )
-            added_layer = proj.addMapLayer(qgs_lyr)
+            added_layer = proj.addMapLayer(qgs_layer)
             if added_layer is None:
                 self.iface.messageBar().pushMessage(
                     'Layer not added',
