@@ -25,8 +25,11 @@
 from collections import OrderedDict, namedtuple
 
 from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
+from qgis.core import QgsDataSourceUri, QgsProject
 
 
+_REMOTE_PROVIDER = 'remoteProvider'
+_REMOTE_SOURCE = 'remoteSource'
 _LAYER_TABLE_HEADERS = OrderedDict((
     ('lid', None),  # None means: do not show in dialog
     ('title', 'Title'),
@@ -42,6 +45,19 @@ _DISPLAYED_ATTRS = tuple(k for k, v in _LAYER_TABLE_HEADERS.items() if v)
 
 
 PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
+
+
+def _same_layer(pg_layer, qgs_layer):
+    """Returns ``True`` if the given QGIS Layer comes from the given
+    PostgresLayer, that is if they have same schema, name, and geom column."""
+    remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
+    if (qgs_layer.customProperty(_REMOTE_PROVIDER) != 'postgres'
+            or not remote_source):
+        return False
+    uri = QgsDataSourceUri(remote_source)
+    return (pg_layer.schema_name == uri.schema() and
+            pg_layer.table_name == uri.table() and
+            pg_layer.geometry_column == uri.geometryColumn())
 
 
 class PostgresLayerTableModel(QAbstractTableModel):
@@ -83,6 +99,16 @@ class PostgresLayerTableModel(QAbstractTableModel):
                 return QVariant()
         else:
             return QVariant(str(section + 1))
+
+    def flags(self, index):
+        """Returns the item flags for the given index."""
+        proj = QgsProject.instance()
+        pg_layer = self.available_layers[index.row()]
+        if any(map(lambda qgs_layer: _same_layer(pg_layer, qgs_layer),
+               proj.mapLayers().values())):
+            return Qt.NoItemFlags
+        else:
+            return super().flags(index)
 
     def addLayer(self, layer):
         """Add the given layer to the list of available editable layers."""
