@@ -29,7 +29,7 @@ from qgis.core import QgsDataSourceUri
 import psycopg2
 
 
-class EditableLayerDownloader(Callable):
+class PostgresLayerDownloader(Callable):
     """Wraps just enough to connect to a PostgreSQL database using QGIS3 new
     authentication system and download list of editable layers."""
 

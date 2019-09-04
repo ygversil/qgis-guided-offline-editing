@@ -30,12 +30,12 @@ from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
 
 
-from .db_manager import EditableLayerDownloader
+from .db_manager import PostgresLayerDownloader
 # Initialize Qt resources from file resources.py
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
-from .layer_model import EditableLayer, EditableLayerTableModel, LAYER_ATTRS
+from .layer_model import PostgresLayer, PostgresLayerTableModel, LAYER_ATTRS
 from .project_context_manager import transactional_project
 import os.path
 
@@ -210,7 +210,7 @@ class GuidedOfflineEditingPlugin:
                                  self.tr('No project file'),
                                  self.tr('Please save the project to a '
                                          'file first.'))
-        self.layer_model = EditableLayerTableModel()
+        self.layer_model = PostgresLayerTableModel()
         self.offliner = QgsOfflineEditing()
         self.refreshLayerList()
         # show the dialog
@@ -228,14 +228,14 @@ class GuidedOfflineEditingPlugin:
 
     def refreshLayerList(self):
         """Refresh the layer table."""
-        fetch_layers = EditableLayerDownloader(host='db.priv.ariegenature.fr',
+        fetch_layers = PostgresLayerDownloader(host='db.priv.ariegenature.fr',
                                                port=5432,
                                                dbname='ana',
                                                schema='common',
                                                authcfg='ldapana')
         for layer_dict in fetch_layers():
             self.layer_model.addLayer(
-                EditableLayer(**{k: v for k, v in layer_dict.items()
+                PostgresLayer(**{k: v for k, v in layer_dict.items()
                                  if k in LAYER_ATTRS})
             )
         self.dlg.refresh_layer_table(self.layer_model)

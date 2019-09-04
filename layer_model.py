@@ -41,10 +41,10 @@ LAYER_ATTRS = tuple(_LAYER_TABLE_HEADERS.keys())
 _DISPLAYED_ATTRS = tuple(k for k, v in _LAYER_TABLE_HEADERS.items() if v)
 
 
-EditableLayer = namedtuple('Layer', LAYER_ATTRS)
+PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
 
 
-class EditableLayerTableModel(QAbstractTableModel):
+class PostgresLayerTableModel(QAbstractTableModel):
     """Qt table model representing available editable layers."""
 
     def __init__(self, parent=None, **kwargs):
