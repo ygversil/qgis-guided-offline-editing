@@ -223,7 +223,7 @@ class GuidedOfflineEditingPlugin:
             # and substitute with your code.
             pass
         self.dlg.okCancelButtonBox.accepted.disconnect(
-            self.add_selected_layers
+            self.prepare_project_for_offline_editing
         )
 
     def refreshLayerList(self):
