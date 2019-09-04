@@ -40,9 +40,6 @@ from .project_context_manager import transactional_project
 import os.path
 
 
-_IS_OFFLINE_EDITABLE = 'isOfflineEditable'
-
-
 class GuidedOfflineEditingPlugin:
     """QGIS Plugin Implementation."""
 
