@@ -202,7 +202,7 @@ class GuidedOfflineEditingPlugin:
             self.dlg = GuidedOfflineEditingPluginDialog()
             self.clock_seq = 0
         self.dlg.okCancelButtonBox.accepted.connect(
-            self.add_selected_layers
+            self.prepare_project_for_offline_editing
         )
         proj = QgsProject.instance()
         if (proj.projectStorage() is None and proj.fileName() == ''):
@@ -240,37 +240,42 @@ class GuidedOfflineEditingPlugin:
             )
         self.dlg.refresh_layer_table(self.layer_model)
 
-    def add_selected_layers(self):
+    def add_selected_layers(self, proj):
         """Add the selected layers to the project legend."""
+        added_layer_ids = []
+        for i in self.dlg.selected_row_indices():
+            layer = self.layer_model.available_layers[i]
+            qgs_lyr = QgsVectorLayer(
+                "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
+                'table="{schema}"."{table}" ({geom})'
+                "authcfg=ldapana estimatedmetadata=true "
+                "checkPrimaryKeyUnicity='0' sql=".format(
+                    schema=layer.schema_name,
+                    table=layer.table_name,
+                    geom=layer.geometry_column
+                ),
+                layer.title,
+                'postgres'
+            )
+            added_layer = proj.addMapLayer(qgs_lyr)
+            if added_layer is None:
+                self.iface.messageBar().pushMessage(
+                    'Layer not added',
+                    'Cannot add layer "{}"'.format(layer.title),
+                    Qgis.Critical,
+                    10
+                )
+                raise RuntimeError('Cannot add layer '
+                                   '"{}"'.format(layer.title))
+            added_layer_ids.append(added_layer.id())
+        return added_layer_ids
+
+    def prepare_project_for_offline_editing(self):
+        """Prepare the project for offline editing."""
         self.clock_seq += 1
-        offline_layer_ids = []
         with transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
-            for i in self.dlg.selected_row_indices():
-                layer = self.layer_model.available_layers[i]
-                qgs_lyr = QgsVectorLayer(
-                    "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
-                    'table="{schema}"."{table}" ({geom})'
-                    "authcfg=ldapana estimatedmetadata=true "
-                    "checkPrimaryKeyUnicity='0' sql=".format(
-                        schema=layer.schema_name,
-                        table=layer.table_name,
-                        geom=layer.geometry_column
-                    ),
-                    layer.title,
-                    'postgres'
-                )
-                added_layer = proj.addMapLayer(qgs_lyr)
-                if added_layer is None:
-                    self.iface.messageBar().pushMessage(
-                        'Layer not added',
-                        'Cannot add layer "{}"'.format(layer.title),
-                        Qgis.Critical,
-                        10
-                    )
-                    raise RuntimeError('Cannot add layer '
-                                       '"{}"'.format(layer.title))
-                offline_layer_ids.append(added_layer.id())
+            offline_layer_ids = self.add_selected_layers(proj)
             # XXX: if called multiple times for the same QGIS project, this
             # works because, as of QGIS 3.8, the convertToOfflineProject
             # method does not check if the project is already an offline
