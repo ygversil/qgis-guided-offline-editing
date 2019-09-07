@@ -198,7 +198,7 @@ class GuidedOfflineEditingPlugin:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
             self.clock_seq = 0
-        self.dlg.okCancelButtonBox.accepted.connect(
+        self.dlg.downloadButton.clicked.connect(
             self.prepare_project_for_offline_editing
         )
         proj = QgsProject.instance()
@@ -219,7 +219,7 @@ class GuidedOfflineEditingPlugin:
             # Do something useful here - delete the line containing pass
             # and substitute with your code.
             pass
-        self.dlg.okCancelButtonBox.accepted.disconnect(
+        self.dlg.downloadButton.clicked.disconnect(
             self.prepare_project_for_offline_editing
         )
 
