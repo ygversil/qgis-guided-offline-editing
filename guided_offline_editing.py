@@ -212,7 +212,7 @@ class GuidedOfflineEditingPlugin:
             return
         self.layer_model = PostgresLayerTableModel()
         self.offliner = QgsOfflineEditing()
-        self.refreshLayerList()
+        self.refreshDownloadableLayerTable()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -228,8 +228,8 @@ class GuidedOfflineEditingPlugin:
         self.dlg.busy.disconnect(self.dlg.setBusy)
         self.dlg.idle.disconnect(self.dlg.setIdle)
 
-    def refreshLayerList(self):
-        """Refresh the layer table."""
+    def refreshDownloadableLayerTable(self):
+        """Refresh the downloadable layer table."""
         fetch_layers = PostgresLayerDownloader(host='db.priv.ariegenature.fr',
                                                port=5432,
                                                dbname='ana',
@@ -240,7 +240,7 @@ class GuidedOfflineEditingPlugin:
                 PostgresLayer(**{k: v for k, v in layer_dict.items()
                                  if k in LAYER_ATTRS})
             )
-        self.dlg.refresh_layer_table(self.layer_model)
+        self.dlg.refresh_downloadable_layer_table(self.layer_model)
 
     def add_selected_layers(self, proj):
         """Add the selected layers to the project legend."""
