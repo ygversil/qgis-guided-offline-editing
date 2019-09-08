@@ -66,7 +66,7 @@
        <item>
         <widget class="QLabel" name="uploadLayerlabel">
          <property name="text">
-          <string>Layers to be sent</string>
+          <string>Offline layers</string>
          </property>
         </widget>
        </item>
