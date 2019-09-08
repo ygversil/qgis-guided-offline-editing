@@ -169,7 +169,7 @@ class GuidedOfflineEditingPlugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = (':/plugins/guided_offline_editing/'
+        icon_path = (':/plugins/guided_offline_editing/icons/'
                      'guided_offline_editing_copy.png')
         self.add_action(
             icon_path,

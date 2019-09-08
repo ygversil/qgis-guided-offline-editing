@@ -49,9 +49,9 @@ PY_FILES = \
 
 UI_FILES = guided_offline_editing_dialog_base.ui
 
-EXTRAS = metadata.txt guided_offline_editing_copy.png
+EXTRAS = metadata.txt
 
-EXTRA_DIRS =
+EXTRA_DIRS = icons
 
 COMPILED_RESOURCE_FILES = resources.py
 
