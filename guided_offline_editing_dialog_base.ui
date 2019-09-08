@@ -20,6 +20,10 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="downloadTab">
+      <attribute name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/plugins/guided_offline_editing/icons/offline_editing_copy.png</normaloff>:/plugins/guided_offline_editing/icons/offline_editing_copy.png</iconset>
+      </attribute>
       <attribute name="title">
        <string>Download</string>
       </attribute>
@@ -51,6 +55,10 @@
       </layout>
      </widget>
      <widget class="QWidget" name="uploadTab">
+      <attribute name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/plugins/guided_offline_editing/icons/offline_editing_sync.png</normaloff>:/plugins/guided_offline_editing/icons/offline_editing_sync.png</iconset>
+      </attribute>
       <attribute name="title">
        <string>Upload</string>
       </attribute>
@@ -105,7 +113,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>closeButtonBox</sender>

@@ -30,7 +30,8 @@ from PyQt5 import QtWidgets
 # This loads your .ui file so that PyQt can populate your plugin with the
 # elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'guided_offline_editing_dialog_base.ui'))
+    os.path.dirname(__file__), 'guided_offline_editing_dialog_base.ui'
+), resource_suffix='')
 
 
 class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
