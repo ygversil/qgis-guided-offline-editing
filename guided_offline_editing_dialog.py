@@ -25,6 +25,7 @@
 import os
 
 from PyQt5 import uic
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5 import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the
@@ -35,6 +36,10 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
+
+    busy = pyqtSignal()
+    idle = pyqtSignal()
+
     def __init__(self, parent=None):
         """Constructor."""
         super(GuidedOfflineEditingPluginDialog, self).__init__(parent)
@@ -57,3 +62,15 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             for index in self.downloadLayerTable.selectionModel()
             .selectedRows()
         )
+
+    def setBusy(self):
+        """Show busy interface: set waiting cursor and disable buttons."""
+        self.downloadButton.setEnabled(False)
+        self.uploadButton.setEnabled(False)
+        QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
+
+    def setIdle(self):
+        """Show idle interface: set normal cursir and enable buttons."""
+        self.downloadButton.setEnabled(True)
+        self.uploadButton.setEnabled(True)
+        QtWidgets.QApplication.restoreOverrideCursor()

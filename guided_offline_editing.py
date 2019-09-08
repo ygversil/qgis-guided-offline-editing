@@ -201,6 +201,8 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadButton.clicked.connect(
             self.prepare_project_for_offline_editing
         )
+        self.dlg.busy.connect(self.dlg.setBusy)
+        self.dlg.idle.connect(self.dlg.setIdle)
         proj = QgsProject.instance()
         if (proj.projectStorage() is None and proj.fileName() == ''):
             QMessageBox.critical(self.iface.mainWindow(),
@@ -223,6 +225,8 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadButton.clicked.disconnect(
             self.prepare_project_for_offline_editing
         )
+        self.dlg.busy.disconnect(self.dlg.setBusy)
+        self.dlg.idle.disconnect(self.dlg.setIdle)
 
     def refreshLayerList(self):
         """Refresh the layer table."""
@@ -270,6 +274,7 @@ class GuidedOfflineEditingPlugin:
 
     def prepare_project_for_offline_editing(self):
         """Prepare the project for offline editing."""
+        self.dlg.busy.emit()
         self.clock_seq += 1
         with transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
@@ -287,3 +292,4 @@ class GuidedOfflineEditingPlugin:
                 added_layer_ids,
                 containerType=QgsOfflineEditing.GPKG
             )
+        self.dlg.idle.emit()
