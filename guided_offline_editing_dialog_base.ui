@@ -106,5 +106,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>closeButtonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>704</x>
+     <y>544</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1406</x>
+     <y>798</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
