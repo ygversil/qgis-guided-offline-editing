@@ -55,6 +55,9 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.downloadLayerTable.resizeColumnsToContents()
         self.downloadLayerTable.resizeRowsToContents()
 
+    def refresh_offline_layer_list(self, model):
+        self.uploadLayerList.setModel(model)
+
     def selected_row_indices(self):
         """Yield each selected editable layer."""
         yield from (

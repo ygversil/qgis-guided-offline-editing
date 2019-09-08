@@ -24,7 +24,8 @@
 
 import uuid
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtCore import (QSettings, QTranslator, qVersion, QCoreApplication,
+                          QStringListModel)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
@@ -38,6 +39,9 @@ from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .layer_model import PostgresLayer, PostgresLayerTableModel, LAYER_ATTRS
 from .project_context_manager import transactional_project
 import os.path
+
+
+_IS_OFFLINE_EDITABLE = 'isOfflineEditable'
 
 
 class GuidedOfflineEditingPlugin:
@@ -211,8 +215,10 @@ class GuidedOfflineEditingPlugin:
                                          'file first.'))
             return
         self.layer_model = PostgresLayerTableModel()
+        self.offline_layer_model = QStringListModel()
         self.offliner = QgsOfflineEditing()
         self.refreshDownloadableLayerTable()
+        self.refreshOfflineLayerList()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -241,6 +247,16 @@ class GuidedOfflineEditingPlugin:
                                  if k in LAYER_ATTRS})
             )
         self.dlg.refresh_downloadable_layer_table(self.layer_model)
+
+    def refreshOfflineLayerList(self):
+        """Refresh the offline layer list."""
+        proj = QgsProject.instance()
+        offline_layers = [
+            qgs_layer.name() for _, qgs_layer in proj.mapLayers().items()
+            if qgs_layer.customProperty(_IS_OFFLINE_EDITABLE)
+        ]
+        self.offline_layer_model.setStringList(offline_layers)
+        self.dlg.refresh_offline_layer_list(self.offline_layer_model)
 
     def add_selected_layers(self, proj):
         """Add the selected layers to the project legend."""
