@@ -207,6 +207,7 @@ class GuidedOfflineEditingPlugin:
                                  self.tr('No project file'),
                                  self.tr('Please save the project to a '
                                          'file first.'))
+            return
         self.layer_model = PostgresLayerTableModel()
         self.offliner = QgsOfflineEditing()
         self.refreshLayerList()
