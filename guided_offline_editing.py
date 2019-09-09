@@ -24,7 +24,8 @@
 
 import uuid
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtCore import (QSettings, QTranslator, qVersion, QCoreApplication,
+                          QStringListModel)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
@@ -38,6 +39,9 @@ from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .layer_model import PostgresLayer, PostgresLayerTableModel, LAYER_ATTRS
 from .project_context_manager import transactional_project
 import os.path
+
+
+_IS_OFFLINE_EDITABLE = 'isOfflineEditable'
 
 
 class GuidedOfflineEditingPlugin:
@@ -201,6 +205,9 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadButton.clicked.connect(
             self.prepare_project_for_offline_editing
         )
+        self.dlg.uploadButton.clicked.connect(
+            self.synchronize_offline_layers
+        )
         self.dlg.busy.connect(self.dlg.setBusy)
         self.dlg.idle.connect(self.dlg.setIdle)
         proj = QgsProject.instance()
@@ -211,8 +218,11 @@ class GuidedOfflineEditingPlugin:
                                          'file first.'))
             return
         self.layer_model = PostgresLayerTableModel()
+        self.offline_layer_model = QStringListModel()
+        self.offline_layers = dict()
         self.offliner = QgsOfflineEditing()
-        self.refreshLayerList()
+        self.refreshDownloadableLayerTable()
+        self.refreshOfflineLayerList()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -225,11 +235,14 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadButton.clicked.disconnect(
             self.prepare_project_for_offline_editing
         )
+        self.dlg.uploadButton.clicked.disconnect(
+            self.synchronize_offline_layers
+        )
         self.dlg.busy.disconnect(self.dlg.setBusy)
         self.dlg.idle.disconnect(self.dlg.setIdle)
 
-    def refreshLayerList(self):
-        """Refresh the layer table."""
+    def refreshDownloadableLayerTable(self):
+        """Refresh the downloadable layer table."""
         fetch_layers = PostgresLayerDownloader(host='db.priv.ariegenature.fr',
                                                port=5432,
                                                dbname='ana',
@@ -240,7 +253,19 @@ class GuidedOfflineEditingPlugin:
                 PostgresLayer(**{k: v for k, v in layer_dict.items()
                                  if k in LAYER_ATTRS})
             )
-        self.dlg.refresh_layer_table(self.layer_model)
+        self.dlg.refresh_downloadable_layer_table(self.layer_model)
+
+    def refreshOfflineLayerList(self):
+        """Refresh the offline layer list."""
+        proj = QgsProject.instance()
+        self.offline_layers = dict(filter(
+            lambda item: item[1].customProperty(_IS_OFFLINE_EDITABLE),
+            proj.mapLayers().items()
+        ))
+        self.offline_layer_model.setStringList(
+            layer.name() for layer in self.offline_layers.values()
+        )
+        self.dlg.refresh_offline_layer_list(self.offline_layer_model)
 
     def add_selected_layers(self, proj):
         """Add the selected layers to the project legend."""
@@ -292,4 +317,11 @@ class GuidedOfflineEditingPlugin:
                 added_layer_ids,
                 containerType=QgsOfflineEditing.GPKG
             )
+        self.dlg.idle.emit()
+
+    def synchronize_offline_layers(self):
+        """Synchronize offline layers."""
+        self.dlg.busy.emit()
+        with transactional_project(self.iface):
+            self.offliner.synchronize()
         self.dlg.idle.emit()

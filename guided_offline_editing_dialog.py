@@ -50,10 +50,13 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
 
-    def refresh_layer_table(self, model):
+    def refresh_downloadable_layer_table(self, model):
         self.downloadLayerTable.setModel(model)
         self.downloadLayerTable.resizeColumnsToContents()
         self.downloadLayerTable.resizeRowsToContents()
+
+    def refresh_offline_layer_list(self, model):
+        self.uploadLayerList.setModel(model)
 
     def selected_row_indices(self):
         """Yield each selected editable layer."""

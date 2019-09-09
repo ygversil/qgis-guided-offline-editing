@@ -66,12 +66,19 @@
        <item>
         <widget class="QLabel" name="uploadLayerlabel">
          <property name="text">
-          <string>Layers to be sent</string>
+          <string>Offline layers</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="uploadLayerList"/>
+        <widget class="QListView" name="uploadLayerList">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="uploadButton">
