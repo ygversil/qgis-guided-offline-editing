@@ -205,6 +205,9 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadButton.clicked.connect(
             self.prepare_project_for_offline_editing
         )
+        self.dlg.uploadButton.clicked.connect(
+            self.synchronize_offline_layers
+        )
         self.dlg.busy.connect(self.dlg.setBusy)
         self.dlg.idle.connect(self.dlg.setIdle)
         proj = QgsProject.instance()
@@ -231,6 +234,9 @@ class GuidedOfflineEditingPlugin:
             pass
         self.dlg.downloadButton.clicked.disconnect(
             self.prepare_project_for_offline_editing
+        )
+        self.dlg.uploadButton.clicked.disconnect(
+            self.synchronize_offline_layers
         )
         self.dlg.busy.disconnect(self.dlg.setBusy)
         self.dlg.idle.disconnect(self.dlg.setIdle)
@@ -311,4 +317,11 @@ class GuidedOfflineEditingPlugin:
                 added_layer_ids,
                 containerType=QgsOfflineEditing.GPKG
             )
+        self.dlg.idle.emit()
+
+    def synchronize_offline_layers(self):
+        """Synchronize offline layers."""
+        self.dlg.busy.emit()
+        with transactional_project(self.iface):
+            self.offliner.synchronize()
         self.dlg.idle.emit()
