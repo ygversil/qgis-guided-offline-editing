@@ -216,6 +216,7 @@ class GuidedOfflineEditingPlugin:
             return
         self.layer_model = PostgresLayerTableModel()
         self.offline_layer_model = QStringListModel()
+        self.offline_layers = dict()
         self.offliner = QgsOfflineEditing()
         self.refreshDownloadableLayerTable()
         self.refreshOfflineLayerList()
@@ -251,11 +252,13 @@ class GuidedOfflineEditingPlugin:
     def refreshOfflineLayerList(self):
         """Refresh the offline layer list."""
         proj = QgsProject.instance()
-        offline_layers = [
-            qgs_layer.name() for _, qgs_layer in proj.mapLayers().items()
-            if qgs_layer.customProperty(_IS_OFFLINE_EDITABLE)
-        ]
-        self.offline_layer_model.setStringList(offline_layers)
+        self.offline_layers = dict(filter(
+            lambda item: item[1].customProperty(_IS_OFFLINE_EDITABLE),
+            proj.mapLayers().items()
+        ))
+        self.offline_layer_model.setStringList(
+            layer.name() for layer in self.offline_layers.values()
+        )
         self.dlg.refresh_offline_layer_list(self.offline_layer_model)
 
     def add_selected_layers(self, proj):
