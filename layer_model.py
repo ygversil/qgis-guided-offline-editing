@@ -178,3 +178,26 @@ class OfflineLayerListModel(QObject):
                     geometry_type=None,
                 )
             )
+
+    def synced_layer_ids(self):
+        """Yield each layer ids that was synchronized online after offline."""
+        proj = QgsProject.instance()
+        for _, qgs_layer in proj.mapLayers().items():
+            if qgs_layer.customProperty(_IS_OFFLINE_EDITABLE):
+                continue
+            provider = qgs_layer.dataProvider()
+            if provider.name() != 'postgres':
+                continue
+            uri = QgsDataSourceUri(provider.dataSourceUri())
+            pg_layer = PostgresLayer(
+                lid=None, title=None, comments=None,
+                schema_name=uri.schema(),
+                table_name=uri.table(),
+                geometry_column=uri.geometryColumn(),
+                geometry_srid=None,
+                geometry_type=None,
+
+            )
+            if any(offline_layer == pg_layer
+                   for offline_layer in self._pg_layers):
+                yield qgs_layer.id()
