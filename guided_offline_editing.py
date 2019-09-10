@@ -303,7 +303,8 @@ class GuidedOfflineEditingPlugin:
         self.dlg.idle.emit()
 
     def synchronize_offline_layers(self):
-        """Synchronize offline layers."""
+        """Send edited data from offline layers to postgres and convert the
+        project back to offline."""
         self.dlg.busy.emit()
         with transactional_project(self.iface):
             self.offliner.synchronize()
