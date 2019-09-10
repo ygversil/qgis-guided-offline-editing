@@ -35,7 +35,7 @@ from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .layer_model import OfflineLayerListModel, PostgresLayerTableModel
-from .project_context_manager import busy_dialog, transactional_project
+from .context_managers import busy_dialog, transactional_project
 import os.path
 
 
