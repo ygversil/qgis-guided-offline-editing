@@ -307,6 +307,7 @@ class GuidedOfflineEditingPlugin:
         with busy_dialog(self.dlg, self.offline_layer_model), \
                 transactional_project(self.iface) as proj:
             self.offliner.synchronize()
+            self.clock_seq = 0
             synced_layer_ids = list(self.offline_layer_model
                                     .synced_layer_ids())
             self.convert_layers_to_offline(proj, synced_layer_ids)
