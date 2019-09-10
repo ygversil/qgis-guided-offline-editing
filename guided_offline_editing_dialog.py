@@ -49,9 +49,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.downloadable_layer_model = None
 
-    def refresh_downloadable_layer_table(self, model):
-        self.downloadLayerTable.setModel(model)
+    def refresh_downloadable_layer_table(self):
+        self.downloadLayerTable.setModel(self.downloadable_layer_model)
         self.downloadLayerTable.resizeColumnsToContents()
         self.downloadLayerTable.resizeRowsToContents()
 
@@ -77,3 +78,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.downloadButton.setEnabled(True)
         self.uploadButton.setEnabled(True)
         QtWidgets.QApplication.restoreOverrideCursor()
+
+    def set_downloadable_layer_model(self, model):
+        """Link to the given ``PostgresLayerTableModel`` instance."""
+        self.downloadable_layer_model = model

@@ -24,8 +24,10 @@
 
 from collections import OrderedDict, namedtuple
 
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt
+from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt, pyqtSignal
 from qgis.core import QgsDataSourceUri, QgsProject
+
+from .db_manager import PostgresLayerDownloader
 
 
 _REMOTE_PROVIDER = 'remoteProvider'
@@ -62,6 +64,8 @@ def _same_layer(pg_layer, qgs_layer):
 
 class PostgresLayerTableModel(QAbstractTableModel):
     """Qt table model representing available editable layers."""
+
+    model_changed = pyqtSignal()
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent, **kwargs)
@@ -110,6 +114,17 @@ class PostgresLayerTableModel(QAbstractTableModel):
         else:
             return super().flags(index)
 
-    def addLayer(self, layer):
-        """Add the given layer to the list of available editable layers."""
-        self.available_layers.append(layer)
+    def refresh_layers(self):
+        """Refresh the available layers list from PostgreSQL database."""
+        self.available_layers.clear()
+        fetch_layers = PostgresLayerDownloader(host='db.priv.ariegenature.fr',
+                                               port=5432,
+                                               dbname='ana',
+                                               schema='common',
+                                               authcfg='ldapana')
+        for layer_dict in fetch_layers():
+            self.available_layers.append(
+                PostgresLayer(**{k: v for k, v in layer_dict.items()
+                                 if k in LAYER_ATTRS})
+            )
+        self.model_changed.emit()

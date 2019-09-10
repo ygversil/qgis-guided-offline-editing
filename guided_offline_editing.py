@@ -31,12 +31,11 @@ from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
 
 
-from .db_manager import PostgresLayerDownloader
 # Initialize Qt resources from file resources.py
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
-from .layer_model import PostgresLayer, PostgresLayerTableModel, LAYER_ATTRS
+from .layer_model import PostgresLayerTableModel
 from .project_context_manager import transactional_project
 import os.path
 
@@ -217,11 +216,15 @@ class GuidedOfflineEditingPlugin:
                                  self.tr('Please save the project to a '
                                          'file first.'))
             return
-        self.layer_model = PostgresLayerTableModel()
+        self.downloadable_layer_model = PostgresLayerTableModel()
+        self.dlg.set_downloadable_layer_model(self.downloadable_layer_model)
+        self.downloadable_layer_model.model_changed.connect(
+            self.dlg.refresh_downloadable_layer_table
+        )
+        self.downloadable_layer_model.refresh_layers()
         self.offline_layer_model = QStringListModel()
         self.offline_layers = dict()
         self.offliner = QgsOfflineEditing()
-        self.refreshDownloadableLayerTable()
         self.refreshOfflineLayerList()
         # show the dialog
         self.dlg.show()
@@ -240,20 +243,9 @@ class GuidedOfflineEditingPlugin:
         )
         self.dlg.busy.disconnect(self.dlg.setBusy)
         self.dlg.idle.disconnect(self.dlg.setIdle)
-
-    def refreshDownloadableLayerTable(self):
-        """Refresh the downloadable layer table."""
-        fetch_layers = PostgresLayerDownloader(host='db.priv.ariegenature.fr',
-                                               port=5432,
-                                               dbname='ana',
-                                               schema='common',
-                                               authcfg='ldapana')
-        for layer_dict in fetch_layers():
-            self.layer_model.addLayer(
-                PostgresLayer(**{k: v for k, v in layer_dict.items()
-                                 if k in LAYER_ATTRS})
-            )
-        self.dlg.refresh_downloadable_layer_table(self.layer_model)
+        self.downloadable_layer_model.model_changed.disconnect(
+            self.dlg.refresh_downloadable_layer_table
+        )
 
     def refreshOfflineLayerList(self):
         """Refresh the offline layer list."""
@@ -271,7 +263,7 @@ class GuidedOfflineEditingPlugin:
         """Add the selected layers to the project legend."""
         added_layer_ids = []
         for i in self.dlg.selected_row_indices():
-            pg_layer = self.layer_model.available_layers[i]
+            pg_layer = self.downloadable_layer_model.available_layers[i]
             qgs_layer = QgsVectorLayer(
                 "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
                 'table="{schema}"."{table}" ({geom})'
