@@ -51,7 +51,7 @@ _DISPLAYED_ATTRS = tuple(k for k, v in _LAYER_TABLE_HEADERS.items() if v)
 PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
 
 
-def _same_layer(pg_layer, qgs_layer):
+def _comes_from(qgs_layer, pg_layer):
     """Returns ``True`` if the given QGIS Layer comes from the given
     PostgresLayer, that is if they have same schema, name, and geom column."""
     remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
@@ -110,7 +110,7 @@ class PostgresLayerTableModel(QAbstractTableModel):
         """Returns the item flags for the given index."""
         proj = QgsProject.instance()
         pg_layer = self.available_layers[index.row()]
-        if any(map(lambda qgs_layer: _same_layer(pg_layer, qgs_layer),
+        if any(map(lambda qgs_layer: _comes_from(qgs_layer, pg_layer),
                proj.mapLayers().values())):
             return Qt.NoItemFlags
         else:
