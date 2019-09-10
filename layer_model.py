@@ -144,6 +144,7 @@ class OfflineLayerListModel(QObject):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.offline_layers = dict()
+        self._pg_layers = []
         self.model = QStringListModel()
 
     def refresh_layers(self):
@@ -157,4 +158,23 @@ class OfflineLayerListModel(QObject):
         self.model.setStringList(
             layer.name() for layer in self.offline_layers.values()
         )
+        self.save_to_pg_layers()
         self.model_changed.emit()
+
+    def save_to_pg_layers(self):
+        """Save information about offline layers to list of ``PostgresLayer``
+        instances."""
+        self._pg_layers.clear()
+        for qgs_layer in self.offline_layers.values():
+            remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
+            uri = QgsDataSourceUri(remote_source)
+            self._pg_layers.append(
+                PostgresLayer(
+                    lid=None, title=None, comments=None,
+                    schema_name=uri.schema(),
+                    table_name=uri.table(),
+                    geometry_column=uri.geometryColumn(),
+                    geometry_srid=None,
+                    geometry_type=None,
+                )
+            )
