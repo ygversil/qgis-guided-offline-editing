@@ -35,7 +35,7 @@ from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .layer_model import OfflineLayerListModel, PostgresLayerTableModel
-from .project_context_manager import transactional_project
+from .project_context_manager import busy_dialog, transactional_project
 import os.path
 
 
@@ -294,22 +294,19 @@ class GuidedOfflineEditingPlugin:
 
     def add_pg_layers_and_convert_to_offline(self):
         """Prepare the project for offline editing."""
-        self.dlg.busy.emit()
         self.clock_seq += 1
-        with transactional_project(self.iface) as proj:
+        with busy_dialog(self.dlg, self.offline_layer_model), \
+                transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
             added_layer_ids = list(self.add_selected_layers(proj))
             self.convert_layers_to_offline(proj, added_layer_ids)
-        self.dlg.idle.emit()
 
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        self.dlg.busy.emit()
-        with transactional_project(self.iface):
+        with busy_dialog(self.dlg, self.offline_layer_model), \
+                transactional_project(self.iface) as proj:
             self.offliner.synchronize()
-        with transactional_project(self.iface) as proj:
             synced_layer_ids = list(self.offline_layer_model
                                     .synced_layer_ids())
             self.convert_layers_to_offline(proj, synced_layer_ids)
-        self.dlg.idle.emit()

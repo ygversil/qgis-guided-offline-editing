@@ -28,6 +28,26 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
+def busy_dialog(dlg, *models):
+    """Context manager that put dialog in busy state and ensure that it returns
+    to idle state on exit.
+
+    It also refresh layers from any given model.
+    """
+    dlg.busy.emit()
+    try:
+        yield
+    except Exception as exc:
+        QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
+                                 'Extensions',
+                                 Qgis.Critical)
+    finally:
+        for model in models:
+            model.refresh_layers()
+        dlg.idle.emit()
+
+
+@contextmanager
 def transactional_project(iface):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
