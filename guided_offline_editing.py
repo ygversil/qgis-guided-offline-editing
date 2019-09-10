@@ -24,8 +24,7 @@
 
 import uuid
 
-from PyQt5.QtCore import (QSettings, QTranslator, qVersion, QCoreApplication,
-                          QStringListModel)
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
@@ -35,12 +34,9 @@ from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
-from .layer_model import PostgresLayerTableModel
+from .layer_model import OfflineLayerListModel, PostgresLayerTableModel
 from .project_context_manager import transactional_project
 import os.path
-
-
-_IS_OFFLINE_EDITABLE = 'isOfflineEditable'
 
 
 class GuidedOfflineEditingPlugin:
@@ -222,10 +218,13 @@ class GuidedOfflineEditingPlugin:
             self.dlg.refresh_downloadable_layer_table
         )
         self.downloadable_layer_model.refresh_layers()
-        self.offline_layer_model = QStringListModel()
-        self.offline_layers = dict()
+        self.offline_layer_model = OfflineLayerListModel()
+        self.dlg.set_offline_layer_model(self.offline_layer_model)
+        self.offline_layer_model.model_changed.connect(
+            self.dlg.refresh_offline_layer_list
+        )
+        self.offline_layer_model.refresh_layers()
         self.offliner = QgsOfflineEditing()
-        self.refreshOfflineLayerList()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -246,18 +245,9 @@ class GuidedOfflineEditingPlugin:
         self.downloadable_layer_model.model_changed.disconnect(
             self.dlg.refresh_downloadable_layer_table
         )
-
-    def refreshOfflineLayerList(self):
-        """Refresh the offline layer list."""
-        proj = QgsProject.instance()
-        self.offline_layers = dict(filter(
-            lambda item: item[1].customProperty(_IS_OFFLINE_EDITABLE),
-            proj.mapLayers().items()
-        ))
-        self.offline_layer_model.setStringList(
-            layer.name() for layer in self.offline_layers.values()
+        self.offline_layer_model.model_changed.disconnect(
+            self.dlg.refresh_offline_layer_list
         )
-        self.dlg.refresh_offline_layer_list(self.offline_layer_model)
 
     def add_selected_layers(self, proj):
         """Add the selected layers to the project legend."""

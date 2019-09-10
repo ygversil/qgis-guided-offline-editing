@@ -50,14 +50,15 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self.downloadable_layer_model = None
+        self.offline_layer_model = None
 
     def refresh_downloadable_layer_table(self):
         self.downloadLayerTable.setModel(self.downloadable_layer_model)
         self.downloadLayerTable.resizeColumnsToContents()
         self.downloadLayerTable.resizeRowsToContents()
 
-    def refresh_offline_layer_list(self, model):
-        self.uploadLayerList.setModel(model)
+    def refresh_offline_layer_list(self):
+        self.uploadLayerList.setModel(self.offline_layer_model)
 
     def selected_row_indices(self):
         """Yield each selected editable layer."""
@@ -82,3 +83,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def set_downloadable_layer_model(self, model):
         """Link to the given ``PostgresLayerTableModel`` instance."""
         self.downloadable_layer_model = model
+
+    def set_offline_layer_model(self, model):
+        """Link to the given ``OfflineLayerListModel`` instance."""
+        self.offline_layer_model = model.model

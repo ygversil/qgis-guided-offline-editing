@@ -24,12 +24,14 @@
 
 from collections import OrderedDict, namedtuple
 
-from PyQt5.QtCore import QAbstractTableModel, QVariant, Qt, pyqtSignal
+from PyQt5.QtCore import (QAbstractTableModel, QObject, QStringListModel,
+                          QVariant, Qt, pyqtSignal)
 from qgis.core import QgsDataSourceUri, QgsProject
 
 from .db_manager import PostgresLayerDownloader
 
 
+_IS_OFFLINE_EDITABLE = 'isOfflineEditable'
 _REMOTE_PROVIDER = 'remoteProvider'
 _REMOTE_SOURCE = 'remoteSource'
 _LAYER_TABLE_HEADERS = OrderedDict((
@@ -127,4 +129,28 @@ class PostgresLayerTableModel(QAbstractTableModel):
                 PostgresLayer(**{k: v for k, v in layer_dict.items()
                                  if k in LAYER_ATTRS})
             )
+        self.model_changed.emit()
+
+
+class OfflineLayerListModel(QObject):
+    """Represents offline layers in a QGIS project."""
+
+    model_changed = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.offline_layers = dict()
+        self.model = QStringListModel()
+
+    def refresh_layers(self):
+        """Refresh the offline layers dict from QGIS project legend."""
+        self.offline_layers.clear()
+        proj = QgsProject.instance()
+        self.offline_layers.update(filter(
+            lambda item: item[1].customProperty(_IS_OFFLINE_EDITABLE),
+            proj.mapLayers().items()
+        ))
+        self.model.setStringList(
+            layer.name() for layer in self.offline_layers.values()
+        )
         self.model_changed.emit()
