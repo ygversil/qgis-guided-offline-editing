@@ -198,7 +198,7 @@ class GuidedOfflineEditingPlugin:
             self.dlg = GuidedOfflineEditingPluginDialog()
             self.clock_seq = 0
         self.dlg.downloadButton.clicked.connect(
-            self.prepare_project_for_offline_editing
+            self.add_pg_layers_and_convert_to_offline
         )
         self.dlg.uploadButton.clicked.connect(
             self.synchronize_offline_layers
@@ -235,7 +235,7 @@ class GuidedOfflineEditingPlugin:
             # and substitute with your code.
             pass
         self.dlg.downloadButton.clicked.disconnect(
-            self.prepare_project_for_offline_editing
+            self.add_pg_layers_and_convert_to_offline
         )
         self.dlg.uploadButton.clicked.disconnect(
             self.synchronize_offline_layers
@@ -292,7 +292,7 @@ class GuidedOfflineEditingPlugin:
             containerType=QgsOfflineEditing.GPKG
         )
 
-    def prepare_project_for_offline_editing(self):
+    def add_pg_layers_and_convert_to_offline(self):
         """Prepare the project for offline editing."""
         self.dlg.busy.emit()
         self.clock_seq += 1
