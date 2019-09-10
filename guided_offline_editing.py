@@ -253,7 +253,7 @@ class GuidedOfflineEditingPlugin:
         """Add the selected layers to the project legend."""
         added_layer_ids = []
         for i in self.dlg.selected_row_indices():
-            pg_layer = self.downloadable_layer_model.available_layers[i]
+            pg_layer = self.downloadable_layer_model.layer_at_row(i)
             qgs_layer = QgsVectorLayer(
                 "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
                 'table="{schema}"."{table}" ({geom})'

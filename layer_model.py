@@ -131,6 +131,10 @@ class PostgresLayerTableModel(QAbstractTableModel):
             )
         self.model_changed.emit()
 
+    def layer_at_row(self, i):
+        """Return the ``PostgresLayer`` instance at the given row number."""
+        return self.available_layers[i]
+
 
 class OfflineLayerListModel(QObject):
     """Represents offline layers in a QGIS project."""
