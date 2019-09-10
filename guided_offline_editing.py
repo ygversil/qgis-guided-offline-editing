@@ -251,7 +251,6 @@ class GuidedOfflineEditingPlugin:
 
     def add_selected_layers(self, proj):
         """Add the selected layers to the project legend."""
-        added_layer_ids = []
         for i in self.dlg.selected_row_indices():
             pg_layer = self.downloadable_layer_model.layer_at_row(i)
             qgs_layer = QgsVectorLayer(
@@ -276,8 +275,7 @@ class GuidedOfflineEditingPlugin:
                 )
                 raise RuntimeError('Cannot add layer '
                                    '"{}"'.format(pg_layer.title))
-            added_layer_ids.append(added_layer.id())
-        return added_layer_ids
+            yield added_layer.id()
 
     def prepare_project_for_offline_editing(self):
         """Prepare the project for offline editing."""
@@ -285,7 +283,7 @@ class GuidedOfflineEditingPlugin:
         self.clock_seq += 1
         with transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
-            added_layer_ids = self.add_selected_layers(proj)
+            added_layer_ids = list(self.add_selected_layers(proj))
             # XXX: if called multiple times for the same QGIS project, this
             # works because, as of QGIS 3.8, the convertToOfflineProject
             # method does not check if the project is already an offline
