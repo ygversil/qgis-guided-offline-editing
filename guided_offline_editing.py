@@ -277,6 +277,21 @@ class GuidedOfflineEditingPlugin:
                                    '"{}"'.format(pg_layer.title))
             yield added_layer.id()
 
+    def convert_layers_to_offline(self, proj, layer_ids):
+        # XXX: if called multiple times for the same QGIS project, this
+        # works because, as of QGIS 3.8, the convertToOfflineProject
+        # method does not check if the project is already an offline
+        # project. So new layers can be converted offline although the
+        # project is already offline himself.
+        self.offliner.convertToOfflineProject(
+            proj.absolutePath(),
+            'offline-{id_}.gpkg'.format(
+                id_=uuid.uuid1(clock_seq=self.clock_seq)
+            ),
+            layer_ids,
+            containerType=QgsOfflineEditing.GPKG
+        )
+
     def prepare_project_for_offline_editing(self):
         """Prepare the project for offline editing."""
         self.dlg.busy.emit()
@@ -284,19 +299,7 @@ class GuidedOfflineEditingPlugin:
         with transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
             added_layer_ids = list(self.add_selected_layers(proj))
-            # XXX: if called multiple times for the same QGIS project, this
-            # works because, as of QGIS 3.8, the convertToOfflineProject
-            # method does not check if the project is already an offline
-            # project. So new layers can be converted offline although the
-            # project is already offline himself.
-            self.offliner.convertToOfflineProject(
-                proj.absolutePath(),
-                'offline-{id_}.gpkg'.format(
-                    id_=uuid.uuid1(clock_seq=self.clock_seq)
-                ),
-                added_layer_ids,
-                containerType=QgsOfflineEditing.GPKG
-            )
+            self.convert_layers_to_offline(proj, added_layer_ids)
         self.dlg.idle.emit()
 
     def synchronize_offline_layers(self):
