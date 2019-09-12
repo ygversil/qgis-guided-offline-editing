@@ -28,7 +28,7 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def busy_dialog(dlg, *models):
+def busy_dialog(dlg, models_to_clear=None, models_to_refresh=None):
     """Context manager that put dialog in busy state and ensure that it returns
     to idle state on exit.
 
@@ -42,7 +42,11 @@ def busy_dialog(dlg, *models):
                                  'Extensions',
                                  Qgis.Critical)
     finally:
-        for model in models:
+        models_to_clear = models_to_clear or []
+        for model in models_to_clear:
+            model.clearSelection()
+        models_to_refresh = models_to_refresh or []
+        for model in models_to_refresh:
             model.refresh_layers()
         dlg.idle.emit()
 

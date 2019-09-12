@@ -295,7 +295,9 @@ class GuidedOfflineEditingPlugin:
     def add_pg_layers_and_convert_to_offline(self):
         """Prepare the project for offline editing."""
         self.clock_seq += 1
-        with busy_dialog(self.dlg, self.offline_layer_model), \
+        with busy_dialog(self.dlg,
+                         models_to_clear=[self.downloadable_layer_model],
+                         models_to_refresh=[self.offline_layer_model]), \
                 transactional_project(self.iface) as proj:
             proj.setTitle(proj.title().replace(' (offline)', ''))
             added_layer_ids = list(self.add_selected_layers(proj))
@@ -304,7 +306,8 @@ class GuidedOfflineEditingPlugin:
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        with busy_dialog(self.dlg, self.offline_layer_model), \
+        with busy_dialog(self.dlg,
+                         models_to_refresh=[self.offline_layer_model]), \
                 transactional_project(self.iface) as proj:
             self.offliner.synchronize()
             self.clock_seq = 0
