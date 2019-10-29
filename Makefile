@@ -51,7 +51,7 @@ UI_FILES = guided_offline_editing_dialog_base.ui
 
 EXTRAS = metadata.txt
 
-EXTRA_DIRS = icons
+EXTRA_DIRS = i18n icons
 
 COMPILED_RESOURCE_FILES = resources.py
 
