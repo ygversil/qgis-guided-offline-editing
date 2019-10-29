@@ -26,7 +26,7 @@ import uuid
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QMessageBox
+from PyQt5.QtWidgets import QAction
 from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
 
 
@@ -205,13 +205,6 @@ class GuidedOfflineEditingPlugin:
         )
         self.dlg.busy.connect(self.dlg.setBusy)
         self.dlg.idle.connect(self.dlg.setIdle)
-        proj = QgsProject.instance()
-        if (proj.projectStorage() is None and proj.fileName() == ''):
-            QMessageBox.critical(self.iface.mainWindow(),
-                                 self.tr('No project file'),
-                                 self.tr('Please save the project to a '
-                                         'file first.'))
-            return
         self.downloadable_layer_model = PostgresLayerTableModel()
         self.dlg.set_downloadable_layer_model(self.downloadable_layer_model)
         self.downloadable_layer_model.model_changed.connect(
