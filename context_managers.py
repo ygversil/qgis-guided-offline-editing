@@ -40,7 +40,7 @@ def busy_dialog(dlg, models_to_clear=None, models_to_refresh=None):
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
-                                 Qgis.Critical)
+                                 level=Qgis.Critical)
     finally:
         models_to_clear = models_to_clear or []
         for model in models_to_clear:
@@ -69,23 +69,23 @@ def transactional_project(iface):
         QgsMessageLog.logMessage('GuidedOfflineEditing: project has not been '
                                  'saved before transaction.'
                                  'Extensions',
-                                 Qgis.Warning)
+                                 level=Qgis.Warning)
     try:
         yield proj
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
-                                 Qgis.Critical)
+                                 level=Qgis.Critical)
         QgsMessageLog.logMessage('GuidedOfflineEditing: an error occured, '
                                  "project not saved.",
                                  'Extensions',
-                                 Qgis.Critical)
+                                 level=Qgis.Critical)
     finally:
         project_saved = proj.write()
         if not project_saved:
             QgsMessageLog.logMessage('GuidedOfflineEditing: project has not '
                                      'been saved after transaction.'
                                      'Extensions',
-                                     Qgis.Warning)
+                                     level=Qgis.Warning)
         # XXX: better way to avoid warning if the user click save ?
         iface.addProject(proj.fileName())
