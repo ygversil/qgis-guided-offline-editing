@@ -22,44 +22,74 @@
  ***************************************************************************/
 """
 
+from collections import namedtuple
 from collections.abc import Callable
+from urllib.parse import (urlunparse as build_url,
+                          urlencode as build_url_query)
 
-from psycopg2.extras import DictCursor
-from qgis.core import QgsDataSourceUri
-import psycopg2
+from qgis.core import QgsApplication
 
 
-class PostgresLayerDownloader(Callable):
+PG_PROJECT_STORAGE_TYPE = 'postgresql'
+GPKG_PROJECT_STORAGE_TYPE = 'geopackage'
+
+
+UrlParts = namedtuple('UrlParts', ('scheme', 'netloc', 'path', 'parameters',
+                                   'query', 'fragment'))
+
+
+def build_pg_project_url(authcfg, sslmode, host, port, dbname, schema,
+                         project=None):
+    """Returns a ``postgresql://`` URL with given parameters that can be used
+    to open or list QGIS projects saved in PostgreSQL."""
+    query_params = (
+        ('authcfg', authcfg),
+        ('sslmode', sslmode),
+        ('dbname', dbname),
+        ('schema', schema),
+    )
+    if project:
+        query_params += (
+            ('project', project),
+        )
+    return build_url(
+        UrlParts(scheme=PG_PROJECT_STORAGE_TYPE,
+                 netloc='{host}:{port}'.format(host=host, port=port),
+                 path='',
+                 parameters='',
+                 query=build_url_query(query_params),
+                 fragment='')
+    )
+
+
+def build_gpkg_project_url(gpkg_path, project=None):
+    """Returns a ``geopackage://`` URL with given parameters that can be used
+    to open or list QGIS projects saved in GeoPackage."""
+    if project:
+        query_params = (
+            ('projectName', project),
+        )
+    return build_url(
+        UrlParts(scheme=GPKG_PROJECT_STORAGE_TYPE,
+                 netloc='',
+                 path=gpkg_path,
+                 parameters='',
+                 query=build_url_query(query_params),
+                 fragment='')
+    )
+
+
+class PostgresProjectDownloader(Callable):
     """Wraps just enough to connect to a PostgreSQL database using QGIS3 new
     authentication system and download list of editable layers."""
 
     def __init__(self, host='localhost', port=5432, dbname='qgis',
-                 schema='common', authcfg='authorg'):
-        uri = QgsDataSourceUri()
-        uri.setConnection(aHost=host, aPort=str(port), aDatabase=dbname,
-                          aUsername='', aPassword='', authConfigId=authcfg)
-        self.conn_info = uri.connectionInfo(True)
-        self.editable_layer_schema = schema
+                 schema='qgis', authcfg='authorg', sslmode='disable'):
+        self.url = build_pg_project_url(authcfg=authcfg, sslmode=sslmode,
+                                        host=host, port=port, dbname=dbname,
+                                        schema=schema)
 
     def __call__(self):
-        with psycopg2.connect(self.conn_info) as conn, \
-                conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(
-                "select lyr.lid, "
-                "lyr.legend_title as title, "
-                "obj_description("
-                "format('%s.%s', lyr.schema_name, lyr.table_name)::regclass"
-                ") as comments, "
-                "lyr.schema_name, "
-                "lyr.table_name, "
-                "geom.f_geometry_column as geometry_column, "
-                "geom.srid as geometry_srid, "
-                "geom.type as geometry_type "
-                "from {schema}.editable_layer as lyr "
-                "left join geometry_columns as geom "
-                "on (lyr.schema_name, lyr.table_name) = "
-                "(geom.f_table_schema, geom.f_table_name)".format(
-                    schema=self.editable_layer_schema,
-                )
-            )
-            yield from cur
+        pg_pstore = (QgsApplication.projectStorageRegistry().
+                     projectStorageFromType(PG_PROJECT_STORAGE_TYPE))
+        yield from pg_pstore.listProjects(self.url)

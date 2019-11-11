@@ -27,6 +27,7 @@ import os
 from PyQt5 import uic
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5 import QtWidgets
+from qgis.gui import QgsFileWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the
 # elements from Qt Designer
@@ -49,41 +50,58 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.downloadable_layer_model = None
+        self.pgProjectDestFileWidget.setStorageMode(QgsFileWidget.SaveFile)
+        self.pg_project_model = None
         self.offline_layer_model = None
 
-    def refresh_downloadable_layer_table(self):
-        self.downloadLayerTable.setModel(self.downloadable_layer_model)
-        self.downloadLayerTable.resizeColumnsToContents()
-        self.downloadLayerTable.resizeRowsToContents()
+    def pg_project_selection_model(self):
+        """Return the selection model from the themes table."""
+        return self.pgProjectList.selectionModel()
+
+    def refresh_pg_project_list(self):
+        self.pgProjectList.setModel(self.pg_project_model.model)
 
     def refresh_offline_layer_list(self):
-        self.uploadLayerList.setModel(self.offline_layer_model)
+        self.offlineLayerList.setModel(self.offline_layer_model)
 
-    def selected_row_indices(self):
-        """Yield each selected editable layer."""
-        yield from (
-            index.row()
-            for index in self.downloadLayerTable.selectionModel()
-            .selectedRows()
-        )
+    def selected_destination_path(self):
+        """Return the selected destination file or ``None`` if no destination
+        file has been selected."""
+        return self.pgProjectDestFileWidget.filePath() or None
 
-    def setBusy(self):
+    def selected_pg_project(self):
+        """Return the selected project name or ``None`` if no project is
+        selected."""
+        selected_rows = self.pg_project_selection_model().selectedRows()
+        if selected_rows:
+            return self.pg_project_model.project_at_index(selected_rows[0])
+        else:
+            return None
+
+    def set_busy(self):
         """Show busy interface: set waiting cursor and disable buttons."""
         self.downloadButton.setEnabled(False)
         self.uploadButton.setEnabled(False)
         QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
 
-    def setIdle(self):
+    def set_idle(self):
         """Show idle interface: set normal cursir and enable buttons."""
         self.downloadButton.setEnabled(True)
         self.uploadButton.setEnabled(True)
         QtWidgets.QApplication.restoreOverrideCursor()
 
-    def set_downloadable_layer_model(self, model):
-        """Link to the given ``PostgresLayerTableModel`` instance."""
-        self.downloadable_layer_model = model
-
     def set_offline_layer_model(self, model):
         """Link to the given ``OfflineLayerListModel`` instance."""
         self.offline_layer_model = model.model
+
+    def set_pg_project_model(self, model):
+        """Link to the given ``PostgresPorjectListModel`` instance."""
+        self.pg_project_model = model
+
+    def update_download_button_state(self, model):
+        """Set the download button enable or disable depending on UI state."""
+        if (not self.selected_pg_project or
+                not self.selected_destination_path()):
+            self.downloadButton.setEnabled(False)
+        else:
+            self.downloadButton.setEnabled(True)

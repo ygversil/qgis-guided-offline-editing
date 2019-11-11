@@ -14,6 +14,26 @@
    <string>Guided Offline Editing Plugin</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="dbTitleLabel">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Guided Offline Editing</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -27,26 +47,39 @@
       <attribute name="title">
        <string>Download</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QLabel" name="downloadLayerLabel">
+        <widget class="QLabel" name="pgProjectLabel">
          <property name="text">
-          <string>Select layers to edit</string>
+          <string>Select project to download</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTableView" name="downloadLayerTable">
-         <property name="selectionMode">
-          <enum>QAbstractItemView::MultiSelection</enum>
+        <widget class="QListView" name="pgProjectList"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="pgProjectDestFileLabel">
+         <property name="text">
+          <string>Destination file</string>
          </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsFileWidget" name="pgProjectDestFileWidget">
+         <property name="dialogTitle">
+          <string>Select a file for projet and layers</string>
+         </property>
+         <property name="filter">
+          <string>GeoPackage (*.gpkg)</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="downloadButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Download</string>
          </property>
@@ -64,14 +97,17 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="uploadLayerlabel">
+        <widget class="QLabel" name="offlineLayerlabel">
          <property name="text">
           <string>Offline layers</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QListView" name="uploadLayerList">
+        <widget class="QListView" name="offlineLayerList">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::NoSelection</enum>
          </property>
@@ -82,6 +118,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="uploadButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Upload</string>
          </property>
@@ -98,28 +137,15 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="dbTitleLable">
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::PlainText</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsFileWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsfilewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

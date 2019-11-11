@@ -23,12 +23,13 @@
 """
 
 from contextlib import contextmanager
+import traceback
 
 from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def busy_dialog(dlg, models_to_clear=None, models_to_refresh=None):
+def busy_dialog(dlg, selections_to_clear=None, models_to_refresh=None):
     """Context manager that put dialog in busy state and ensure that it returns
     to idle state on exit.
 
@@ -41,51 +42,62 @@ def busy_dialog(dlg, models_to_clear=None, models_to_refresh=None):
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
                                  level=Qgis.Critical)
+        QgsMessageLog.logMessage(
+            'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
+            'Extensions',
+            level=Qgis.Critical)
     finally:
-        models_to_clear = models_to_clear or []
-        for model in models_to_clear:
-            model.clearSelection()
+        selections_to_clear = selections_to_clear or []
+        for selection_model in selections_to_clear:
+            selection_model.clearSelection()
         models_to_refresh = models_to_refresh or []
         for model in models_to_refresh:
-            model.refresh_layers()
+            model.refresh_data()
         dlg.idle.emit()
 
 
 @contextmanager
-def transactional_project(iface):
+def transactional_project(dest_url=None):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
 
-    The project is also saved before the context manager returns its instance.
+    The project is saved to its original location if ``dest_path`` is ``None``,
+    else it is saved to ``dest_path``.
 
-    Implementation detail: we need to reload the project with
-    ``iface.addProject()`` after saving it. Otherwise, if the user clicks on
-    the save icon in QGIS UI, a warning will be shown indicating that the file
-    has been modified on disk after it has been opened by QGIS.
+    Implementation detail: after saving the project with ``proj.write()`` (thus
+    updating the project file on disk), when the user clicks on the Save icon
+    in QGIS UI, a warning is shown indicating that the file has been modified
+    after it has been opened by QGIS. Workaround: the project is reloaded with
+    ``proj.clear()`` and ``proj.read()``.
     """
-    proj = QgsProject.instance()
-    project_saved = proj.write()
-    if not project_saved:
-        QgsMessageLog.logMessage('GuidedOfflineEditing: project has not been '
-                                 'saved before transaction.'
-                                 'Extensions',
-                                 level=Qgis.Warning)
     try:
+        proj = QgsProject.instance()
         yield proj
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
                                  level=Qgis.Critical)
-        QgsMessageLog.logMessage('GuidedOfflineEditing: an error occured, '
-                                 "project not saved.",
-                                 'Extensions',
-                                 level=Qgis.Critical)
+        QgsMessageLog.logMessage(
+            'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
+            'Extensions',
+            level=Qgis.Critical)
     finally:
-        project_saved = proj.write()
+        if not dest_url:
+            project_saved = proj.write()
+        else:
+            project_saved = proj.write(dest_url)
         if not project_saved:
             QgsMessageLog.logMessage('GuidedOfflineEditing: project has not '
-                                     'been saved after transaction.'
+                                     'been saved after transaction.',
                                      'Extensions',
                                      level=Qgis.Warning)
+            QgsMessageLog.logMessage(
+                'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
+                'Extensions',
+                level=Qgis.Warning)
         # XXX: better way to avoid warning if the user click save ?
-        iface.addProject(proj.fileName())
+        proj.clear()
+        if not dest_url:
+            proj.read(proj.fileName())
+        else:
+            proj.read(dest_url)

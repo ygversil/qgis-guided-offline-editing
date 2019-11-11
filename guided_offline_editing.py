@@ -22,21 +22,27 @@
  ***************************************************************************/
 """
 
-import uuid
+import pathlib
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
-from qgis.core import Qgis, QgsOfflineEditing, QgsProject, QgsVectorLayer
-
+from qgis.core import (QgsExpressionContextScope, QgsExpressionContextUtils,
+                       QgsOfflineEditing)
 
 # Initialize Qt resources from file resources.py
 # from .resources import *
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
-from .layer_model import OfflineLayerListModel, PostgresLayerTableModel
+from .layer_model import OfflineLayerListModel, PostgresProjectListModel
 from .context_managers import busy_dialog, transactional_project
+from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path
+
+
+# Shorter names for these functions
+qgis_variable = QgsExpressionContextScope.variable
+layer_scope = QgsExpressionContextUtils.layerScope
 
 
 class GuidedOfflineEditingPlugin:
@@ -140,34 +146,26 @@ class GuidedOfflineEditingPlugin:
             added to self.actions list.
         :rtype: QAction
         """
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
-
         if status_tip is not None:
             action.setStatusTip(status_tip)
-
         if whats_this is not None:
             action.setWhatsThis(whats_this)
-
         if add_to_toolbar:
             # Adds plugin icon to Plugins toolbar
             self.iface.addToolBarIcon(action)
-
         if add_to_menu:
             self.iface.addPluginToDatabaseMenu(
                 self.menu,
                 action)
-
         self.actions.append(action)
-
         return action
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
         icon_path = (':/plugins/guided_offline_editing/icons/'
                      'guided_offline_editing_copy.png')
         self.add_action(
@@ -175,7 +173,6 @@ class GuidedOfflineEditingPlugin:
             text=self.tr(u'Guided Offline Editing'),
             callback=self.run,
             parent=self.iface.mainWindow())
-
         # will be set False in run()
         self.first_start = True
 
@@ -196,30 +193,42 @@ class GuidedOfflineEditingPlugin:
         if self.first_start is True:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
-            self.clock_seq = 0
         self.dlg.downloadButton.clicked.connect(
             self.add_pg_layers_and_convert_to_offline
         )
         self.dlg.uploadButton.clicked.connect(
             self.synchronize_offline_layers
         )
-        self.dlg.busy.connect(self.dlg.setBusy)
-        self.dlg.idle.connect(self.dlg.setIdle)
-        self.downloadable_layer_model = PostgresLayerTableModel()
-        self.dlg.set_downloadable_layer_model(self.downloadable_layer_model)
-        self.downloadable_layer_model.model_changed.connect(
-            self.dlg.refresh_downloadable_layer_table
+        self.dlg.busy.connect(self.dlg.set_busy)
+        self.dlg.idle.connect(self.dlg.set_idle)
+        self.pg_project_model = PostgresProjectListModel(
+            host='db.priv.ariegenature.fr',
+            port=5432,
+            dbname='ana',
+            schema='qgis',
+            authcfg='ldapana',
+            sslmode='disabled',
         )
-        self.downloadable_layer_model.refresh_layers()
+        self.dlg.set_pg_project_model(self.pg_project_model)
+        self.pg_project_model.model_changed.connect(
+            self.dlg.refresh_pg_project_list
+        )
+        self.pg_project_model.refresh_data()
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
         self.offline_layer_model.model_changed.connect(
             self.dlg.refresh_offline_layer_list
         )
-        self.offline_layer_model.refresh_layers()
+        self.offline_layer_model.refresh_data()
         self.offliner = QgsOfflineEditing()
         # show the dialog
         self.dlg.show()
+        self.dlg.pg_project_selection_model().selectionChanged.connect(
+            self.dlg.update_download_button_state
+        )
+        self.dlg.pgProjectDestFileWidget.fileChanged.connect(
+            self.dlg.update_download_button_state
+        )
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
@@ -227,74 +236,74 @@ class GuidedOfflineEditingPlugin:
             # Do something useful here - delete the line containing pass
             # and substitute with your code.
             pass
+        self.dlg.pg_project_selection_model().selectionChanged.disconnect(
+            self.dlg.update_download_button_state
+        )
+        self.dlg.pgProjectDestFileWidget.fileChanged.disconnect(
+            self.dlg.update_download_button_state
+        )
         self.dlg.downloadButton.clicked.disconnect(
             self.add_pg_layers_and_convert_to_offline
         )
         self.dlg.uploadButton.clicked.disconnect(
             self.synchronize_offline_layers
         )
-        self.dlg.busy.disconnect(self.dlg.setBusy)
-        self.dlg.idle.disconnect(self.dlg.setIdle)
-        self.downloadable_layer_model.model_changed.disconnect(
-            self.dlg.refresh_downloadable_layer_table
+        self.dlg.busy.disconnect(self.dlg.set_busy)
+        self.dlg.idle.disconnect(self.dlg.set_idle)
+        self.pg_project_model.model_changed.disconnect(
+            self.dlg.refresh_pg_project_list
         )
         self.offline_layer_model.model_changed.disconnect(
             self.dlg.refresh_offline_layer_list
         )
 
-    def add_selected_layers(self, proj):
-        """Add the selected layers to the project legend."""
-        for i in self.dlg.selected_row_indices():
-            pg_layer = self.downloadable_layer_model.layer_at_row(i)
-            qgs_layer = QgsVectorLayer(
-                "host=db.priv.ariegenature.fr port=5432 dbname='ana' "
-                'table="{schema}"."{table}" ({geom})'
-                "authcfg=ldapana estimatedmetadata=true "
-                "checkPrimaryKeyUnicity='0' sql=".format(
-                    schema=pg_layer.schema_name,
-                    table=pg_layer.table_name,
-                    geom=pg_layer.geometry_column
-                ),
-                pg_layer.title,
-                'postgres'
-            )
-            added_layer = proj.addMapLayer(qgs_layer)
-            if added_layer is None:
-                self.iface.messageBar().pushMessage(
-                    'Layer not added',
-                    'Cannot add layer "{}"'.format(pg_layer.title),
-                    Qgis.Critical,
-                    10
-                )
-                raise RuntimeError('Cannot add layer '
-                                   '"{}"'.format(pg_layer.title))
-            yield added_layer.id()
-
-    def convert_layers_to_offline(self, proj, layer_ids):
-        # XXX: if called multiple times for the same QGIS project, this
-        # works because, as of QGIS 3.8, the convertToOfflineProject
-        # method does not check if the project is already an offline
-        # project. So new layers can be converted offline although the
-        # project is already offline himself.
+    def convert_layers_to_offline(self, proj, layer_ids, dest_path):
+        dest_path = pathlib.Path(dest_path)
         self.offliner.convertToOfflineProject(
-            proj.absolutePath(),
-            'offline-{id_}.gpkg'.format(
-                id_=uuid.uuid1(clock_seq=self.clock_seq)
-            ),
+            str(dest_path.parent),
+            dest_path.name,
             layer_ids,
             containerType=QgsOfflineEditing.GPKG
         )
 
     def add_pg_layers_and_convert_to_offline(self):
         """Prepare the project for offline editing."""
-        self.clock_seq += 1
+        project_name = self.dlg.selected_pg_project()
         with busy_dialog(self.dlg,
-                         models_to_clear=[self.downloadable_layer_model],
-                         models_to_refresh=[self.offline_layer_model]), \
-                transactional_project(self.iface) as proj:
-            proj.setTitle(proj.title().replace(' (offline)', ''))
-            added_layer_ids = list(self.add_selected_layers(proj))
-            self.convert_layers_to_offline(proj, added_layer_ids)
+                         selections_to_clear=[
+                             self.dlg.pg_project_selection_model()
+                         ],
+                         models_to_refresh=[self.offline_layer_model]):
+            self.iface.addProject(build_pg_project_url(
+                host='db.priv.ariegenature.fr',
+                port=5432,
+                dbname='ana',
+                schema='qgis',
+                authcfg='ldapana',
+                sslmode='disabled',
+                project=project_name
+            ))
+            dest_path = self.dlg.selected_destination_path()
+            with transactional_project(
+                dest_url=build_gpkg_project_url(dest_path,
+                                                project=project_name)
+            ) as proj:
+                proj.writeEntryBool('Paths', '/Absolute', False)
+            with transactional_project(
+                dest_url=build_gpkg_project_url(dest_path,
+                                                project=project_name)
+            ) as proj:
+                layer_ids_to_download = [
+                    layer_id
+                    for layer_id, layer in proj.mapLayers().items()
+                    if (
+                        qgis_variable(layer_scope(layer), 'offline') and
+                        qgis_variable(layer_scope(layer), 'offline').lower()
+                        not in ('no', 'false')
+                    )
+                ]
+                self.convert_layers_to_offline(proj, layer_ids_to_download,
+                                               dest_path)
 
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
@@ -303,7 +312,4 @@ class GuidedOfflineEditingPlugin:
                          models_to_refresh=[self.offline_layer_model]), \
                 transactional_project(self.iface) as proj:
             self.offliner.synchronize()
-            self.clock_seq = 0
-            synced_layer_ids = list(self.offline_layer_model
-                                    .synced_layer_ids())
             self.convert_layers_to_offline(proj, synced_layer_ids)

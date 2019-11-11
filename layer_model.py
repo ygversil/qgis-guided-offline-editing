@@ -24,28 +24,26 @@
 
 from collections import OrderedDict, namedtuple
 
-from PyQt5.QtCore import (QAbstractTableModel, QObject, QStringListModel,
-                          QVariant, Qt, pyqtSignal)
+from PyQt5.QtCore import QObject, QStringListModel, Qt, pyqtSignal
 from qgis.core import QgsDataSourceUri, QgsProject
 
-from .db_manager import PostgresLayerDownloader
+from .db_manager import PostgresProjectDownloader
 
 
 _IS_OFFLINE_EDITABLE = 'isOfflineEditable'
 _REMOTE_PROVIDER = 'remoteProvider'
 _REMOTE_SOURCE = 'remoteSource'
 _LAYER_TABLE_HEADERS = OrderedDict((
-    ('lid', None),  # None means: do not show in dialog
+    ('layer_id', None),  # None means: do not show in dialog
     ('title', 'Title'),
     ('comments', 'Comments'),
     ('schema_name', None),
     ('table_name', None),
     ('geometry_column', None),
     ('geometry_srid', 'SRID'),
-    ('geometry_type', 'Geometry Type'),
+    ('geometry_type', 'Type'),
 ))
 LAYER_ATTRS = tuple(_LAYER_TABLE_HEADERS.keys())
-_DISPLAYED_ATTRS = tuple(k for k, v in _LAYER_TABLE_HEADERS.items() if v)
 
 
 PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
@@ -53,87 +51,48 @@ PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
 
 def _comes_from(qgs_layer, pg_layer):
     """Returns ``True`` if the given QGIS Layer comes from the given
-    PostgresLayer, that is if they have same schema, name, and geom column."""
+    PostgresLayer, that is if they have same schema, and name."""
     remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
     if (qgs_layer.customProperty(_REMOTE_PROVIDER) != 'postgres'
             or not remote_source):
         return False
     uri = QgsDataSourceUri(remote_source)
     return (pg_layer.schema_name == uri.schema() and
-            pg_layer.table_name == uri.table() and
-            pg_layer.geometry_column == uri.geometryColumn())
+            pg_layer.table_name == uri.table())
 
 
-class PostgresLayerTableModel(QAbstractTableModel):
-    """Qt table model representing available editable layers."""
+class PostgresProjectListModel(QObject):
+    """Qt list model representing available projects saved in PostgreSQL."""
 
     model_changed = pyqtSignal()
 
-    def __init__(self, parent=None, **kwargs):
-        super().__init__(parent, **kwargs)
-        self.available_layers = []
+    def __init__(self, host, port, dbname, schema, authcfg, sslmode, *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.host = host
+        self.port = port
+        self.dbname = dbname
+        self.schema = schema
+        self.authcfg = authcfg
+        self.sslmode = sslmode
+        self.model = QStringListModel()
 
-    def rowCount(self, parent=None):
-        """Returns the number of rows under the given parent."""
-        return len(self.available_layers)
-
-    def columnCount(self, parent=None):
-        """Returns the number of columns for the children of the given
-        parent."""
-        return len(_DISPLAYED_ATTRS)
-
-    def data(self, index, role=Qt.DisplayRole):
-        """Returns the data stored under the given role for the item referred
-        to by the index."""
-        if not index.isValid() or role != Qt.DisplayRole:
-            return QVariant()
-        else:
-            return QVariant(
-                getattr(self.available_layers[index.row()],
-                        _DISPLAYED_ATTRS[index.column()])
-            )
-
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
-        """Returns the data for the given role and section in the header with
-        the specified orientation."""
-        if role != Qt.DisplayRole:
-            return QVariant()
-        if orientation == Qt.Horizontal:
-            try:
-                return self.tr(_LAYER_TABLE_HEADERS[_DISPLAYED_ATTRS[section]])
-            except IndexError:
-                return QVariant()
-        else:
-            return QVariant(str(section + 1))
-
-    def flags(self, index):
-        """Returns the item flags for the given index."""
-        proj = QgsProject.instance()
-        pg_layer = self.available_layers[index.row()]
-        if any(map(lambda qgs_layer: _comes_from(qgs_layer, pg_layer),
-               proj.mapLayers().values())):
-            return Qt.NoItemFlags
-        else:
-            return super().flags(index)
-
-    def refresh_layers(self):
-        """Refresh the available layers list from PostgreSQL database."""
-        self.available_layers.clear()
-        fetch_layers = PostgresLayerDownloader(host='db.priv.ariegenature.fr',
-                                               port=5432,
-                                               dbname='ana',
-                                               schema='common',
-                                               authcfg='ldapana')
-        for layer_dict in fetch_layers():
-            self.available_layers.append(
-                PostgresLayer(**{k: v for k, v in layer_dict.items()
-                                 if k in LAYER_ATTRS})
-            )
+    def refresh_data(self):
+        """Refresh the list of projects saved in PostgreSQL."""
+        fetch_projects = PostgresProjectDownloader(
+            host=self.host,
+            port=self.port,
+            dbname=self.dbname,
+            schema=self.schema,
+            authcfg=self.authcfg,
+            sslmode=self.sslmode,
+        )
+        self.model.setStringList(list(fetch_projects()))
         self.model_changed.emit()
 
-    def layer_at_row(self, i):
-        """Return the ``PostgresLayer`` instance at the given row number."""
-        return self.available_layers[i]
+    def project_at_index(self, index):
+        """Return the name of project at given index."""
+        return self.model.data(index, Qt.DisplayRole)
 
 
 class OfflineLayerListModel(QObject):
@@ -147,7 +106,7 @@ class OfflineLayerListModel(QObject):
         self._pg_layers = []
         self.model = QStringListModel()
 
-    def refresh_layers(self):
+    def refresh_data(self):
         """Refresh the offline layers dict from QGIS project legend."""
         self.offline_layers.clear()
         proj = QgsProject.instance()
@@ -170,7 +129,7 @@ class OfflineLayerListModel(QObject):
             uri = QgsDataSourceUri(remote_source)
             self._pg_layers.append(
                 PostgresLayer(
-                    lid=None, title=None, comments=None,
+                    layer_id=None, title=None, comments=None,
                     schema_name=uri.schema(),
                     table_name=uri.table(),
                     geometry_column=uri.geometryColumn(),
@@ -190,7 +149,7 @@ class OfflineLayerListModel(QObject):
                 continue
             uri = QgsDataSourceUri(provider.dataSourceUri())
             pg_layer = PostgresLayer(
-                lid=None, title=None, comments=None,
+                layer_id=None, title=None, comments=None,
                 schema_name=uri.schema(),
                 table_name=uri.table(),
                 geometry_column=uri.geometryColumn(),
