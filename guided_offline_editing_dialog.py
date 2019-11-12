@@ -54,6 +54,15 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pg_project_model = None
         self.offline_layer_model = None
 
+    def initialize_extent_group_box(self, original_extent, current_extent,
+                                    output_crs, canvas):
+        self.pgProjectDownloadExtent.setOriginalExtent(original_extent,
+                                                       output_crs)
+        self.pgProjectDownloadExtent.setCurrentExtent(current_extent,
+                                                      output_crs)
+        self.pgProjectDownloadExtent.setOutputCrs(output_crs)
+        self.pgProjectDownloadExtent.setMapCanvas(canvas)
+
     def pg_project_selection_model(self):
         """Return the selection model from the project list."""
         return self.pgProjectList.selectionModel()
@@ -68,6 +77,14 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Return the selected destination file or ``None`` if no destination
         file has been selected."""
         return self.pgProjectDestFileWidget.filePath() or None
+
+    def selected_extent(self):
+        """Return the selected extent from where data should be downloaded."""
+        extent = self.pgProjectDownloadExtent.outputExtent()
+        if extent.area() == 0.0:
+            return None
+        else:
+            return extent
 
     def selected_pg_project(self):
         """Return the selected project name or ``None`` if no project is

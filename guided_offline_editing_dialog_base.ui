@@ -59,6 +59,16 @@
         <widget class="QListView" name="pgProjectList"/>
        </item>
        <item>
+        <widget class="QLabel" name="pgProjectDownloadExtentLabel">
+         <property name="text">
+          <string>Extent to download</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsExtentGroupBox" name="pgProjectDownloadExtent"/>
+       </item>
+       <item>
         <widget class="QLabel" name="pgProjectDestFileLabel">
          <property name="text">
           <string>Destination file</string>
@@ -140,6 +150,18 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsExtentGroupBox</class>
+   <extends>QgsCollapsibleGroupBox</extends>
+   <header>qgsextentgroupbox.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QgsFileWidget</class>
    <extends>QWidget</extends>
