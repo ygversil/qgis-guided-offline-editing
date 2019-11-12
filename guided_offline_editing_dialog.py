@@ -55,7 +55,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.offline_layer_model = None
 
     def pg_project_selection_model(self):
-        """Return the selection model from the themes table."""
+        """Return the selection model from the project list."""
         return self.pgProjectList.selectionModel()
 
     def refresh_pg_project_list(self):
