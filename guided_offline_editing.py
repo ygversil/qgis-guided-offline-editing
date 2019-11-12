@@ -333,8 +333,6 @@ class GuidedOfflineEditingPlugin:
                     only_selected = True
                 else:
                     only_selected = False
-                for layer_id in layer_ids_to_download:
-                    layer = proj.mapLayer(layer_id)
                 self.convert_layers_to_offline(layer_ids_to_download,
                                                dest_path,
                                                only_selected=only_selected)
