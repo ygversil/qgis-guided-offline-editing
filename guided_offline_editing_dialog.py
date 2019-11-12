@@ -54,8 +54,17 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pg_project_model = None
         self.offline_layer_model = None
 
+    def initialize_extent_group_box(self, original_extent, current_extent,
+                                    output_crs, canvas):
+        self.pgProjectDownloadExtent.setOriginalExtent(original_extent,
+                                                       output_crs)
+        self.pgProjectDownloadExtent.setCurrentExtent(current_extent,
+                                                      output_crs)
+        self.pgProjectDownloadExtent.setOutputCrs(output_crs)
+        self.pgProjectDownloadExtent.setMapCanvas(canvas)
+
     def pg_project_selection_model(self):
-        """Return the selection model from the themes table."""
+        """Return the selection model from the project list."""
         return self.pgProjectList.selectionModel()
 
     def refresh_pg_project_list(self):
@@ -68,6 +77,14 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Return the selected destination file or ``None`` if no destination
         file has been selected."""
         return self.pgProjectDestFileWidget.filePath() or None
+
+    def selected_extent(self):
+        """Return the selected extent from where data should be downloaded."""
+        extent = self.pgProjectDownloadExtent.outputExtent()
+        if extent.area() == 0.0:
+            return None
+        else:
+            return extent
 
     def selected_pg_project(self):
         """Return the selected project name or ``None`` if no project is
@@ -98,9 +115,9 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Link to the given ``PostgresPorjectListModel`` instance."""
         self.pg_project_model = model
 
-    def update_download_button_state(self, model):
+    def update_download_button_state(self):
         """Set the download button enable or disable depending on UI state."""
-        if (not self.selected_pg_project or
+        if (not self.selected_pg_project() or
                 not self.selected_destination_path()):
             self.downloadButton.setEnabled(False)
         else:
