@@ -98,9 +98,9 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Link to the given ``PostgresPorjectListModel`` instance."""
         self.pg_project_model = model
 
-    def update_download_button_state(self, model):
+    def update_download_button_state(self):
         """Set the download button enable or disable depending on UI state."""
-        if (not self.selected_pg_project or
+        if (not self.selected_pg_project() or
                 not self.selected_destination_path()):
             self.downloadButton.setEnabled(False)
         else:
