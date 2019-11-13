@@ -39,13 +39,21 @@ LRELEASE = lrelease
 # translation
 SOURCES = \
 	__init__.py \
-	context_managers.py db_manager.py guided_offline_editing.py guided_offline_editing_dialog.py layer_model.py
+	context_managers.py \
+	db_manager.py \
+	guided_offline_editing.py \
+	guided_offline_editing_dialog.py \
+	layer_model.py \
 
 PLUGINNAME = guided_offline_editing
 
 PY_FILES = \
 	__init__.py \
-	context_managers.py db_manager.py guided_offline_editing.py guided_offline_editing_dialog.py layer_model.py
+	context_managers.py \
+	db_manager.py \
+	guided_offline_editing.py \
+	guided_offline_editing_dialog.py \
+	layer_model.py \
 
 UI_FILES = guided_offline_editing_dialog_base.ui
 
