@@ -49,18 +49,6 @@ LAYER_ATTRS = tuple(_LAYER_TABLE_HEADERS.keys())
 PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
 
 
-def _comes_from(qgs_layer, pg_layer):
-    """Returns ``True`` if the given QGIS Layer comes from the given
-    PostgresLayer, that is if they have same schema, and name."""
-    remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
-    if (qgs_layer.customProperty(_REMOTE_PROVIDER) != 'postgres'
-            or not remote_source):
-        return False
-    uri = QgsDataSourceUri(remote_source)
-    return (pg_layer.schema_name == uri.schema() and
-            pg_layer.table_name == uri.table())
-
-
 class PostgresProjectListModel(QObject):
     """Qt list model representing available projects saved in PostgreSQL."""
 
