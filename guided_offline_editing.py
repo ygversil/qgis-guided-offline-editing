@@ -43,7 +43,7 @@ from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
 from .layer_model import OfflineLayerListModel, PostgresProjectListModel
-from .context_managers import busy_dialog, transactional_project
+from .context_managers import cleanup, transactional_project
 from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path
 
@@ -230,6 +230,7 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         self.dlg.update_download_button_state()
+        self.dlg.update_upload_button_state()
         self.offliner.progressModeSet.connect(
             self.set_progress_mode
         )
@@ -241,13 +242,14 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg.set_progress_bar
         )
         self.offliner.progressStopped.connect(self.progress_dlg.hide)
-        self.dlg.busy.connect(self.dlg.set_busy)
-        self.dlg.idle.connect(self.dlg.set_idle)
         self.pg_project_model.model_changed.connect(
             self.dlg.refresh_pg_project_list
         )
         self.offline_layer_model.model_changed.connect(
             self.dlg.refresh_offline_layer_list
+        )
+        self.offline_layer_model.model_changed.connect(
+            self.dlg.update_upload_button_state
         )
         self.dlg.pg_project_selection_model().selectionChanged.connect(
             self.dlg.update_download_button_state
@@ -261,6 +263,10 @@ class GuidedOfflineEditingPlugin:
         self.dlg.uploadButton.clicked.connect(
             self.synchronize_offline_layers
         )
+        if self.offline_layer_model.is_empty():
+            self.dlg.tabWidget.setCurrentIndex(0)
+        else:
+            self.dlg.tabWidget.setCurrentIndex(1)
         self.dlg.show()
         # Run the dialog event loop
         self.dlg.exec_()
@@ -287,13 +293,14 @@ class GuidedOfflineEditingPlugin:
         self.dlg.uploadButton.clicked.disconnect(
             self.synchronize_offline_layers
         )
-        self.dlg.busy.disconnect(self.dlg.set_busy)
-        self.dlg.idle.disconnect(self.dlg.set_idle)
         self.pg_project_model.model_changed.disconnect(
             self.dlg.refresh_pg_project_list
         )
         self.offline_layer_model.model_changed.disconnect(
             self.dlg.refresh_offline_layer_list
+        )
+        self.offline_layer_model.model_changed.disconnect(
+            self.dlg.update_upload_button_state
         )
 
     def select_feature_by_extent(self, proj, layer_ids, extent):
@@ -317,11 +324,11 @@ class GuidedOfflineEditingPlugin:
     def add_pg_layers_and_convert_to_offline(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        with busy_dialog(self.dlg,
-                         selections_to_clear=[
-                             self.dlg.pg_project_selection_model()
-                         ],
-                         models_to_refresh=[self.offline_layer_model]):
+        with cleanup(
+            selections_to_clear=[self.dlg.pg_project_selection_model()],
+            models_to_refresh=[self.offline_layer_model],
+            file_widget_to_clear=self.dlg.pgProjectDestFileWidget,
+        ):
             self.iface.addProject(build_pg_project_url(
                 host='db.priv.ariegenature.fr',
                 port=5432,
@@ -391,7 +398,8 @@ class GuidedOfflineEditingPlugin:
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        with busy_dialog(self.dlg,
-                         models_to_refresh=[self.offline_layer_model]):
+        with cleanup(
+                models_to_refresh=[self.offline_layer_model]
+        ):
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()

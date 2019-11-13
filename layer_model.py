@@ -22,43 +22,13 @@
  ***************************************************************************/
 """
 
-from collections import OrderedDict, namedtuple
-
 from PyQt5.QtCore import QObject, QStringListModel, Qt, pyqtSignal
-from qgis.core import QgsDataSourceUri, QgsProject
+from qgis.core import QgsProject
 
 from .db_manager import PostgresProjectDownloader
 
 
 _IS_OFFLINE_EDITABLE = 'isOfflineEditable'
-_REMOTE_PROVIDER = 'remoteProvider'
-_REMOTE_SOURCE = 'remoteSource'
-_LAYER_TABLE_HEADERS = OrderedDict((
-    ('layer_id', None),  # None means: do not show in dialog
-    ('title', 'Title'),
-    ('comments', 'Comments'),
-    ('schema_name', None),
-    ('table_name', None),
-    ('geometry_column', None),
-    ('geometry_srid', 'SRID'),
-    ('geometry_type', 'Type'),
-))
-LAYER_ATTRS = tuple(_LAYER_TABLE_HEADERS.keys())
-
-
-PostgresLayer = namedtuple('PostgresLayer', LAYER_ATTRS)
-
-
-def _comes_from(qgs_layer, pg_layer):
-    """Returns ``True`` if the given QGIS Layer comes from the given
-    PostgresLayer, that is if they have same schema, and name."""
-    remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
-    if (qgs_layer.customProperty(_REMOTE_PROVIDER) != 'postgres'
-            or not remote_source):
-        return False
-    uri = QgsDataSourceUri(remote_source)
-    return (pg_layer.schema_name == uri.schema() and
-            pg_layer.table_name == uri.table())
 
 
 class PostgresProjectListModel(QObject):
@@ -102,61 +72,18 @@ class OfflineLayerListModel(QObject):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.offline_layers = dict()
-        self._pg_layers = []
         self.model = QStringListModel()
 
     def refresh_data(self):
         """Refresh the offline layers dict from QGIS project legend."""
-        self.offline_layers.clear()
         proj = QgsProject.instance()
-        self.offline_layers.update(filter(
-            lambda item: item[1].customProperty(_IS_OFFLINE_EDITABLE),
-            proj.mapLayers().items()
-        ))
+        offline_layers = (layer for layer_id, layer in proj.mapLayers().items()
+                          if layer.customProperty(_IS_OFFLINE_EDITABLE))
         self.model.setStringList(
-            layer.name() for layer in self.offline_layers.values()
+            layer.name() for layer in offline_layers
         )
-        self.save_to_pg_layers()
         self.model_changed.emit()
 
-    def save_to_pg_layers(self):
-        """Save information about offline layers to list of ``PostgresLayer``
-        instances."""
-        self._pg_layers.clear()
-        for qgs_layer in self.offline_layers.values():
-            remote_source = qgs_layer.customProperty(_REMOTE_SOURCE)
-            uri = QgsDataSourceUri(remote_source)
-            self._pg_layers.append(
-                PostgresLayer(
-                    layer_id=None, title=None, comments=None,
-                    schema_name=uri.schema(),
-                    table_name=uri.table(),
-                    geometry_column=uri.geometryColumn(),
-                    geometry_srid=None,
-                    geometry_type=None,
-                )
-            )
-
-    def synced_layer_ids(self):
-        """Yield each layer ids that was synchronized online after offline."""
-        proj = QgsProject.instance()
-        for _, qgs_layer in proj.mapLayers().items():
-            if qgs_layer.customProperty(_IS_OFFLINE_EDITABLE):
-                continue
-            provider = qgs_layer.dataProvider()
-            if provider.name() != 'postgres':
-                continue
-            uri = QgsDataSourceUri(provider.dataSourceUri())
-            pg_layer = PostgresLayer(
-                layer_id=None, title=None, comments=None,
-                schema_name=uri.schema(),
-                table_name=uri.table(),
-                geometry_column=uri.geometryColumn(),
-                geometry_srid=None,
-                geometry_type=None,
-
-            )
-            if any(offline_layer == pg_layer
-                   for offline_layer in self._pg_layers):
-                yield qgs_layer.id()
+    def is_empty(self):
+        """Returns ``True`` if model is empty."""
+        return self.model.rowCount() == 0
