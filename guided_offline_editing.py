@@ -36,7 +36,7 @@ from qgis.core import (
 )
 
 # Initialize Qt resources from file resources.py
-# from .resources import *
+from .resources import *  # noqa
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .layer_model import OfflineLayerListModel, PostgresProjectListModel
