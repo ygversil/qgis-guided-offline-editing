@@ -39,6 +39,9 @@ from qgis.core import (
 from .resources import *  # noqa
 # Import the code for the dialog
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
+from .guided_offline_editing_progress_dialog import (
+    GuidedOfflineEditingPluginProgressDialog
+)
 from .layer_model import OfflineLayerListModel, PostgresProjectListModel
 from .context_managers import busy_dialog, transactional_project
 from .db_manager import build_gpkg_project_url, build_pg_project_url
@@ -199,6 +202,9 @@ class GuidedOfflineEditingPlugin:
         if self.first_start is True:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
+            self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
+                parent=self.iface.mainWindow()
+            )
         self.offliner = QgsOfflineEditing()
         self.pg_project_model = PostgresProjectListModel(
             host='db.priv.ariegenature.fr',
@@ -224,6 +230,17 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         self.dlg.update_download_button_state()
+        self.offliner.progressModeSet.connect(
+            self.set_progress_mode
+        )
+        self.offliner.progressStarted.connect(self.progress_dlg.show)
+        self.offliner.layerProgressUpdated.connect(
+            self.progress_dlg.set_progress_label
+        )
+        self.offliner.progressUpdated.connect(
+            self.progress_dlg.set_progress_bar
+        )
+        self.offliner.progressStopped.connect(self.progress_dlg.hide)
         self.dlg.busy.connect(self.dlg.set_busy)
         self.dlg.idle.connect(self.dlg.set_idle)
         self.pg_project_model.model_changed.connect(
@@ -247,6 +264,17 @@ class GuidedOfflineEditingPlugin:
         self.dlg.show()
         # Run the dialog event loop
         self.dlg.exec_()
+        self.offliner.progressModeSet.disconnect(
+            self.set_progress_mode
+        )
+        self.offliner.progressStarted.disconnect(self.progress_dlg.show)
+        self.offliner.layerProgressUpdated.disconnect(
+            self.progress_dlg.set_progress_label
+        )
+        self.offliner.progressUpdated.disconnect(
+            self.progress_dlg.set_progress_bar
+        )
+        self.offliner.progressStopped.disconnect(self.progress_dlg.hide)
         self.dlg.pg_project_selection_model().selectionChanged.disconnect(
             self.dlg.update_download_button_state
         )
@@ -277,6 +305,7 @@ class GuidedOfflineEditingPlugin:
     def convert_layers_to_offline(self, layer_ids, dest_path,
                                   only_selected=False):
         dest_path = pathlib.Path(dest_path)
+        self.progress_dlg.set_title(self.tr('Downloading layers...'))
         self.offliner.convertToOfflineProject(
             str(dest_path.parent),
             dest_path.name,
@@ -332,9 +361,37 @@ class GuidedOfflineEditingPlugin:
                                                dest_path,
                                                only_selected=only_selected)
 
+    def set_progress_mode(self, mode, max_):
+        """Update progress dialog information."""
+        map_mode_format = {
+            QgsOfflineEditing.CopyFeatures: self.tr(
+                '%v / %m features copied'
+            ),
+            QgsOfflineEditing.ProcessFeatures: self.tr(
+                '%v / %m features processed'
+            ),
+            QgsOfflineEditing.AddFields: self.tr(
+                '%v / %m fields added'
+            ),
+            QgsOfflineEditing.AddFeatures: self.tr(
+                '%v / %m features added'
+            ),
+            QgsOfflineEditing.RemoveFeatures: self.tr(
+                '%v / %m features removed'
+            ),
+            QgsOfflineEditing.UpdateFeatures: self.tr(
+                '%v / %m feature updates'
+            ),
+            QgsOfflineEditing.UpdateGeometries: self.tr(
+                '%v / %m feature geometry updates'
+            ),
+        }
+        self.progress_dlg.setup_progress_bar(map_mode_format[mode], max_)
+
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
         with busy_dialog(self.dlg,
                          models_to_refresh=[self.offline_layer_model]):
+            self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()

@@ -11,14 +11,59 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="177"/>
+        <location filename="../guided_offline_editing.py" line="180"/>
         <source>Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="188"/>
+        <location filename="../guided_offline_editing.py" line="191"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="356"/>
+        <source>%v / %m features copied</source>
+        <translation>%v / %m entités copiées</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="359"/>
+        <source>%v / %m features processed</source>
+        <translation>%v / %m entitées traitées</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="362"/>
+        <source>%v / %m fields added</source>
+        <translation>%v / %m champs ajoutés</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="365"/>
+        <source>%v / %m features added</source>
+        <translation>%v / %m entités ajoutées</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="368"/>
+        <source>%v / %m features removed</source>
+        <translation>%v / %m entités supprimées</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="371"/>
+        <source>%v / %m feature updates</source>
+        <translation>%v / %m entités modifiées</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="374"/>
+        <source>%v / %m feature geometry updates</source>
+        <translation>%v / %m géométries modifées</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="297"/>
+        <source>Downloading layers...</source>
+        <translation>Téléchargement des couches...</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="385"/>
+        <source>Uploading layers...</source>
+        <translation>Téléversement des couches...</translation>
     </message>
 </context>
 <context>
@@ -67,6 +112,27 @@
         <location filename="../guided_offline_editing_dialog_base.ui" line="84"/>
         <source>GeoPackage (*.gpkg)</source>
         <translation>GeoPackage (*.gpkg)</translation>
+    </message>
+</context>
+<context>
+    <name>GuidedOfflineEditingPluginProgressDialog</name>
+    <message>
+        <location filename="../guided_offline_editing_progress_dialog.py" line="57"/>
+        <source>Layer {} of {}</source>
+        <translation>Couche {} sur {}</translation>
+    </message>
+</context>
+<context>
+    <name>guided_offline_editing_progress_dialog</name>
+    <message>
+        <location filename="../guided_offline_editing_progress_dialog_base.ui" line="17"/>
+        <source>Dialog</source>
+        <translation>Fenêtre de  dialogue</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_progress_dialog_base.ui" line="23"/>
+        <source>Layer 1 of 3</source>
+        <translation>Couche 1 sur 3</translation>
     </message>
 </context>
 </TS>

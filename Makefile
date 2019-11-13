@@ -43,7 +43,8 @@ SOURCES = \
 	db_manager.py \
 	guided_offline_editing.py \
 	guided_offline_editing_dialog.py \
-	layer_model.py \
+	guided_offline_editing_progress_dialog.py \
+	layer_model.py
 
 PLUGINNAME = guided_offline_editing
 
@@ -53,9 +54,12 @@ PY_FILES = \
 	db_manager.py \
 	guided_offline_editing.py \
 	guided_offline_editing_dialog.py \
-	layer_model.py \
+	guided_offline_editing_progress_dialog.py \
+	layer_model.py
 
-UI_FILES = guided_offline_editing_dialog_base.ui
+UI_FILES = \
+	guided_offline_editing_dialog_base.ui \
+	guided_offline_editing_progress_dialog_base.ui
 
 EXTRAS = metadata.txt
 
