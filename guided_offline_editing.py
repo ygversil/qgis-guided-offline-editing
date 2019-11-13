@@ -82,7 +82,7 @@ class GuidedOfflineEditingPlugin:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Guided Offline Editing Plugin')
+        self.menu = self.tr(u'&Guided Offline Editing')
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -186,7 +186,7 @@ class GuidedOfflineEditingPlugin:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginDatabaseMenu(
-                self.tr(u'&Guided Offline Editing Plugin'),
+                self.tr(u'&Guided Offline Editing'),
                 action)
             self.iface.removeToolBarIcon(action)
 

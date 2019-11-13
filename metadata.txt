@@ -7,7 +7,7 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=Guided Offline Editing Plugin
+name=Guided Offline Editing
 qgisMinimumVersion=3.4
 description=Extend the built-in Offline Editing Plugin providing automated processes
 version=0.1

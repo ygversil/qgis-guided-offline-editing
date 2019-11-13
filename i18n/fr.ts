@@ -11,23 +11,18 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="188"/>
-        <source>&amp;Guided Offline Editing Plugin</source>
-        <translation>Extension édition hors-connexion assistée</translation>
-    </message>
-    <message>
         <location filename="../guided_offline_editing.py" line="177"/>
         <source>Guided Offline Editing</source>
+        <translation>Édition hors-connexion assistée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="188"/>
+        <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
 </context>
 <context>
     <name>GuidedOfflineEditingPluginDialogBase</name>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="14"/>
-        <source>Guided Offline Editing Plugin</source>
-        <translation>Extension édition hors-connexion assistée</translation>
-    </message>
     <message>
         <location filename="../guided_offline_editing_dialog_base.ui" line="94"/>
         <source>Download</source>
