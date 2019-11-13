@@ -83,3 +83,7 @@ class OfflineLayerListModel(QObject):
             layer.name() for layer in offline_layers
         )
         self.model_changed.emit()
+
+    def is_empty(self):
+        """Returns ``True`` if model is empty."""
+        return self.model.rowCount() == 0

@@ -67,7 +67,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pgProjectList.setModel(self.pg_project_model.model)
 
     def refresh_offline_layer_list(self):
-        self.offlineLayerList.setModel(self.offline_layer_model)
+        self.offlineLayerList.setModel(self.offline_layer_model.model)
 
     def selected_destination_path(self):
         """Return the selected destination file or ``None`` if no destination
@@ -93,7 +93,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def set_offline_layer_model(self, model):
         """Link to the given ``OfflineLayerListModel`` instance."""
-        self.offline_layer_model = model.model
+        self.offline_layer_model = model
 
     def set_pg_project_model(self, model):
         """Link to the given ``PostgresPorjectListModel`` instance."""
@@ -109,7 +109,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def update_upload_button_state(self):
         """Set the upload button enable or disable depending on UI state."""
-        if self.offline_layer_model.rowCount() == 0:
+        if self.offline_layer_model.is_empty():
             self.uploadButton.setEnabled(False)
         else:
             self.uploadButton.setEnabled(True)
