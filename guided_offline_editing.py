@@ -263,6 +263,10 @@ class GuidedOfflineEditingPlugin:
         self.dlg.uploadButton.clicked.connect(
             self.synchronize_offline_layers
         )
+        if self.offline_layer_model.is_empty():
+            self.dlg.tabWidget.setCurrentIndex(0)
+        else:
+            self.dlg.tabWidget.setCurrentIndex(1)
         self.dlg.show()
         # Run the dialog event loop
         self.dlg.exec_()
