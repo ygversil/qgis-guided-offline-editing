@@ -230,6 +230,7 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         self.dlg.update_download_button_state()
+        self.dlg.update_upload_button_state()
         self.offliner.progressModeSet.connect(
             self.set_progress_mode
         )
@@ -248,6 +249,9 @@ class GuidedOfflineEditingPlugin:
         )
         self.offline_layer_model.model_changed.connect(
             self.dlg.refresh_offline_layer_list
+        )
+        self.offline_layer_model.model_changed.connect(
+            self.dlg.update_upload_button_state
         )
         self.dlg.pg_project_selection_model().selectionChanged.connect(
             self.dlg.update_download_button_state
@@ -294,6 +298,9 @@ class GuidedOfflineEditingPlugin:
         )
         self.offline_layer_model.model_changed.disconnect(
             self.dlg.refresh_offline_layer_list
+        )
+        self.offline_layer_model.model_changed.disconnect(
+            self.dlg.update_upload_button_state
         )
 
     def select_feature_by_extent(self, proj, layer_ids, extent):

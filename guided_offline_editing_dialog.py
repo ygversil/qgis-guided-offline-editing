@@ -122,3 +122,11 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.downloadButton.setEnabled(False)
         else:
             self.downloadButton.setEnabled(True)
+
+    def update_upload_button_state(self):
+        """Set the upload button enable or disable depending on UI state."""
+        print(self.offline_layer_model.rowCount())
+        if self.offline_layer_model.rowCount() == 0:
+            self.uploadButton.setEnabled(False)
+        else:
+            self.uploadButton.setEnabled(True)
