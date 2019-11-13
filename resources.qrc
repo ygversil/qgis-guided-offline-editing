@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/guided_offline_editing/" >
+    <qresource prefix="/plugins/guided_offline_editing">
         <file>icons/guided_offline_editing_copy.png</file>
         <file>icons/offline_editing_copy.png</file>
         <file>icons/offline_editing_sync.png</file>
