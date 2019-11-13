@@ -341,7 +341,5 @@ class GuidedOfflineEditingPlugin:
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
         with busy_dialog(self.dlg,
-                         models_to_refresh=[self.offline_layer_model]), \
-                transactional_project(self.iface) as proj:
+                         models_to_refresh=[self.offline_layer_model]):
             self.offliner.synchronize()
-            self.convert_layers_to_offline(synced_layer_ids)
