@@ -75,18 +75,14 @@ class GuidedOfflineEditingPlugin:
             self.plugin_dir,
             'i18n',
             '{}.qm'.format(locale))
-
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Guided Offline Editing')
-
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
@@ -195,7 +191,6 @@ class GuidedOfflineEditingPlugin:
 
     def run(self):
         """Run method that performs all the real work"""
-
         # Create the dialog with elements (after translation) and keep
         # reference. Only create GUI ONCE in callback, so that it will only
         # load when the plugin is started
