@@ -25,6 +25,8 @@
 from contextlib import contextmanager
 import traceback
 
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
@@ -33,6 +35,7 @@ def cleanup(selections_to_clear=None, models_to_refresh=None,
             file_widget_to_clear=None):
     """Context manager that ensure cleaning actions are taken on exit."""
     try:
+        QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
         yield
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
@@ -51,6 +54,7 @@ def cleanup(selections_to_clear=None, models_to_refresh=None,
             model.refresh_data()
         if file_widget_to_clear is not None:
             file_widget_to_clear.setFilePath('')
+        QtWidgets.QApplication.restoreOverrideCursor()
 
 
 @contextmanager
