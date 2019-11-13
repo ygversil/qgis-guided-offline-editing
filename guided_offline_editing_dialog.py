@@ -25,7 +25,6 @@
 import os
 
 from PyQt5 import uic
-from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5 import QtWidgets
 from qgis.gui import QgsFileWidget
 
@@ -37,9 +36,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
-
-    busy = pyqtSignal()
-    idle = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -94,18 +90,6 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             return self.pg_project_model.project_at_index(selected_rows[0])
         else:
             return None
-
-    def set_busy(self):
-        """Show busy interface: set waiting cursor and disable buttons."""
-        self.downloadButton.setEnabled(False)
-        self.uploadButton.setEnabled(False)
-        QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
-
-    def set_idle(self):
-        """Show idle interface: set normal cursir and enable buttons."""
-        self.downloadButton.setEnabled(True)
-        self.uploadButton.setEnabled(True)
-        QtWidgets.QApplication.restoreOverrideCursor()
 
     def set_offline_layer_model(self, model):
         """Link to the given ``OfflineLayerListModel`` instance."""

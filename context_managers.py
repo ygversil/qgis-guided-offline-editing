@@ -29,13 +29,9 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def busy_dialog(dlg, selections_to_clear=None, models_to_refresh=None):
-    """Context manager that put dialog in busy state and ensure that it returns
-    to idle state on exit.
-
-    It also refresh layers from any given model.
-    """
-    dlg.busy.emit()
+def cleanup(selections_to_clear=None, models_to_refresh=None,
+            file_widget_to_clear=None):
+    """Context manager that ensure cleaning actions are taken on exit."""
     try:
         yield
     except Exception as exc:
@@ -53,7 +49,8 @@ def busy_dialog(dlg, selections_to_clear=None, models_to_refresh=None):
         models_to_refresh = models_to_refresh or []
         for model in models_to_refresh:
             model.refresh_data()
-        dlg.idle.emit()
+        if file_widget_to_clear is not None:
+            file_widget_to_clear.setFilePath('')
 
 
 @contextmanager

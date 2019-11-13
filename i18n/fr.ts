@@ -21,47 +21,47 @@
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="356"/>
+        <location filename="../guided_offline_editing.py" line="370"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="359"/>
+        <location filename="../guided_offline_editing.py" line="373"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="362"/>
+        <location filename="../guided_offline_editing.py" line="376"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="365"/>
+        <location filename="../guided_offline_editing.py" line="379"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="368"/>
+        <location filename="../guided_offline_editing.py" line="382"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="371"/>
+        <location filename="../guided_offline_editing.py" line="385"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="374"/>
+        <location filename="../guided_offline_editing.py" line="388"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="297"/>
+        <location filename="../guided_offline_editing.py" line="311"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="385"/>
+        <location filename="../guided_offline_editing.py" line="400"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
