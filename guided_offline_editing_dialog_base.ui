@@ -188,5 +188,37 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>downloadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>398</x>
+     <y>487</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1083</x>
+     <y>634</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uploadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>489</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>913</x>
+     <y>507</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>

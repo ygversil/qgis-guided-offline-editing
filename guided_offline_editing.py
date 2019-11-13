@@ -246,12 +246,7 @@ class GuidedOfflineEditingPlugin:
         )
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass
-            # and substitute with your code.
-            pass
+        self.dlg.exec_()
         self.dlg.pg_project_selection_model().selectionChanged.disconnect(
             self.dlg.update_download_button_state
         )
