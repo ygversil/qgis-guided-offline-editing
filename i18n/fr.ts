@@ -11,24 +11,14 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="187"/>
+        <location filename="../guided_offline_editing.py" line="188"/>
         <source>&amp;Guided Offline Editing Plugin</source>
-        <translation>Extension édition hors-ligne assistée</translation>
+        <translation>Extension édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="175"/>
+        <location filename="../guided_offline_editing.py" line="177"/>
         <source>Guided Offline Editing</source>
-        <translation>Édition hors-ligne assistée</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing.py" line="212"/>
-        <source>No project file</source>
-        <translation>Aucun fichier projet</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing.py" line="212"/>
-        <source>Please save the project to a file first.</source>
-        <translation>Merci d'enregistrer le projet dans un projet.</translation>
+        <translation>Édition hors-connexion assistée</translation>
     </message>
 </context>
 <context>
@@ -36,42 +26,52 @@
     <message>
         <location filename="../guided_offline_editing_dialog_base.ui" line="14"/>
         <source>Guided Offline Editing Plugin</source>
-        <translation>Extension édition hors-ligne assistée</translation>
+        <translation>Extension édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="27"/>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="125"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="94"/>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="54"/>
-        <source>Select themes to download</source>
-        <translation>Sélectionner les thème à télécharger</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="75"/>
-        <source>Downloaded layers</source>
-        <translation>Télécharger les couches</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="104"/>
-        <source>Relations between layers</source>
-        <translation>Relations entre couches</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="163"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="135"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="143"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="112"/>
         <source>Offline layers</source>
-        <translation>Couches hors-lignes</translation>
+        <translation>Couches hors-connexions</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="27"/>
+        <source>Guided Offline Editing</source>
+        <translation>Édition hors-connexion assistée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="54"/>
+        <source>Select project to download</source>
+        <translation>Sélectionner le projet à télécharger</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="64"/>
+        <source>Extent to download</source>
+        <translation>Emprise à télécharger</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
+        <source>Destination file</source>
+        <translation>Fichier de destination</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="81"/>
+        <source>Select a file for projet and layers</source>
+        <translation>Sélectionner un fichier pour le projet et les couches</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="84"/>
+        <source>GeoPackage (*.gpkg)</source>
+        <translation>GeoPackage (*.gpkg)</translation>
     </message>
 </context>
 </TS>
