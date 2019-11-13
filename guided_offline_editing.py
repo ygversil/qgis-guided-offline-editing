@@ -42,7 +42,7 @@ from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
-from .layer_model import OfflineLayerListModel, PostgresProjectListModel
+from .model import OfflineLayerListModel, PostgresProjectListModel
 from .context_managers import cleanup, transactional_project
 from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path

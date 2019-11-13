@@ -44,7 +44,7 @@ SOURCES = \
 	guided_offline_editing.py \
 	guided_offline_editing_dialog.py \
 	guided_offline_editing_progress_dialog.py \
-	layer_model.py
+	model.py
 
 PLUGINNAME = guided_offline_editing
 
@@ -55,7 +55,7 @@ PY_FILES = \
 	guided_offline_editing.py \
 	guided_offline_editing_dialog.py \
 	guided_offline_editing_progress_dialog.py \
-	layer_model.py
+	model.py
 
 UI_FILES = \
 	guided_offline_editing_dialog_base.ui \
