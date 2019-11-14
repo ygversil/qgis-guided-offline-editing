@@ -33,6 +33,7 @@ from qgis.core import (
     QgsExpressionContextUtils,
     QgsOfflineEditing,
     QgsRectangle,
+    QgsSettings,
 )
 
 # Initialize Qt resources from file resources.py
@@ -201,18 +202,28 @@ class GuidedOfflineEditingPlugin:
                 parent=self.iface.mainWindow()
             )
         self.offliner = QgsOfflineEditing()
+        s = QgsSettings()
+        self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
+        self.pg_port = s.value('Plugin-GuidedOfflineEditing/port', 5432)
+        self.pg_authcfg = s.value('Plugin-GuidedOfflineEditing/authcfg',
+                                  'authorg')
+        self.pg_dbname = s.value('Plugin-GuidedOfflineEditing/dbname', 'orgdb')
+        self.pg_schema = s.value('Plugin-GuidedOfflineEditing/schema', 'qgis')
+        self.pg_sslmode = s.value('Plugin-GuidedOfflineEditing/sslmode',
+                                  'disabled')
         self.pg_project_model = PostgresProjectListModel(
-            host='db.priv.ariegenature.fr',
-            port=5432,
-            dbname='ana',
-            schema='qgis',
-            authcfg='ldapana',
-            sslmode='disabled',
+            host=self.pg_host,
+            port=self.pg_port,
+            dbname=self.pg_dbname,
+            schema=self.pg_schema,
+            authcfg=self.pg_authcfg,
+            sslmode=self.pg_sslmode,
         )
         self.pg_project_model.refresh_data()
         self.offline_layer_model = OfflineLayerListModel()
         self.offline_layer_model.refresh_data()
-        output_crs = QgsCoordinateReferenceSystem('EPSG:2154')
+        output_crs_id = s.value('Projections/projectDefaultCrs', 'EPSG:4326')
+        output_crs = QgsCoordinateReferenceSystem(output_crs_id)
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         # show the dialog
@@ -325,12 +336,12 @@ class GuidedOfflineEditingPlugin:
             file_widget_to_clear=self.dlg.pgProjectDestFileWidget,
         ):
             self.iface.addProject(build_pg_project_url(
-                host='db.priv.ariegenature.fr',
-                port=5432,
-                dbname='ana',
-                schema='qgis',
-                authcfg='ldapana',
-                sslmode='disabled',
+                host=self.pg_host,
+                port=self.pg_port,
+                dbname=self.pg_dbname,
+                schema=self.pg_schema,
+                authcfg=self.pg_authcfg,
+                sslmode=self.pg_sslmode,
                 project=project_name
             ))
             dest_path = self.dlg.selected_destination_path()
