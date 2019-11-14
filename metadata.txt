@@ -8,13 +8,13 @@
 
 [general]
 name=Guided Offline Editing
-qgisMinimumVersion=3.4
-description=Extend the built-in Offline Editing Plugin providing automated processes
+qgisMinimumVersion=3.8
+description=Extend the built-in Offline Editing plugin providing automated processes
 version=0.1
 author=Yann Voté
 email=ygversil@lilo.org
 
-about=This QGIS plugin extend the built-in Offline Editing Plugin by providing some automated processes. As a side effect, it also restricts what can be done when converting a project for offline editing. Features: * copy styles and input form to offline layer when converting for offline editing, * check for valid geometries before going back online.
+about=This plugin lies on the now built-in Offline Editing plugin and provides some automation to make life easier for users. How it works ? A "power user" prepares beforehand one or more projects for editing online layers (PostgreSQL/Postgis tables). That is: she loads PostgreSQL layers in QGIS and prepares forms to edit these layers with as much as details as possible (form validation, field help, relationships, and so on). She also indicates which layers must be downloaded for offline edition. Then these projects are saved in PostgreSQL (this is a feature introduced in QGIS 3.8). The plugin then shows to "normal users" the list of available projects that have been prepared for offline editing in this manner. She select one project and just clicks `Download`. That's it! The project is converted offline. Later, when back online, she just clicks `Upload` and the layers are synchronised online.
 
 tracker=https://github.com/ygversil/qgis-guided-offline-editing/issues
 repository=https://github.com/ygversil/qgis-guided-offline-editing
@@ -26,7 +26,7 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=attribute table,attribute,attribute edit,csv,database,digitizing,editing,feature,field,vector,layers,python,qgis,gis,offline,synchronize
+tags=attribute table,attribute,attribute edit,database,digitizing,editing,feature,field,vector,layers,python,qgis,gis,offline,synchronize
 
 homepage=https://github.com/ygversil/qgis-guided-offline-editing
 category=Database
