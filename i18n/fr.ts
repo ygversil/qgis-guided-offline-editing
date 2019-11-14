@@ -99,11 +99,6 @@
         <translation>Emprise à télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
-        <source>Destination file</source>
-        <translation>Fichier de destination</translation>
-    </message>
-    <message>
         <location filename="../guided_offline_editing_dialog_base.ui" line="81"/>
         <source>Select a file for projet and layers</source>
         <translation>Sélectionner un fichier pour le projet et les couches</translation>
@@ -112,6 +107,11 @@
         <location filename="../guided_offline_editing_dialog_base.ui" line="84"/>
         <source>GeoPackage (*.gpkg)</source>
         <translation>GeoPackage (*.gpkg)</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
+        <source>Destination GeoPackage</source>
+        <translation>GeoPackage de destination</translation>
     </message>
 </context>
 <context>

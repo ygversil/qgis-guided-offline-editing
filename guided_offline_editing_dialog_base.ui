@@ -71,7 +71,7 @@
        <item>
         <widget class="QLabel" name="pgProjectDestFileLabel">
          <property name="text">
-          <string>Destination file</string>
+          <string>Destination GeoPackage</string>
          </property>
         </widget>
        </item>
