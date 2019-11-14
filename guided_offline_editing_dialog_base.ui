@@ -1,65 +1,222 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>GuidedOfflineEditingPluginDialogBase</class>
- <widget class="QDialog" name="GuidedOfflineEditingPluginDialogBase" >
-  <property name="geometry" >
+ <widget class="QDialog" name="GuidedOfflineEditingPluginDialogBase">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>750</width>
+    <height>560</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Guided Offline Editing Plugin</string>
+  <property name="windowTitle">
+   <string>Guided Offline Editing</string>
   </property>
-  <widget class="QDialogButtonBox" name="button_box" >
-   <property name="geometry" >
-    <rect>
-     <x>30</x>
-     <y>240</y>
-     <width>341</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons" >
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="dbTitleLabel">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Guided Offline Editing</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="downloadTab">
+      <attribute name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/plugins/guided_offline_editing/icons/offline_editing_copy.png</normaloff>:/plugins/guided_offline_editing/icons/offline_editing_copy.png</iconset>
+      </attribute>
+      <attribute name="title">
+       <string>Download</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="pgProjectLabel">
+         <property name="text">
+          <string>Select project to download</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListView" name="pgProjectList"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="pgProjectDownloadExtentLabel">
+         <property name="text">
+          <string>Extent to download</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsExtentGroupBox" name="pgProjectDownloadExtent"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="pgProjectDestFileLabel">
+         <property name="text">
+          <string>Destination GeoPackage</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsFileWidget" name="pgProjectDestFileWidget">
+         <property name="dialogTitle">
+          <string>Select a file for projet and layers</string>
+         </property>
+         <property name="filter">
+          <string>GeoPackage (*.gpkg)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="downloadButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Download</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="uploadTab">
+      <attribute name="icon">
+       <iconset resource="resources.qrc">
+        <normaloff>:/plugins/guided_offline_editing/icons/offline_editing_sync.png</normaloff>:/plugins/guided_offline_editing/icons/offline_editing_sync.png</iconset>
+      </attribute>
+      <attribute name="title">
+       <string>Upload</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="offlineLayerlabel">
+         <property name="text">
+          <string>Offline layers</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListView" name="offlineLayerList">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="uploadButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Upload</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QDialogButtonBox" name="closeButtonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsExtentGroupBox</class>
+   <extends>QgsCollapsibleGroupBox</extends>
+   <header>qgsextentgroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsFileWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsfilewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
-   <sender>button_box</sender>
-   <signal>accepted()</signal>
+   <sender>closeButtonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
    <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
-   <slot>accept()</slot>
+   <slot>reject()</slot>
    <hints>
-    <hint type="source_label" >
-     <x>248</x>
-     <y>254</y>
+    <hint type="sourcelabel">
+     <x>704</x>
+     <y>544</y>
     </hint>
-    <hint type="destination_label" >
-     <x>157</x>
-     <y>274</y>
+    <hint type="destinationlabel">
+     <x>1406</x>
+     <y>798</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>button_box</sender>
-   <signal>rejected()</signal>
+   <sender>downloadButton</sender>
+   <signal>clicked()</signal>
    <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="source_label" >
-     <x>316</x>
-     <y>260</y>
+    <hint type="sourcelabel">
+     <x>398</x>
+     <y>487</y>
     </hint>
-    <hint type="destination_label" >
-     <x>286</x>
-     <y>274</y>
+    <hint type="destinationlabel">
+     <x>1083</x>
+     <y>634</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uploadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>489</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>913</x>
+     <y>507</y>
     </hint>
    </hints>
   </connection>

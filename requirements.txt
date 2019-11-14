@@ -1,3 +1,5 @@
+bumpversion
+pb_tool
 sphinx
 pytest
 pytest-cov

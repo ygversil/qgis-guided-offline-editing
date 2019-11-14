@@ -26,14 +26,17 @@ import os
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
+from qgis.gui import QgsFileWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the
 # elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'guided_offline_editing_dialog_base.ui'))
+    os.path.dirname(__file__), 'guided_offline_editing_dialog_base.ui'
+), resource_suffix='')
 
 
 class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
+
     def __init__(self, parent=None):
         """Constructor."""
         super(GuidedOfflineEditingPluginDialog, self).__init__(parent)
@@ -43,3 +46,70 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.pgProjectDestFileWidget.setStorageMode(QgsFileWidget.SaveFile)
+        self.pg_project_model = None
+        self.offline_layer_model = None
+
+    def initialize_extent_group_box(self, original_extent, current_extent,
+                                    output_crs, canvas):
+        self.pgProjectDownloadExtent.setOriginalExtent(original_extent,
+                                                       output_crs)
+        self.pgProjectDownloadExtent.setCurrentExtent(current_extent,
+                                                      output_crs)
+        self.pgProjectDownloadExtent.setOutputCrs(output_crs)
+        self.pgProjectDownloadExtent.setMapCanvas(canvas)
+
+    def pg_project_selection_model(self):
+        """Return the selection model from the project list."""
+        return self.pgProjectList.selectionModel()
+
+    def refresh_pg_project_list(self):
+        self.pgProjectList.setModel(self.pg_project_model.model)
+
+    def refresh_offline_layer_list(self):
+        self.offlineLayerList.setModel(self.offline_layer_model.model)
+
+    def selected_destination_path(self):
+        """Return the selected destination file or ``None`` if no destination
+        file has been selected."""
+        return self.pgProjectDestFileWidget.filePath() or None
+
+    def selected_extent(self):
+        """Return the selected extent from where data should be downloaded."""
+        extent = self.pgProjectDownloadExtent.outputExtent()
+        if extent.area() == 0.0:
+            return None
+        else:
+            return extent
+
+    def selected_pg_project(self):
+        """Return the selected project name or ``None`` if no project is
+        selected."""
+        selected_rows = self.pg_project_selection_model().selectedRows()
+        if selected_rows:
+            return self.pg_project_model.project_at_index(selected_rows[0])
+        else:
+            return None
+
+    def set_offline_layer_model(self, model):
+        """Link to the given ``OfflineLayerListModel`` instance."""
+        self.offline_layer_model = model
+
+    def set_pg_project_model(self, model):
+        """Link to the given ``PostgresPorjectListModel`` instance."""
+        self.pg_project_model = model
+
+    def update_download_button_state(self):
+        """Set the download button enable or disable depending on UI state."""
+        if (not self.selected_pg_project() or
+                not self.selected_destination_path()):
+            self.downloadButton.setEnabled(False)
+        else:
+            self.downloadButton.setEnabled(True)
+
+    def update_upload_button_state(self):
+        """Set the upload button enable or disable depending on UI state."""
+        if self.offline_layer_model.is_empty():
+            self.uploadButton.setEnabled(False)
+        else:
+            self.uploadButton.setEnabled(True)

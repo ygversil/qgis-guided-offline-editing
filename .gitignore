@@ -119,3 +119,5 @@ flexfield/flexfieldjs/node_modules/
 i18n/*.qm
 qgis-auth.db
 testapp.py
+resources.py
+pb_tool.cfg

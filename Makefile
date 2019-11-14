@@ -39,19 +39,31 @@ LRELEASE = lrelease
 # translation
 SOURCES = \
 	__init__.py \
-	guided_offline_editing.py guided_offline_editing_dialog.py
+	context_managers.py \
+	db_manager.py \
+	guided_offline_editing.py \
+	guided_offline_editing_dialog.py \
+	guided_offline_editing_progress_dialog.py \
+	model.py
 
 PLUGINNAME = guided_offline_editing
 
 PY_FILES = \
 	__init__.py \
-	guided_offline_editing.py guided_offline_editing_dialog.py
+	context_managers.py \
+	db_manager.py \
+	guided_offline_editing.py \
+	guided_offline_editing_dialog.py \
+	guided_offline_editing_progress_dialog.py \
+	model.py
 
-UI_FILES = guided_offline_editing_dialog_base.ui
+UI_FILES = \
+	guided_offline_editing_dialog_base.ui \
+	guided_offline_editing_progress_dialog_base.ui
 
-EXTRAS = metadata.txt icon.png
+EXTRAS = metadata.txt
 
-EXTRA_DIRS =
+EXTRA_DIRS = i18n icons
 
 COMPILED_RESOURCE_FILES = resources.py
 
