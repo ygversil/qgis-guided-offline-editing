@@ -33,17 +33,23 @@ class GuidedOfflineEditingPluginDialogTest(unittest.TestCase):
         """Runs after each test."""
         self.dialog = None
 
-    def test_dialog_ok(self):
-        """Test we can click OK."""
-
-        button = self.dialog.button_box.button(QDialogButtonBox.Ok)
+    def test_dialog_download(self):
+        """Check that clicking Download button close window as rejected."""
+        button = self.dialog.downloadButton
         button.click()
         result = self.dialog.result()
-        self.assertEqual(result, QDialog.Accepted)
+        self.assertEqual(result, QDialog.Rejected)
 
-    def test_dialog_cancel(self):
-        """Test we can click cancel."""
-        button = self.dialog.button_box.button(QDialogButtonBox.Cancel)
+    def test_dialog_upload(self):
+        """Check that clicking Download button close window as rejected."""
+        button = self.dialog.uploadButton
+        button.click()
+        result = self.dialog.result()
+        self.assertEqual(result, QDialog.Rejected)
+
+    def test_dialog_close(self):
+        """Check that clicking Close button close window as rejected."""
+        button = self.dialog.closeButtonBox.button(QDialogButtonBox.Close)
         button.click()
         result = self.dialog.result()
         self.assertEqual(result, QDialog.Rejected)
