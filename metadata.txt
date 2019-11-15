@@ -23,7 +23,8 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=0.3 - First public release
+- Read config from QgsSettings (that is in QGIS INI file)
 
 # Tags are comma separated with spaces allowed
 tags=attribute table,attribute,attribute edit,database,digitizing,editing,feature,field,vector,layers,python,qgis,gis,offline,synchronize
