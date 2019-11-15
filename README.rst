@@ -64,6 +64,87 @@ He or she can now edit the layers offline and, when back online, launch the
 plugin again and click the upload button to synchronize the layers online.
 
 
+Requirements and settings
+=========================
+
+QGIS minimum version
+--------------------
+
+Since this plugin saves QGIS projects in GeoPackage files, **QGIS 3.8 or
+later** is required, and this is the only software requirement.
+
+Common configuration ID in QGIS authentication database
+-------------------------------------------------------
+
+In a multi-user context (eg. an organization), for each user to be able to
+connect to PostgreSQL and open projects and layers, each user must store its
+PostgreSQL credentials in QGIS authentication database under a configuration
+with **the same ID for all users**. For example, if ``orgldap`` is the *authid*
+to be shared across all users, the user A must store its PostgreSQL credentials
+with this specific authid (username: ``usera``, password: ``secreta``, authid:
+``orgldap``), and user B must also use the same authid (username: ``userb``,
+password: ``secretb``, authid: ``orgldap``). *Under no circumstances you should
+let the authid to be automatically generated*.
+
+See the following link for more information:
+https://docs.qgis.org/3.4/en/docs/user_manual/auth_system/auth_overview.html
+
+Plugin configuration
+--------------------
+
+PostgreSQL connection information must be provided as QGIS settings, in QGIS
+INI file (either the global one, or the ``QGIS3.ini`` file in each user
+folder), under a ``[Plugin-GuidedOfflineEditing]`` section. Possible values in
+this section are:
+
+* ``host``: PostgreSQL host (default: ``localhost``),
+
+* ``port``: PostgreSQL port (default: ``5432``),
+
+* ``authcfg``: configuration ID in QGIS authentication database where
+  PostgreSQL credentials are stored (default: ``authorg``),
+
+* ``sslmode``: ``enabled`` or ``disabled`` depending whether SSL is used to
+  connect to PostgreSQL (default: ``disabled``),
+
+* ``dbname``: PostgreSQL database where QGIS projects are saved (default:
+  ``orgdb``),
+
+* ``schema``: PostgreSQL schema where QGIS projects are saved (default:
+  ``qgis``).
+
+Here is an example configuration tu put in ``QGIS3.ini`` file:
+
+::
+
+        [Plugin-GuidedOfflineEditing]
+        host=db.priv.acme.org
+        port=5432
+        authcfg=acmeaut
+        dbname=acmedb
+        schema=qgis
+        sslmode=disabled
+
+If you are deploying QGIS on multiple computer, you can put this configuration
+in a global INI file, (eg. ``qgis_acme_sttings.ini``) and set the
+``QGIS_GLOBAL_SETTINGS_FILE`` environment variable. See the following link for
+more information:
+https://docs.qgis.org/3.4/en/docs/user_manual/introduction/qgis_configuration.html#deploying-qgis-within-an-organization
+
+
+PostgreSQL permissions
+----------------------
+
+Finally, care must be taken that each user has sufficient permissions to edit
+relevant tables (``SELECT``, ``INSERT``, ``UPDATE``, ``DELETE``). The easiest
+way to achieve this is to create a role (a PostgreSQL user with ``NOLOGIN``
+permission), grant correct permissions to this role on all tables that need to
+be edited, and assign each actual user to this role.
+
+See the following link for more information:
+https://www.postgresql.org/docs/current/role-membership.html
+
+
 Caveats when designing tables
 =============================
 
