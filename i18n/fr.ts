@@ -21,47 +21,47 @@
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="390"/>
+        <location filename="../guided_offline_editing.py" line="385"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="393"/>
+        <location filename="../guided_offline_editing.py" line="388"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="396"/>
+        <location filename="../guided_offline_editing.py" line="391"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="399"/>
+        <location filename="../guided_offline_editing.py" line="394"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="402"/>
+        <location filename="../guided_offline_editing.py" line="397"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="405"/>
+        <location filename="../guided_offline_editing.py" line="400"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="408"/>
+        <location filename="../guided_offline_editing.py" line="403"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="329"/>
+        <location filename="../guided_offline_editing.py" line="322"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="420"/>
+        <location filename="../guided_offline_editing.py" line="415"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
@@ -74,12 +74,12 @@
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="198"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="181"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="175"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="158"/>
         <source>Offline layers</source>
         <translation>Couches hors-connexions</translation>
     </message>
@@ -94,21 +94,6 @@
         <translation>Emprise à télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="144"/>
-        <source>Select a file for projet and layers</source>
-        <translation>Sélectionner un fichier pour le projet et les couches</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="147"/>
-        <source>GeoPackage (*.gpkg)</source>
-        <translation>GeoPackage (*.gpkg)</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="137"/>
-        <source>Destination GeoPackage</source>
-        <translation>GeoPackage de destination</translation>
-    </message>
-    <message>
         <location filename="../guided_offline_editing_dialog_base.ui" line="54"/>
         <source>Select project to work with</source>
         <translation>Sélectionner le projet sur lequel travailler</translation>
@@ -119,7 +104,7 @@
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="157"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="140"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
     </message>

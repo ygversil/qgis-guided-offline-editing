@@ -72,7 +72,7 @@ def build_gpkg_project_url(gpkg_path, project=None):
     return build_url(
         UrlParts(scheme=GPKG_PROJECT_STORAGE_TYPE,
                  netloc='',
-                 path=gpkg_path,
+                 path=str(gpkg_path),
                  parameters='',
                  query=build_url_query(query_params),
                  fragment='')

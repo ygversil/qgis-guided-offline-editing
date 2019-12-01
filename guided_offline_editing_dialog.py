@@ -26,7 +26,6 @@ import os
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
-from qgis.gui import QgsFileWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the
 # elements from Qt Designer
@@ -46,7 +45,6 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.pgProjectDestFileWidget.setStorageMode(QgsFileWidget.SaveFile)
         self.pg_project_model = None
         self.offline_layer_model = None
 
@@ -81,11 +79,6 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def refresh_offline_layer_list(self):
         self.offlineLayerList.setModel(self.offline_layer_model.model)
 
-    def selected_destination_path(self):
-        """Return the selected destination file or ``None`` if no destination
-        file has been selected."""
-        return self.pgProjectDestFileWidget.filePath() or None
-
     def selected_extent(self):
         """Return the selected extent from where data should be downloaded."""
         extent = self.pgProjectDownloadExtent.outputExtent()
@@ -113,17 +106,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def update_go_button_state(self):
         """Set the download button enable or disable depending on UI state."""
-        if self.downloadCheckBox.isChecked():
-            if (not self.selected_pg_project() or
-                    not self.selected_destination_path()):
-                self.goButton.setEnabled(False)
-            else:
-                self.goButton.setEnabled(True)
+        if not self.selected_pg_project():
+            self.goButton.setEnabled(False)
         else:
-            if not self.selected_pg_project():
-                self.goButton.setEnabled(False)
-            else:
-                self.goButton.setEnabled(True)
+            self.goButton.setEnabled(True)
 
     def update_upload_button_state(self):
         """Set the upload button enable or disable depending on UI state."""

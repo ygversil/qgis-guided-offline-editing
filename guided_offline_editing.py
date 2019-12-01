@@ -265,9 +265,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadCheckBox.stateChanged.connect(
             self.dlg.update_go_button_state
         )
-        self.dlg.pgProjectDestFileWidget.fileChanged.connect(
-            self.dlg.update_go_button_state
-        )
         self.dlg.goButton.clicked.connect(
             self.add_pg_layers_and_convert_to_offline
         )
@@ -298,9 +295,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadCheckBox.stateChanged.disconnect(
             self.dlg.update_go_button_state
         )
-        self.dlg.pgProjectDestFileWidget.fileChanged.disconnect(
-            self.dlg.update_go_button_state
-        )
         self.dlg.goButton.clicked.disconnect(
             self.add_pg_layers_and_convert_to_offline
         )
@@ -325,7 +319,6 @@ class GuidedOfflineEditingPlugin:
 
     def convert_layers_to_offline(self, layer_ids, dest_path,
                                   only_selected=False):
-        dest_path = pathlib.Path(dest_path)
         self.progress_dlg.set_title(self.tr('Downloading layers...'))
         self.offliner.convertToOfflineProject(
             str(dest_path.parent),
@@ -341,7 +334,6 @@ class GuidedOfflineEditingPlugin:
         with cleanup(
             selections_to_clear=[self.dlg.pg_project_selection_model()],
             models_to_refresh=[self.offline_layer_model],
-            file_widget_to_clear=self.dlg.pgProjectDestFileWidget,
         ):
             self.iface.addProject(build_pg_project_url(
                 host=self.pg_host,
@@ -354,7 +346,10 @@ class GuidedOfflineEditingPlugin:
             ))
             if not self.dlg.downloadCheckBox.isChecked():
                 return
-            dest_path = self.dlg.selected_destination_path()
+            gpkg_name = pathlib.Path(
+                '{project_name}_offline.gpkg'.format(project_name=project_name)
+            )
+            dest_path = self.root_path / gpkg_name
             with transactional_project(
                 dest_url=build_gpkg_project_url(dest_path,
                                                 project=project_name)
