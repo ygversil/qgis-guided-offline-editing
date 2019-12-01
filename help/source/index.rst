@@ -29,6 +29,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   admin_guide.rst
+
 Indices and tables
 ==================
 
