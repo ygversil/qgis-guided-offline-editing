@@ -350,6 +350,8 @@ class GuidedOfflineEditingPlugin:
                 sslmode=self.pg_sslmode,
                 project=project_name
             ))
+            if not self.dlg.downloadCheckBox.isChecked():
+                return
             dest_path = self.dlg.selected_destination_path()
             with transactional_project(
                 dest_url=build_gpkg_project_url(dest_path,
