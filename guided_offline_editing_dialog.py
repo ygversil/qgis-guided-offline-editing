@@ -50,6 +50,18 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pg_project_model = None
         self.offline_layer_model = None
 
+    def disable_download_check_box(self):
+        """Disable download check box and show hint."""
+        self.downloadCheckBox.setChecked(False)
+        self.downloadCheckBox.setEnabled(False)
+        self.downloadCheckBoxHint.show()
+
+    def enable_download_check_box(self):
+        """Enable download check box and hide hint."""
+        self.downloadCheckBoxHint.hide()
+        self.downloadCheckBox.setEnabled(True)
+        self.downloadCheckBox.setChecked(False)
+
     def initialize_extent_group_box(self, original_extent, current_extent,
                                     output_crs, canvas):
         self.pgProjectDownloadExtent.setOriginalExtent(original_extent,

@@ -11,57 +11,57 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="177"/>
+        <location filename="../guided_offline_editing.py" line="178"/>
         <source>Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="188"/>
+        <location filename="../guided_offline_editing.py" line="189"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="388"/>
+        <location filename="../guided_offline_editing.py" line="390"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="391"/>
+        <location filename="../guided_offline_editing.py" line="393"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="394"/>
+        <location filename="../guided_offline_editing.py" line="396"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="397"/>
+        <location filename="../guided_offline_editing.py" line="399"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="400"/>
+        <location filename="../guided_offline_editing.py" line="402"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="403"/>
+        <location filename="../guided_offline_editing.py" line="405"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="406"/>
+        <location filename="../guided_offline_editing.py" line="408"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="327"/>
+        <location filename="../guided_offline_editing.py" line="329"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="418"/>
+        <location filename="../guided_offline_editing.py" line="420"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
@@ -74,12 +74,12 @@
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="145"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="198"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="122"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="175"/>
         <source>Offline layers</source>
         <translation>Couches hors-connexions</translation>
     </message>
@@ -89,22 +89,22 @@
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="127"/>
         <source>Extent to download</source>
         <translation>Emprise à télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="91"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="144"/>
         <source>Select a file for projet and layers</source>
         <translation>Sélectionner un fichier pour le projet et les couches</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="94"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="147"/>
         <source>GeoPackage (*.gpkg)</source>
         <translation>GeoPackage (*.gpkg)</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="84"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="137"/>
         <source>Destination GeoPackage</source>
         <translation>GeoPackage de destination</translation>
     </message>
@@ -114,14 +114,19 @@
         <translation>Sélectionner le projet sur lequel travailler</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="64"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="66"/>
         <source>Download offline</source>
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="104"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="157"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="118"/>
+        <source>Set global variable gis_data_home to a valid folder to allow download.</source>
+        <translation>Déclarez la variable globale gis_data_home avec un dossier valide pour autoriser le téléchargement.</translation>
     </message>
 </context>
 <context>

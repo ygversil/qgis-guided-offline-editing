@@ -52,6 +52,7 @@ import os.path
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
 layer_scope = QgsExpressionContextUtils.layerScope
+global_scope = QgsExpressionContextUtils.globalScope
 
 
 class GuidedOfflineEditingPlugin:
@@ -201,6 +202,7 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
+        self.update_download_check_box()
         self.offliner = QgsOfflineEditing()
         s = QgsSettings()
         self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
@@ -417,3 +419,15 @@ class GuidedOfflineEditingPlugin:
         ):
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
+
+    def update_download_check_box(self):
+        """Check or uncheck download check box depending on the gis_data_home
+        global variable."""
+        self.root_path = qgis_variable(global_scope(), 'gis_data_home')
+        self.root_path = (pathlib.Path(self.root_path) if self.root_path
+                          else None)
+        if (self.root_path and self.root_path.exists()
+                and self.root_path.is_dir()):
+            self.dlg.enable_download_check_box()
+        else:
+            self.dlg.disable_download_check_box()
