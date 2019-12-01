@@ -235,7 +235,7 @@ class GuidedOfflineEditingPlugin:
                                              current_extent,
                                              output_crs,
                                              self.canvas)
-        self.dlg.update_download_button_state()
+        self.dlg.update_go_button_state()
         self.dlg.update_upload_button_state()
         self.offliner.progressModeSet.connect(
             self.set_progress_mode
@@ -258,12 +258,15 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_upload_button_state
         )
         self.dlg.pg_project_selection_model().selectionChanged.connect(
-            self.dlg.update_download_button_state
+            self.dlg.update_go_button_state
+        )
+        self.dlg.downloadCheckBox.stateChanged.connect(
+            self.dlg.update_go_button_state
         )
         self.dlg.pgProjectDestFileWidget.fileChanged.connect(
-            self.dlg.update_download_button_state
+            self.dlg.update_go_button_state
         )
-        self.dlg.downloadButton.clicked.connect(
+        self.dlg.goButton.clicked.connect(
             self.add_pg_layers_and_convert_to_offline
         )
         self.dlg.uploadButton.clicked.connect(
@@ -288,12 +291,15 @@ class GuidedOfflineEditingPlugin:
         )
         self.offliner.progressStopped.disconnect(self.progress_dlg.hide)
         self.dlg.pg_project_selection_model().selectionChanged.disconnect(
-            self.dlg.update_download_button_state
+            self.dlg.update_go_button_state
+        )
+        self.dlg.downloadCheckBox.stateChanged.disconnect(
+            self.dlg.update_go_button_state
         )
         self.dlg.pgProjectDestFileWidget.fileChanged.disconnect(
-            self.dlg.update_download_button_state
+            self.dlg.update_go_button_state
         )
-        self.dlg.downloadButton.clicked.disconnect(
+        self.dlg.goButton.clicked.disconnect(
             self.add_pg_layers_and_convert_to_offline
         )
         self.dlg.uploadButton.clicked.disconnect(
@@ -344,6 +350,8 @@ class GuidedOfflineEditingPlugin:
                 sslmode=self.pg_sslmode,
                 project=project_name
             ))
+            if not self.dlg.downloadCheckBox.isChecked():
+                return
             dest_path = self.dlg.selected_destination_path()
             with transactional_project(
                 dest_url=build_gpkg_project_url(dest_path,

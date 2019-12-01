@@ -51,12 +51,22 @@
        <item>
         <widget class="QLabel" name="pgProjectLabel">
          <property name="text">
-          <string>Select project to download</string>
+          <string>Select project to work with</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QListView" name="pgProjectList"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="downloadCheckBox">
+         <property name="text">
+          <string>Download offline</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="pgProjectDownloadExtentLabel">
@@ -86,12 +96,12 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="downloadButton">
+        <widget class="QPushButton" name="goButton">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="text">
-          <string>Download</string>
+          <string>Go!</string>
          </property>
         </widget>
        </item>
@@ -189,7 +199,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>downloadButton</sender>
+   <sender>goButton</sender>
    <signal>clicked()</signal>
    <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
    <slot>reject()</slot>
