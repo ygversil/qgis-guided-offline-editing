@@ -5,7 +5,9 @@ Guided Offline Editing
 Guided Offline Editing is a plugin for QGIS to help users with offline edition
 of PostgreSQL/Postgis layers.
 
-Project homepage: https://github.com/ygversil/qgis-guided-offline-editing
+* Project homepage: https://github.com/ygversil/qgis-guided-offline-editing
+
+* Documentation: https://qgis-guided-offline-editing.readthedocs.io/en/latest/
 
 How does it works ?
 ===================
