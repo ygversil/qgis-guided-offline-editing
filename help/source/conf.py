@@ -86,6 +86,16 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# Add number to figure, tables, ...
+numfig = True
+numfig_secnum_depth = 2
+numfig_format = {
+    'figure': 'Fig. %s',
+    'table': 'Tab. %s',
+    'code-block': 'Listing %s',
+    'section': 'Section'
+}
+
 
 # -- Options for HTML output ---------------------------------------------------
 
