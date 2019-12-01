@@ -260,6 +260,9 @@ class GuidedOfflineEditingPlugin:
         self.dlg.pg_project_selection_model().selectionChanged.connect(
             self.dlg.update_go_button_state
         )
+        self.dlg.downloadCheckBox.stateChanged.connect(
+            self.dlg.update_go_button_state
+        )
         self.dlg.pgProjectDestFileWidget.fileChanged.connect(
             self.dlg.update_go_button_state
         )
@@ -288,6 +291,9 @@ class GuidedOfflineEditingPlugin:
         )
         self.offliner.progressStopped.disconnect(self.progress_dlg.hide)
         self.dlg.pg_project_selection_model().selectionChanged.disconnect(
+            self.dlg.update_go_button_state
+        )
+        self.dlg.downloadCheckBox.stateChanged.disconnect(
             self.dlg.update_go_button_state
         )
         self.dlg.pgProjectDestFileWidget.fileChanged.disconnect(

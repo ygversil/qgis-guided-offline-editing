@@ -101,11 +101,17 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def update_go_button_state(self):
         """Set the download button enable or disable depending on UI state."""
-        if (not self.selected_pg_project() or
-                not self.selected_destination_path()):
-            self.goButton.setEnabled(False)
+        if self.downloadCheckBox.isChecked():
+            if (not self.selected_pg_project() or
+                    not self.selected_destination_path()):
+                self.goButton.setEnabled(False)
+            else:
+                self.goButton.setEnabled(True)
         else:
-            self.goButton.setEnabled(True)
+            if not self.selected_pg_project():
+                self.goButton.setEnabled(False)
+            else:
+                self.goButton.setEnabled(True)
 
     def update_upload_button_state(self):
         """Set the upload button enable or disable depending on UI state."""
