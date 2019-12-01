@@ -10,7 +10,7 @@
 name=Guided Offline Editing
 qgisMinimumVersion=3.8
 description=Extend the built-in Offline Editing plugin providing automated processes
-version=0.4.0-dev1
+version=0.4.0
 author=Yann Voté
 email=ygversil@lilo.org
 
