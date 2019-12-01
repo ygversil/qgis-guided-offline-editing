@@ -237,6 +237,7 @@ class GuidedOfflineEditingPlugin:
                                              current_extent,
                                              output_crs,
                                              self.canvas)
+        self.dlg.update_extent_group_box_state()
         self.dlg.update_go_button_state()
         self.dlg.update_upload_button_state()
         self.offliner.progressModeSet.connect(
@@ -264,6 +265,9 @@ class GuidedOfflineEditingPlugin:
         )
         self.dlg.downloadCheckBox.stateChanged.connect(
             self.dlg.update_go_button_state
+        )
+        self.dlg.downloadCheckBox.stateChanged.connect(
+            self.dlg.update_extent_group_box_state
         )
         self.dlg.goButton.clicked.connect(
             self.add_pg_layers_and_convert_to_offline
@@ -294,6 +298,9 @@ class GuidedOfflineEditingPlugin:
         )
         self.dlg.downloadCheckBox.stateChanged.disconnect(
             self.dlg.update_go_button_state
+        )
+        self.dlg.downloadCheckBox.stateChanged.disconnect(
+            self.dlg.update_extent_group_box_state
         )
         self.dlg.goButton.clicked.disconnect(
             self.add_pg_layers_and_convert_to_offline

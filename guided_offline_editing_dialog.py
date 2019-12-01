@@ -104,6 +104,13 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Link to the given ``PostgresPorjectListModel`` instance."""
         self.pg_project_model = model
 
+    def update_extent_group_box_state(self):
+        """Set the extent group box enable or disable depending on UI state."""
+        if self.downloadCheckBox.isChecked():
+            self.pgProjectDownloadExtent.setEnabled(True)
+        else:
+            self.pgProjectDownloadExtent.setEnabled(False)
+
     def update_go_button_state(self):
         """Set the download button enable or disable depending on UI state."""
         if not self.selected_pg_project():
