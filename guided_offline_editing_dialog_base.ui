@@ -47,7 +47,7 @@
       <attribute name="title">
        <string>Download</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QLabel" name="pgProjectLabel">
          <property name="text">
@@ -59,14 +59,67 @@
         <widget class="QListView" name="pgProjectList"/>
        </item>
        <item>
-        <widget class="QCheckBox" name="downloadCheckBox">
-         <property name="text">
-          <string>Download offline</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QCheckBox" name="downloadCheckBox">
+           <property name="text">
+            <string>Download offline</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="downloadCheckBoxHint">
+           <property name="palette">
+            <palette>
+             <active>
+              <colorrole role="WindowText">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>170</red>
+                 <green>0</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </active>
+             <inactive>
+              <colorrole role="WindowText">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>170</red>
+                 <green>0</green>
+                 <blue>0</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </inactive>
+             <disabled>
+              <colorrole role="WindowText">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>160</red>
+                 <green>162</green>
+                 <blue>162</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </disabled>
+            </palette>
+           </property>
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Set global variable gis_data_home to a valid folder to allow download.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QLabel" name="pgProjectDownloadExtentLabel">
@@ -77,23 +130,6 @@
        </item>
        <item>
         <widget class="QgsExtentGroupBox" name="pgProjectDownloadExtent"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="pgProjectDestFileLabel">
-         <property name="text">
-          <string>Destination GeoPackage</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QgsFileWidget" name="pgProjectDestFileWidget">
-         <property name="dialogTitle">
-          <string>Select a file for projet and layers</string>
-         </property>
-         <property name="filter">
-          <string>GeoPackage (*.gpkg)</string>
-         </property>
-        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="goButton">
@@ -171,11 +207,6 @@
    <extends>QgsCollapsibleGroupBox</extends>
    <header>qgsextentgroupbox.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QgsFileWidget</class>
-   <extends>QWidget</extends>
-   <header>qgsfilewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

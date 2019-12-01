@@ -52,6 +52,7 @@ import os.path
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
 layer_scope = QgsExpressionContextUtils.layerScope
+global_scope = QgsExpressionContextUtils.globalScope
 
 
 class GuidedOfflineEditingPlugin:
@@ -201,6 +202,7 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
+        self.update_download_check_box()
         self.offliner = QgsOfflineEditing()
         s = QgsSettings()
         self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
@@ -263,9 +265,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadCheckBox.stateChanged.connect(
             self.dlg.update_go_button_state
         )
-        self.dlg.pgProjectDestFileWidget.fileChanged.connect(
-            self.dlg.update_go_button_state
-        )
         self.dlg.goButton.clicked.connect(
             self.add_pg_layers_and_convert_to_offline
         )
@@ -296,9 +295,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.downloadCheckBox.stateChanged.disconnect(
             self.dlg.update_go_button_state
         )
-        self.dlg.pgProjectDestFileWidget.fileChanged.disconnect(
-            self.dlg.update_go_button_state
-        )
         self.dlg.goButton.clicked.disconnect(
             self.add_pg_layers_and_convert_to_offline
         )
@@ -323,7 +319,6 @@ class GuidedOfflineEditingPlugin:
 
     def convert_layers_to_offline(self, layer_ids, dest_path,
                                   only_selected=False):
-        dest_path = pathlib.Path(dest_path)
         self.progress_dlg.set_title(self.tr('Downloading layers...'))
         self.offliner.convertToOfflineProject(
             str(dest_path.parent),
@@ -339,7 +334,6 @@ class GuidedOfflineEditingPlugin:
         with cleanup(
             selections_to_clear=[self.dlg.pg_project_selection_model()],
             models_to_refresh=[self.offline_layer_model],
-            file_widget_to_clear=self.dlg.pgProjectDestFileWidget,
         ):
             self.iface.addProject(build_pg_project_url(
                 host=self.pg_host,
@@ -352,7 +346,10 @@ class GuidedOfflineEditingPlugin:
             ))
             if not self.dlg.downloadCheckBox.isChecked():
                 return
-            dest_path = self.dlg.selected_destination_path()
+            gpkg_name = pathlib.Path(
+                '{project_name}_offline.gpkg'.format(project_name=project_name)
+            )
+            dest_path = self.root_path / gpkg_name
             with transactional_project(
                 dest_url=build_gpkg_project_url(dest_path,
                                                 project=project_name)
@@ -417,3 +414,15 @@ class GuidedOfflineEditingPlugin:
         ):
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
+
+    def update_download_check_box(self):
+        """Check or uncheck download check box depending on the gis_data_home
+        global variable."""
+        self.root_path = qgis_variable(global_scope(), 'gis_data_home')
+        self.root_path = (pathlib.Path(self.root_path) if self.root_path
+                          else None)
+        if (self.root_path and self.root_path.exists()
+                and self.root_path.is_dir()):
+            self.dlg.enable_download_check_box()
+        else:
+            self.dlg.disable_download_check_box()

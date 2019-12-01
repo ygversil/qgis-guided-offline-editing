@@ -31,8 +31,7 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def cleanup(selections_to_clear=None, models_to_refresh=None,
-            file_widget_to_clear=None):
+def cleanup(selections_to_clear=None, models_to_refresh=None):
     """Context manager that ensure cleaning actions are taken on exit."""
     try:
         QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -52,8 +51,6 @@ def cleanup(selections_to_clear=None, models_to_refresh=None,
         models_to_refresh = models_to_refresh or []
         for model in models_to_refresh:
             model.refresh_data()
-        if file_widget_to_clear is not None:
-            file_widget_to_clear.setFilePath('')
         QtWidgets.QApplication.restoreOverrideCursor()
 
 
