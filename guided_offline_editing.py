@@ -44,7 +44,7 @@ from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel
-from .context_managers import cleanup, transactional_project
+from .context_managers import cleanup, removing, transactional_project
 from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path
 
@@ -346,38 +346,41 @@ class GuidedOfflineEditingPlugin:
             ))
             if not self.dlg.downloadCheckBox.isChecked():
                 return
+            qgz_name = pathlib.Path(
+                '{project_name}_offline.qgz'.format(project_name=project_name)
+            )
             gpkg_name = pathlib.Path(
                 '{project_name}_offline.gpkg'.format(project_name=project_name)
             )
+            qgz_path = self.root_path / qgz_name
             dest_path = self.root_path / gpkg_name
-            with transactional_project(
-                dest_url=build_gpkg_project_url(dest_path,
-                                                project=project_name)
-            ) as proj:
-                proj.writeEntryBool('Paths', '/Absolute', False)
-            with transactional_project(
-                dest_url=build_gpkg_project_url(dest_path,
-                                                project=project_name)
-            ) as proj:
-                layer_ids_to_download = [
-                    layer_id
-                    for layer_id, layer in proj.mapLayers().items()
-                    if (
-                        qgis_variable(layer_scope(layer), 'offline') and
-                        qgis_variable(layer_scope(layer), 'offline').lower()
-                        not in ('no', 'false')
-                    )
-                ]
-                extent = self.dlg.selected_extent()
-                if extent is not None:
-                    self.select_feature_by_extent(proj, layer_ids_to_download,
-                                                  extent)
-                    only_selected = True
-                else:
-                    only_selected = False
-                self.convert_layers_to_offline(layer_ids_to_download,
-                                               dest_path,
-                                               only_selected=only_selected)
+            with removing(path=qgz_path):
+                with transactional_project(dest_url=str(qgz_path)) as proj:
+                    proj.writeEntryBool('Paths', '/Absolute', False)
+                with transactional_project(
+                    dest_url=build_gpkg_project_url(dest_path,
+                                                    project=project_name)
+                ) as proj:
+                    layer_ids_to_download = [
+                        layer_id
+                        for layer_id, layer in proj.mapLayers().items()
+                        if (
+                            qgis_variable(layer_scope(layer), 'offline') and
+                            qgis_variable(layer_scope(layer), 'offline')
+                            .lower() not in ('no', 'false')
+                        )
+                    ]
+                    extent = self.dlg.selected_extent()
+                    if extent is not None:
+                        self.select_feature_by_extent(proj,
+                                                      layer_ids_to_download,
+                                                      extent)
+                        only_selected = True
+                    else:
+                        only_selected = False
+                    self.convert_layers_to_offline(layer_ids_to_download,
+                                                   dest_path,
+                                                   only_selected=only_selected)
 
     def set_progress_mode(self, mode, max_):
         """Update progress dialog information."""
