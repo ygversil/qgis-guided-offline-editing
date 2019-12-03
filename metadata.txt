@@ -27,6 +27,7 @@ changelog=
   Version 0.5
   * Allow not to download project and directly edit in PostgreSQL/Postgis,
   * When project is downloaded offline, enforce to save it in `gis_data_home` folder, and compute filename from project name in PostgreSQL. Thus do not ask anymore user to select destination file. `gis_data_home` must be a QGIS global variable referencing a valid folder. The reason for this is to allow local filesystem layers in shared projects saved in PostgreSQL. Consequently, eash user must have the same folder tree and the same common layers inside `gis_data_home` folder,
+  * Before converting offline a project, if it is already loaded in QGIS, do not load it again from PostgreSQL,
   * bugfix: error when destination GeoPackage does not exists prior to converting the project offline,
   ====
   Version 0.3 - First public release
