@@ -79,6 +79,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def refresh_offline_layer_list(self):
         self.offlineLayerList.setModel(self.offline_layer_model.model)
 
+    def select_project_at_index(self, index):
+        """Select the project at given index in project list."""
+        self.pgProjectList.setCurrentIndex(index)
+
     def selected_extent(self):
         """Return the selected extent from where data should be downloaded."""
         extent = self.pgProjectDownloadExtent.outputExtent()

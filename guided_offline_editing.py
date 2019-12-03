@@ -32,6 +32,7 @@ from qgis.core import (
     QgsExpressionContextScope,
     QgsExpressionContextUtils,
     QgsOfflineEditing,
+    QgsProject,
     QgsRectangle,
     QgsSettings,
 )
@@ -45,7 +46,8 @@ from .guided_offline_editing_progress_dialog import (
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel
 from .context_managers import cleanup, removing, transactional_project
-from .db_manager import build_gpkg_project_url, build_pg_project_url
+from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
+                         build_pg_project_url)
 import os.path
 
 
@@ -240,6 +242,14 @@ class GuidedOfflineEditingPlugin:
         self.dlg.update_extent_group_box_state()
         self.dlg.update_go_button_state()
         self.dlg.update_upload_button_state()
+        proj = QgsProject.instance()
+        proj_storage = proj.projectStorage()
+        if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE:
+            index = self.pg_project_model.index_for_project_name(
+                proj.baseName()
+            )
+            if index is not None:
+                self.dlg.select_project_at_index(index)
         self.offliner.progressModeSet.connect(
             self.set_progress_mode
         )

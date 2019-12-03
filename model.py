@@ -64,6 +64,13 @@ class PostgresProjectListModel(QObject):
         """Return the name of project at given index."""
         return self.model.data(index, Qt.DisplayRole)
 
+    def index_for_project_name(self, project_name):
+        """Return the index of the given name in project list."""
+        indices = self.model.match(self.model.index(0, 0),
+                                   Qt.DisplayRole,
+                                   project_name)
+        return indices[0] if indices else None
+
 
 class OfflineLayerListModel(QObject):
     """Represents offline layers in a QGIS project."""

@@ -11,57 +11,57 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="178"/>
+        <location filename="../guided_offline_editing.py" line="180"/>
         <source>Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="189"/>
+        <location filename="../guided_offline_editing.py" line="191"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="395"/>
+        <location filename="../guided_offline_editing.py" line="405"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="398"/>
+        <location filename="../guided_offline_editing.py" line="408"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="401"/>
+        <location filename="../guided_offline_editing.py" line="411"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="404"/>
+        <location filename="../guided_offline_editing.py" line="414"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="407"/>
+        <location filename="../guided_offline_editing.py" line="417"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="410"/>
+        <location filename="../guided_offline_editing.py" line="420"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="413"/>
+        <location filename="../guided_offline_editing.py" line="423"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="329"/>
+        <location filename="../guided_offline_editing.py" line="339"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="425"/>
+        <location filename="../guided_offline_editing.py" line="435"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
