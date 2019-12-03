@@ -32,6 +32,7 @@ from qgis.core import (
     QgsExpressionContextScope,
     QgsExpressionContextUtils,
     QgsOfflineEditing,
+    QgsProject,
     QgsRectangle,
     QgsSettings,
 )
@@ -45,7 +46,8 @@ from .guided_offline_editing_progress_dialog import (
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel
 from .context_managers import cleanup, removing, transactional_project
-from .db_manager import build_gpkg_project_url, build_pg_project_url
+from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
+                         build_pg_project_url)
 import os.path
 
 
@@ -237,6 +239,14 @@ class GuidedOfflineEditingPlugin:
                                              current_extent,
                                              output_crs,
                                              self.canvas)
+        proj = QgsProject.instance()
+        proj_storage = proj.projectStorage()
+        if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE:
+            index = self.pg_project_model.index_for_project_name(
+                proj.baseName()
+            )
+            if index is not None:
+                self.dlg.select_project_at_index(index)
         self.dlg.update_extent_group_box_state()
         self.dlg.update_go_button_state()
         self.dlg.update_upload_button_state()
@@ -342,15 +352,20 @@ class GuidedOfflineEditingPlugin:
             selections_to_clear=[self.dlg.pg_project_selection_model()],
             models_to_refresh=[self.offline_layer_model],
         ):
-            self.iface.addProject(build_pg_project_url(
-                host=self.pg_host,
-                port=self.pg_port,
-                dbname=self.pg_dbname,
-                schema=self.pg_schema,
-                authcfg=self.pg_authcfg,
-                sslmode=self.pg_sslmode,
-                project=project_name
-            ))
+            proj = QgsProject.instance()
+            proj_storage = proj.projectStorage()
+            if (not proj_storage
+                    or proj_storage.type() != PG_PROJECT_STORAGE_TYPE
+                    or proj.baseName() != project_name):
+                self.iface.addProject(build_pg_project_url(
+                    host=self.pg_host,
+                    port=self.pg_port,
+                    dbname=self.pg_dbname,
+                    schema=self.pg_schema,
+                    authcfg=self.pg_authcfg,
+                    sslmode=self.pg_sslmode,
+                    project=project_name
+                ))
             if not self.dlg.downloadCheckBox.isChecked():
                 return
             qgz_name = pathlib.Path(
