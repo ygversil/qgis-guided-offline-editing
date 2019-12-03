@@ -239,9 +239,6 @@ class GuidedOfflineEditingPlugin:
                                              current_extent,
                                              output_crs,
                                              self.canvas)
-        self.dlg.update_extent_group_box_state()
-        self.dlg.update_go_button_state()
-        self.dlg.update_upload_button_state()
         proj = QgsProject.instance()
         proj_storage = proj.projectStorage()
         if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE:
@@ -250,6 +247,9 @@ class GuidedOfflineEditingPlugin:
             )
             if index is not None:
                 self.dlg.select_project_at_index(index)
+        self.dlg.update_extent_group_box_state()
+        self.dlg.update_go_button_state()
+        self.dlg.update_upload_button_state()
         self.offliner.progressModeSet.connect(
             self.set_progress_mode
         )
