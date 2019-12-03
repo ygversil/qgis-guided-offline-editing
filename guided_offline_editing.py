@@ -352,15 +352,20 @@ class GuidedOfflineEditingPlugin:
             selections_to_clear=[self.dlg.pg_project_selection_model()],
             models_to_refresh=[self.offline_layer_model],
         ):
-            self.iface.addProject(build_pg_project_url(
-                host=self.pg_host,
-                port=self.pg_port,
-                dbname=self.pg_dbname,
-                schema=self.pg_schema,
-                authcfg=self.pg_authcfg,
-                sslmode=self.pg_sslmode,
-                project=project_name
-            ))
+            proj = QgsProject.instance()
+            proj_storage = proj.projectStorage()
+            if (not proj_storage
+                    or proj_storage.type() != PG_PROJECT_STORAGE_TYPE
+                    or proj.baseName() != project_name):
+                self.iface.addProject(build_pg_project_url(
+                    host=self.pg_host,
+                    port=self.pg_port,
+                    dbname=self.pg_dbname,
+                    schema=self.pg_schema,
+                    authcfg=self.pg_authcfg,
+                    sslmode=self.pg_sslmode,
+                    project=project_name
+                ))
             if not self.dlg.downloadCheckBox.isChecked():
                 return
             qgz_name = pathlib.Path(
