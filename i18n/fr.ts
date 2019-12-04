@@ -74,12 +74,12 @@
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="181"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="128"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="158"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="105"/>
         <source>Offline layers</source>
         <translation>Couches hors-connexions</translation>
     </message>
@@ -89,7 +89,7 @@
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="127"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
         <source>Extent to download</source>
         <translation>Emprise à télécharger</translation>
     </message>
@@ -99,19 +99,14 @@
         <translation>Sélectionner le projet sur lequel travailler</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="66"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="64"/>
         <source>Download offline</source>
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="140"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="87"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="118"/>
-        <source>Set global variable gis_data_home to a valid folder to allow download.</source>
-        <translation>Déclarez la variable globale gis_data_home avec un dossier valide pour autoriser le téléchargement.</translation>
     </message>
 </context>
 <context>
