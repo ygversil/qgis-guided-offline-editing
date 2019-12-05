@@ -296,7 +296,7 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_extent_group_box_state
         )
         self.dlg.goButton.clicked.connect(
-            self.add_pg_layers_and_convert_to_offline
+            self.download_project
         )
         self.dlg.uploadButton.clicked.connect(
             self.synchronize_offline_layers
@@ -329,7 +329,7 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_extent_group_box_state
         )
         self.dlg.goButton.clicked.disconnect(
-            self.add_pg_layers_and_convert_to_offline
+            self.download_project
         )
         self.dlg.uploadButton.clicked.disconnect(
             self.synchronize_offline_layers
@@ -361,7 +361,7 @@ class GuidedOfflineEditingPlugin:
             containerType=QgsOfflineEditing.GPKG
         )
 
-    def add_pg_layers_and_convert_to_offline(self):
+    def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
         with cleanup(
