@@ -237,31 +237,8 @@ class GuidedOfflineEditingPlugin:
         self.connect_signals()
         self.pg_project_model.refresh_data()
         self.offline_layer_model.refresh_data()
-        output_crs = QgsCoordinateReferenceSystem(self.output_crs_id)
-        original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
-        current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
-        # show the dialog
-        self.dlg.initialize_extent_group_box(original_extent,
-                                             current_extent,
-                                             output_crs,
-                                             self.canvas)
-        proj = QgsProject.instance()
-        proj_storage = proj.projectStorage()
-        if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE:
-            index = self.pg_project_model.index_for_project_name(
-                proj.baseName()
-            )
-            if index is not None:
-                self.dlg.select_project_at_index(index)
-        self.dlg.update_extent_group_box_state()
-        self.dlg.update_go_button_state()
-        self.dlg.update_upload_button_state()
-        if self.offline_layer_model.is_empty():
-            self.dlg.tabWidget.setCurrentIndex(0)
-        else:
-            self.dlg.tabWidget.setCurrentIndex(1)
+        self.initialize_dialog_widgets()
         self.dlg.show()
-        # Run the dialog event loop
         self.dlg.exec_()
         self.disconnect_signals()
 
@@ -383,6 +360,35 @@ class GuidedOfflineEditingPlugin:
                     self.convert_layers_to_offline(layer_ids_to_download,
                                                    dest_path,
                                                    only_selected=only_selected)
+
+    def initialize_dialog_widgets(self):
+        """Set up initial state for dialog widgets."""
+        # Init extent widget
+        output_crs = QgsCoordinateReferenceSystem(self.output_crs_id)
+        original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
+        current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
+        self.dlg.initialize_extent_group_box(original_extent,
+                                             current_extent,
+                                             output_crs,
+                                             self.canvas)
+        # Select current project in project list
+        proj = QgsProject.instance()
+        proj_storage = proj.projectStorage()
+        if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE:
+            index = self.pg_project_model.index_for_project_name(
+                proj.baseName()
+            )
+            if index is not None:
+                self.dlg.select_project_at_index(index)
+        # Init other widgets
+        self.dlg.update_extent_group_box_state()
+        self.dlg.update_go_button_state()
+        self.dlg.update_upload_button_state()
+        # If already offline project, show upload tab
+        if self.offline_layer_model.is_empty():
+            self.dlg.tabWidget.setCurrentIndex(0)
+        else:
+            self.dlg.tabWidget.setCurrentIndex(1)
 
     def read_settings(self):
         """Read plugin settings from config file."""
