@@ -221,16 +221,8 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
+        self.read_settings()
         self.offliner = QgsOfflineEditing()
-        s = QgsSettings()
-        self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
-        self.pg_port = s.value('Plugin-GuidedOfflineEditing/port', 5432)
-        self.pg_authcfg = s.value('Plugin-GuidedOfflineEditing/authcfg',
-                                  'authorg')
-        self.pg_dbname = s.value('Plugin-GuidedOfflineEditing/dbname', 'orgdb')
-        self.pg_schema = s.value('Plugin-GuidedOfflineEditing/schema', 'qgis')
-        self.pg_sslmode = s.value('Plugin-GuidedOfflineEditing/sslmode',
-                                  'disabled')
         self.pg_project_model = PostgresProjectListModel(
             host=self.pg_host,
             port=self.pg_port,
@@ -245,8 +237,7 @@ class GuidedOfflineEditingPlugin:
         self.connect_signals()
         self.pg_project_model.refresh_data()
         self.offline_layer_model.refresh_data()
-        output_crs_id = s.value('Projections/projectDefaultCrs', 'EPSG:4326')
-        output_crs = QgsCoordinateReferenceSystem(output_crs_id)
+        output_crs = QgsCoordinateReferenceSystem(self.output_crs_id)
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         # show the dialog
@@ -392,6 +383,20 @@ class GuidedOfflineEditingPlugin:
                     self.convert_layers_to_offline(layer_ids_to_download,
                                                    dest_path,
                                                    only_selected=only_selected)
+
+    def read_settings(self):
+        """Read plugin settings from config file."""
+        s = QgsSettings()
+        self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
+        self.pg_port = s.value('Plugin-GuidedOfflineEditing/port', 5432)
+        self.pg_authcfg = s.value('Plugin-GuidedOfflineEditing/authcfg',
+                                  'authorg')
+        self.pg_dbname = s.value('Plugin-GuidedOfflineEditing/dbname', 'orgdb')
+        self.pg_schema = s.value('Plugin-GuidedOfflineEditing/schema', 'qgis')
+        self.pg_sslmode = s.value('Plugin-GuidedOfflineEditing/sslmode',
+                                  'disabled')
+        self.output_crs_id = s.value('Projections/projectDefaultCrs',
+                                     'EPSG:4326')
 
     def select_feature_by_extent(self, proj, layer_ids, extent):
         for layer_id, layer in proj.mapLayers().items():
