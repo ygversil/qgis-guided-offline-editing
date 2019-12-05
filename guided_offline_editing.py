@@ -344,11 +344,7 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_upload_button_state
         )
 
-    def select_feature_by_extent(self, proj, layer_ids, extent):
-        for layer_id, layer in proj.mapLayers().items():
-            if layer_id not in layer_ids:
-                continue
-            layer.selectByRect(extent)
+    # Helper methods below
 
     def convert_layers_to_offline(self, layer_ids, dest_path,
                                   only_selected=False):
@@ -419,6 +415,12 @@ class GuidedOfflineEditingPlugin:
                     self.convert_layers_to_offline(layer_ids_to_download,
                                                    dest_path,
                                                    only_selected=only_selected)
+
+    def select_feature_by_extent(self, proj, layer_ids, extent):
+        for layer_id, layer in proj.mapLayers().items():
+            if layer_id not in layer_ids:
+                continue
+            layer.selectByRect(extent)
 
     def set_progress_mode(self, mode, max_):
         """Update progress dialog information."""
