@@ -239,18 +239,17 @@ class GuidedOfflineEditingPlugin:
             authcfg=self.pg_authcfg,
             sslmode=self.pg_sslmode,
         )
-        self.pg_project_model.refresh_data()
+        self.dlg.set_pg_project_model(self.pg_project_model)
         self.offline_layer_model = OfflineLayerListModel()
+        self.dlg.set_offline_layer_model(self.offline_layer_model)
+        self.connect_signals()
+        self.pg_project_model.refresh_data()
         self.offline_layer_model.refresh_data()
         output_crs_id = s.value('Projections/projectDefaultCrs', 'EPSG:4326')
         output_crs = QgsCoordinateReferenceSystem(output_crs_id)
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         # show the dialog
-        self.dlg.set_pg_project_model(self.pg_project_model)
-        self.dlg.set_offline_layer_model(self.offline_layer_model)
-        self.dlg.refresh_pg_project_list()
-        self.dlg.refresh_offline_layer_list()
         self.dlg.initialize_extent_group_box(original_extent,
                                              current_extent,
                                              output_crs,
@@ -266,41 +265,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.update_extent_group_box_state()
         self.dlg.update_go_button_state()
         self.dlg.update_upload_button_state()
-        self.offliner.progressModeSet.connect(
-            self.set_progress_mode
-        )
-        self.offliner.progressStarted.connect(self.progress_dlg.show)
-        self.offliner.layerProgressUpdated.connect(
-            self.progress_dlg.set_progress_label
-        )
-        self.offliner.progressUpdated.connect(
-            self.progress_dlg.set_progress_bar
-        )
-        self.offliner.progressStopped.connect(self.progress_dlg.hide)
-        self.pg_project_model.model_changed.connect(
-            self.dlg.refresh_pg_project_list
-        )
-        self.offline_layer_model.model_changed.connect(
-            self.dlg.refresh_offline_layer_list
-        )
-        self.offline_layer_model.model_changed.connect(
-            self.dlg.update_upload_button_state
-        )
-        self.dlg.pg_project_selection_model().selectionChanged.connect(
-            self.dlg.update_go_button_state
-        )
-        self.dlg.downloadCheckBox.stateChanged.connect(
-            self.dlg.update_go_button_state
-        )
-        self.dlg.downloadCheckBox.stateChanged.connect(
-            self.dlg.update_extent_group_box_state
-        )
-        self.dlg.goButton.clicked.connect(
-            self.download_project
-        )
-        self.dlg.uploadButton.clicked.connect(
-            self.synchronize_offline_layers
-        )
         if self.offline_layer_model.is_empty():
             self.dlg.tabWidget.setCurrentIndex(0)
         else:
@@ -308,43 +272,52 @@ class GuidedOfflineEditingPlugin:
         self.dlg.show()
         # Run the dialog event loop
         self.dlg.exec_()
-        self.offliner.progressModeSet.disconnect(
-            self.set_progress_mode
-        )
-        self.offliner.progressStarted.disconnect(self.progress_dlg.show)
-        self.offliner.layerProgressUpdated.disconnect(
-            self.progress_dlg.set_progress_label
-        )
-        self.offliner.progressUpdated.disconnect(
-            self.progress_dlg.set_progress_bar
-        )
-        self.offliner.progressStopped.disconnect(self.progress_dlg.hide)
-        self.dlg.pg_project_selection_model().selectionChanged.disconnect(
-            self.dlg.update_go_button_state
-        )
-        self.dlg.downloadCheckBox.stateChanged.disconnect(
-            self.dlg.update_go_button_state
-        )
-        self.dlg.downloadCheckBox.stateChanged.disconnect(
-            self.dlg.update_extent_group_box_state
-        )
-        self.dlg.goButton.clicked.disconnect(
-            self.download_project
-        )
-        self.dlg.uploadButton.clicked.disconnect(
-            self.synchronize_offline_layers
-        )
-        self.pg_project_model.model_changed.disconnect(
-            self.dlg.refresh_pg_project_list
-        )
-        self.offline_layer_model.model_changed.disconnect(
-            self.dlg.refresh_offline_layer_list
-        )
-        self.offline_layer_model.model_changed.disconnect(
-            self.dlg.update_upload_button_state
-        )
+        self.disconnect_signals()
 
     # Helper methods below
+
+    def _manage_signals(self, action):
+        """Connect or disconnect all signals."""
+        getattr(self.offliner.progressModeSet, action)(
+            self.set_progress_mode
+        )
+        getattr(self.offliner.progressStarted, action)(
+            self.progress_dlg.show
+        )
+        getattr(self.offliner.layerProgressUpdated, action)(
+            self.progress_dlg.set_progress_label
+        )
+        getattr(self.offliner.progressUpdated, action)(
+            self.progress_dlg.set_progress_bar
+        )
+        getattr(self.offliner.progressStopped, action)(
+            self.progress_dlg.hide
+        )
+        getattr(self.pg_project_model.model_changed, action)(
+            self.dlg.refresh_pg_project_list
+        )
+        getattr(self.offline_layer_model.model_changed, action)(
+            self.dlg.refresh_offline_layer_list
+        )
+        getattr(self.offline_layer_model.model_changed, action)(
+            self.dlg.update_upload_button_state
+        )
+        getattr(self.dlg.downloadCheckBox.stateChanged, action)(
+            self.dlg.update_go_button_state
+        )
+        getattr(self.dlg.downloadCheckBox.stateChanged, action)(
+            self.dlg.update_extent_group_box_state
+        )
+        getattr(self.dlg.goButton.clicked, action)(
+            self.download_project
+        )
+        getattr(self.dlg.uploadButton.clicked, action)(
+            self.synchronize_offline_layers
+        )
+
+    def connect_signals(self):
+        """Connect all signals."""
+        self._manage_signals(action='connect')
 
     def convert_layers_to_offline(self, layer_ids, dest_path,
                                   only_selected=False):
@@ -356,6 +329,10 @@ class GuidedOfflineEditingPlugin:
             onlySelected=only_selected,
             containerType=QgsOfflineEditing.GPKG
         )
+
+    def disconnect_signals(self):
+        """Disconnect all signals."""
+        self._manage_signals(action='disconnect')
 
     def download_project(self):
         """Prepare the project for offline editing."""

@@ -47,6 +47,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.pg_project_model = None
         self.offline_layer_model = None
+        self.pg_project_selection_model = None
 
     def initialize_extent_group_box(self, original_extent, current_extent,
                                     output_crs, canvas):
@@ -63,6 +64,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def refresh_pg_project_list(self):
         self.pgProjectList.setModel(self.pg_project_model.model)
+        self.pg_project_selection_model = self.pgProjectList.selectionModel()
+        self.pg_project_selection_model.selectionChanged.connect(
+            self.update_go_button_state
+        )
 
     def refresh_offline_layer_list(self):
         self.offlineLayerList.setModel(self.offline_layer_model.model)
@@ -82,7 +87,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def selected_pg_project(self):
         """Return the selected project name or ``None`` if no project is
         selected."""
-        selected_rows = self.pg_project_selection_model().selectedRows()
+        selected_rows = self.pg_project_selection_model.selectedRows()
         if selected_rows:
             return self.pg_project_model.project_at_index(selected_rows[0])
         else:
