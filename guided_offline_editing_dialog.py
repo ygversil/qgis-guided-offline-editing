@@ -121,3 +121,17 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.uploadButton.setEnabled(False)
         else:
             self.uploadButton.setEnabled(True)
+
+    def update_widgets(self, project_index_to_select=None,
+                       tab_index_to_show=0):
+        """Update some widgets state."""
+        if project_index_to_select is not None:
+            self.select_project_at_index(project_index_to_select)
+        self.tabWidget.setCurrentIndex(tab_index_to_show)
+        if (project_index_to_select is None
+                and self.downloadCheckBox.isChecked()):
+            self.downloadCheckBox.setChecked(False)
+        elif (project_index_to_select is not None
+              and tab_index_to_show == 0
+              and not self.downloadCheckBox.isChecked()):
+            self.downloadCheckBox.setChecked(True)

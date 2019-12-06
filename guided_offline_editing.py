@@ -232,9 +232,7 @@ class GuidedOfflineEditingPlugin:
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
         self.connect_signals()
-        self.pg_project_model.refresh_data()
-        self.offline_layer_model.refresh_data()
-        self.initialize_dialog_widgets()
+        self.refresh_data_and_dialog()
         self.dlg.show()
         self.dlg.exec_()
         self.disconnect_signals()
@@ -358,9 +356,11 @@ class GuidedOfflineEditingPlugin:
                                                    dest_path,
                                                    only_selected=only_selected)
 
-    def initialize_dialog_widgets(self):
-        """Set up initial state for dialog widgets."""
+    def refresh_data_and_dialog(self):
+        """Refresh models and update dialog widgets accordingly."""
         # Init extent widget
+        self.pg_project_model.refresh_data()
+        self.offline_layer_model.refresh_data()
         output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
@@ -371,21 +371,14 @@ class GuidedOfflineEditingPlugin:
         # Select current project in project list
         proj = QgsProject.instance()
         proj_storage = proj.projectStorage()
-        if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE:
-            index = self.pg_project_model.index_for_project_name(
-                proj.baseName()
-            )
-            if index is not None:
-                self.dlg.select_project_at_index(index)
-        # Init other widgets
-        self.dlg.update_extent_group_box_state()
-        self.dlg.update_go_button_state()
-        self.dlg.update_upload_button_state()
+        project_index = (self.pg_project_model.index_for_project_name(
+            proj.baseName()
+        ) if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE
+                         else None)
         # If already offline project, show upload tab
-        if self.offline_layer_model.is_empty():
-            self.dlg.tabWidget.setCurrentIndex(0)
-        else:
-            self.dlg.tabWidget.setCurrentIndex(1)
+        tab_index = 0 if self.offline_layer_model.is_empty() else 1
+        self.dlg.update_widgets(project_index_to_select=project_index,
+                                tab_index_to_show=tab_index)
 
     def read_gis_data_home(self):
         """Read global ``gis_data_home`` QGIS variable and return a
