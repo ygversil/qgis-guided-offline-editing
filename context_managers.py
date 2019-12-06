@@ -31,11 +31,13 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def cleanup(selections_to_clear=None, models_to_refresh=None):
-    """Context manager that ensure cleaning actions are taken on exit."""
+def busy_refreshing(refresh_func):
+    """Context manager that shows busy cursor on startup and ensures that
+    normal cursor is back on exit. Also ``refresh_func`` is called on exit."""
     try:
         QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
         yield
+        refresh_func()
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
@@ -45,12 +47,6 @@ def cleanup(selections_to_clear=None, models_to_refresh=None):
             'Extensions',
             level=Qgis.Critical)
     finally:
-        selections_to_clear = selections_to_clear or []
-        for selection_model in selections_to_clear:
-            selection_model.clearSelection()
-        models_to_refresh = models_to_refresh or []
-        for model in models_to_refresh:
-            model.refresh_data()
         QtWidgets.QApplication.restoreOverrideCursor()
 
 

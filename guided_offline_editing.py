@@ -45,7 +45,7 @@ from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
-from .context_managers import cleanup, removing, transactional_project
+from .context_managers import busy_refreshing, removing, transactional_project
 from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
                          build_pg_project_url)
 import os.path
@@ -300,10 +300,7 @@ class GuidedOfflineEditingPlugin:
     def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        with cleanup(
-            selections_to_clear=[self.dlg.pg_project_selection_model()],
-            models_to_refresh=[self.offline_layer_model],
-        ):
+        with busy_refreshing(self.refresh_data_and_dialog):
             proj = QgsProject.instance()
             proj_storage = proj.projectStorage()
             if (not proj_storage
@@ -442,8 +439,6 @@ class GuidedOfflineEditingPlugin:
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        with cleanup(
-                models_to_refresh=[self.offline_layer_model]
-        ):
+        with busy_refreshing(self.refresh_data_and_dialog):
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
