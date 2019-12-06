@@ -353,30 +353,6 @@ class GuidedOfflineEditingPlugin:
                                                    dest_path,
                                                    only_selected=only_selected)
 
-    def refresh_data_and_dialog(self):
-        """Refresh models and update dialog widgets accordingly."""
-        # Init extent widget
-        self.pg_project_model.refresh_data()
-        self.offline_layer_model.refresh_data()
-        output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
-        original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
-        current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
-        self.dlg.initialize_extent_group_box(original_extent,
-                                             current_extent,
-                                             output_crs,
-                                             self.canvas)
-        # Select current project in project list
-        proj = QgsProject.instance()
-        proj_storage = proj.projectStorage()
-        project_index = (self.pg_project_model.index_for_project_name(
-            proj.baseName()
-        ) if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE
-                         else None)
-        # If already offline project, show upload tab
-        tab_index = 0 if self.offline_layer_model.is_empty() else 1
-        self.dlg.update_widgets(project_index_to_select=project_index,
-                                tab_index_to_show=tab_index)
-
     def read_gis_data_home(self):
         """Read global ``gis_data_home`` QGIS variable and return a
         ``pathlib.Path`` object with it, or ``None`` if it is not valid."""
@@ -402,6 +378,30 @@ class GuidedOfflineEditingPlugin:
         d['output_crs_id'] = s.value('Projections/projectDefaultCrs',
                                      'EPSG:4326')
         return Settings(**d)
+
+    def refresh_data_and_dialog(self):
+        """Refresh models and update dialog widgets accordingly."""
+        # Init extent widget
+        self.pg_project_model.refresh_data()
+        self.offline_layer_model.refresh_data()
+        output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
+        original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
+        current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
+        self.dlg.initialize_extent_group_box(original_extent,
+                                             current_extent,
+                                             output_crs,
+                                             self.canvas)
+        # Select current project in project list
+        proj = QgsProject.instance()
+        proj_storage = proj.projectStorage()
+        project_index = (self.pg_project_model.index_for_project_name(
+            proj.baseName()
+        ) if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE
+                         else None)
+        # If already offline project, show upload tab
+        tab_index = 0 if self.offline_layer_model.is_empty() else 1
+        self.dlg.update_widgets(project_index_to_select=project_index,
+                                tab_index_to_show=tab_index)
 
     def select_feature_by_extent(self, proj, layer_ids, extent):
         for layer_id, layer in proj.mapLayers().items():
