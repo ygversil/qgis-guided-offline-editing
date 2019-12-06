@@ -297,7 +297,7 @@ class GuidedOfflineEditingPlugin:
     def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        with busy_refreshing(self.refresh_data_and_dialog):
+        with busy_refreshing():
             proj = QgsProject.instance()
             proj_storage = proj.projectStorage()
             if (not proj_storage
@@ -436,6 +436,6 @@ class GuidedOfflineEditingPlugin:
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        with busy_refreshing(self.refresh_data_and_dialog):
+        with busy_refreshing():
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()

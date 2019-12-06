@@ -31,13 +31,14 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def busy_refreshing(refresh_func):
+def busy_refreshing(refresh_func=None):
     """Context manager that shows busy cursor on startup and ensures that
     normal cursor is back on exit. Also ``refresh_func`` is called on exit."""
     try:
         QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
         yield
-        refresh_func()
+        if refresh_func is not None:
+            refresh_func()
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
