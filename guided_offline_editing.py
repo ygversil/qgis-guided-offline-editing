@@ -22,6 +22,7 @@
  ***************************************************************************/
 """
 
+from collections import namedtuple
 import pathlib
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
@@ -49,6 +50,17 @@ from .context_managers import cleanup, removing, transactional_project
 from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
                          build_pg_project_url)
 import os.path
+
+
+Settings = namedtuple('Settings', (
+    'pg_host',
+    'pg_port',
+    'pg_dbname',
+    'pg_schema',
+    'pg_authcfg',
+    'pg_sslmode',
+    'output_crs_id',
+))
 
 
 # Shorter names for these functions
@@ -218,15 +230,15 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
-        self.read_settings()
+        self.settings = self.read_settings()
         self.offliner = QgsOfflineEditing()
         self.pg_project_model = PostgresProjectListModel(
-            host=self.pg_host,
-            port=self.pg_port,
-            dbname=self.pg_dbname,
-            schema=self.pg_schema,
-            authcfg=self.pg_authcfg,
-            sslmode=self.pg_sslmode,
+            host=self.settings.pg_host,
+            port=self.settings.pg_port,
+            dbname=self.settings.pg_dbname,
+            schema=self.settings.pg_schema,
+            authcfg=self.settings.pg_authcfg,
+            sslmode=self.settings.pg_sslmode,
         )
         self.dlg.set_pg_project_model(self.pg_project_model)
         self.offline_layer_model = OfflineLayerListModel()
@@ -312,12 +324,12 @@ class GuidedOfflineEditingPlugin:
                     or proj_storage.type() != PG_PROJECT_STORAGE_TYPE
                     or proj.baseName() != project_name):
                 self.iface.addProject(build_pg_project_url(
-                    host=self.pg_host,
-                    port=self.pg_port,
-                    dbname=self.pg_dbname,
-                    schema=self.pg_schema,
-                    authcfg=self.pg_authcfg,
-                    sslmode=self.pg_sslmode,
+                    host=self.settings.pg_host,
+                    port=self.settings.pg_port,
+                    dbname=self.settings.pg_dbname,
+                    schema=self.settings.pg_schema,
+                    authcfg=self.settings.pg_authcfg,
+                    sslmode=self.settings.pg_sslmode,
                     project=project_name
                 ))
             if not self.dlg.downloadCheckBox.isChecked():
@@ -361,7 +373,7 @@ class GuidedOfflineEditingPlugin:
     def initialize_dialog_widgets(self):
         """Set up initial state for dialog widgets."""
         # Init extent widget
-        output_crs = QgsCoordinateReferenceSystem(self.output_crs_id)
+        output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         self.dlg.initialize_extent_group_box(original_extent,
@@ -398,16 +410,20 @@ class GuidedOfflineEditingPlugin:
     def read_settings(self):
         """Read plugin settings from config file."""
         s = QgsSettings()
-        self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
-        self.pg_port = s.value('Plugin-GuidedOfflineEditing/port', 5432)
-        self.pg_authcfg = s.value('Plugin-GuidedOfflineEditing/authcfg',
+        d = dict()
+        d['pg_host'] = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
+        d['pg_port'] = s.value('Plugin-GuidedOfflineEditing/port', 5432)
+        d['pg_authcfg'] = s.value('Plugin-GuidedOfflineEditing/authcfg',
                                   'authorg')
-        self.pg_dbname = s.value('Plugin-GuidedOfflineEditing/dbname', 'orgdb')
-        self.pg_schema = s.value('Plugin-GuidedOfflineEditing/schema', 'qgis')
-        self.pg_sslmode = s.value('Plugin-GuidedOfflineEditing/sslmode',
+        d['pg_dbname'] = s.value('Plugin-GuidedOfflineEditing/dbname',
+                                 'orgdb')
+        d['pg_schema'] = s.value('Plugin-GuidedOfflineEditing/schema',
+                                 'qgis')
+        d['pg_sslmode'] = s.value('Plugin-GuidedOfflineEditing/sslmode',
                                   'disabled')
-        self.output_crs_id = s.value('Projections/projectDefaultCrs',
+        d['output_crs_id'] = s.value('Projections/projectDefaultCrs',
                                      'EPSG:4326')
+        return Settings(**d)
 
     def select_feature_by_extent(self, proj, layer_ids, extent):
         for layer_id, layer in proj.mapLayers().items():
