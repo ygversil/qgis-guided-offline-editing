@@ -135,3 +135,6 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
               and tab_index_to_show == 0
               and not self.downloadCheckBox.isChecked()):
             self.downloadCheckBox.setChecked(True)
+        self.update_extent_group_box_state()
+        self.update_go_button_state()
+        self.update_upload_button_state()
