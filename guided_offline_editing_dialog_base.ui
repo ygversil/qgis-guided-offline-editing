@@ -76,7 +76,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QgsExtentGroupBox" name="pgProjectDownloadExtent"/>
+        <widget class="QgsExtentGroupBox" name="pgProjectDownloadExtent">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="goButton">
