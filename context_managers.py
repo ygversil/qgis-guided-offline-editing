@@ -52,23 +52,6 @@ def busy_refreshing(refresh_func=None):
 
 
 @contextmanager
-def removing(path):
-    """Context manager that ensure given path is deleted on exit."""
-    try:
-        yield
-    except Exception as exc:
-        QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
-                                 'Extensions',
-                                 level=Qgis.Critical)
-        QgsMessageLog.logMessage(
-            'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-            'Extensions',
-            level=Qgis.Critical)
-    finally:
-        path.unlink(missing_ok=True)
-
-
-@contextmanager
 def transactional_project(src_url=None, dest_url=None):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.

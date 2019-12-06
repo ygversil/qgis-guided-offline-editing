@@ -46,7 +46,7 @@ from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
-from .context_managers import busy_refreshing, removing, transactional_project
+from .context_managers import busy_refreshing, transactional_project
 from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
                          build_pg_project_url)
 import os.path
@@ -336,31 +336,31 @@ class GuidedOfflineEditingPlugin:
             '{project_name}_offline.gpkg'.format(project_name=project_name)
         )
         gpkg_path = self.root_path / gpkg_name
-        with removing(path=qgz_path):
-            with transactional_project(
-                dest_url=build_gpkg_project_url(gpkg_path,
-                                                project=project_name)
-            ) as proj:
-                layer_ids_to_download = [
-                    layer_id
-                    for layer_id, layer in proj.mapLayers().items()
-                    if (
-                        qgis_variable(layer_scope(layer), 'offline') and
-                        qgis_variable(layer_scope(layer), 'offline')
-                        .lower() not in ('no', 'false')
-                    )
-                ]
-                extent = self.dlg.selected_extent()
-                if extent is not None:
-                    self.select_feature_by_extent(proj,
-                                                  layer_ids_to_download,
-                                                  extent)
-                    only_selected = True
-                else:
-                    only_selected = False
-                self.convert_layers_to_offline(layer_ids_to_download,
-                                               gpkg_path,
-                                               only_selected=only_selected)
+        with busy_refreshing(), \
+                transactional_project(
+                    dest_url=build_gpkg_project_url(gpkg_path,
+                                                    project=project_name)
+                ) as proj:
+            layer_ids_to_download = [
+                layer_id
+                for layer_id, layer in proj.mapLayers().items()
+                if (
+                    qgis_variable(layer_scope(layer), 'offline') and
+                    qgis_variable(layer_scope(layer), 'offline')
+                    .lower() not in ('no', 'false')
+                )
+            ]
+            extent = self.dlg.selected_extent()
+            if extent is not None:
+                self.select_feature_by_extent(proj,
+                                              layer_ids_to_download,
+                                              extent)
+                only_selected = True
+            else:
+                only_selected = False
+            self.convert_layers_to_offline(layer_ids_to_download,
+                                           gpkg_path,
+                                           only_selected=only_selected)
         self.done = True
 
     def read_gis_data_home(self):
