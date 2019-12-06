@@ -335,10 +335,10 @@ class GuidedOfflineEditingPlugin:
         gpkg_name = pathlib.Path(
             '{project_name}_offline.gpkg'.format(project_name=project_name)
         )
-        dest_path = self.root_path / gpkg_name
+        gpkg_path = self.root_path / gpkg_name
         with removing(path=qgz_path):
             with transactional_project(
-                dest_url=build_gpkg_project_url(dest_path,
+                dest_url=build_gpkg_project_url(gpkg_path,
                                                 project=project_name)
             ) as proj:
                 layer_ids_to_download = [
@@ -359,7 +359,7 @@ class GuidedOfflineEditingPlugin:
                 else:
                     only_selected = False
                 self.convert_layers_to_offline(layer_ids_to_download,
-                                               dest_path,
+                                               gpkg_path,
                                                only_selected=only_selected)
         self.done = True
 
