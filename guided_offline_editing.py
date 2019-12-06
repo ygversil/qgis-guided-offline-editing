@@ -218,6 +218,7 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
+        self.done = False
         self.settings = self.read_settings()
         self.offliner = QgsOfflineEditing()
         self.pg_project_model = PostgresProjectListModel(
@@ -235,7 +236,8 @@ class GuidedOfflineEditingPlugin:
         with busy_refreshing(self.refresh_data_and_dialog):
             self.dlg.show()
         self.dlg.exec_()
-        self.disconnect_signals()
+        if self.done:
+            self.disconnect_signals()
 
     # Helper methods below
 
@@ -349,6 +351,7 @@ class GuidedOfflineEditingPlugin:
                     self.convert_layers_to_offline(layer_ids_to_download,
                                                    dest_path,
                                                    only_selected=only_selected)
+        self.done = True
 
     def read_gis_data_home(self):
         """Read global ``gis_data_home`` QGIS variable and return a
@@ -439,3 +442,4 @@ class GuidedOfflineEditingPlugin:
         with busy_refreshing():
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
+        self.done = True
