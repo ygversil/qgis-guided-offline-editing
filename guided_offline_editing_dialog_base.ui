@@ -184,7 +184,7 @@
    <sender>goButton</sender>
    <signal>clicked()</signal>
    <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
-   <slot>reject()</slot>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>398</x>
@@ -200,7 +200,7 @@
    <sender>uploadButton</sender>
    <signal>clicked()</signal>
    <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
-   <slot>reject()</slot>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>317</x>
