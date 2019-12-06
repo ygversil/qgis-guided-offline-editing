@@ -266,9 +266,6 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_upload_button_state
         )
         getattr(self.dlg.downloadCheckBox.stateChanged, action)(
-            self.dlg.update_go_button_state
-        )
-        getattr(self.dlg.downloadCheckBox.stateChanged, action)(
             self.dlg.update_extent_group_box_state
         )
         getattr(self.dlg.goButton.clicked, action)(
