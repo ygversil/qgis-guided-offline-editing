@@ -73,8 +73,8 @@ def transactional_project(dest_url=None):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
 
-    The project is saved to its original location if ``dest_path`` is ``None``,
-    else it is saved to ``dest_path``.
+    The project is saved to its original location if ``dest_url`` is ``None``,
+    else it is saved to ``dest_url``.
 
     Implementation detail: after saving the project with ``proj.write()`` (thus
     updating the project file on disk), when the user clicks on the Save icon
