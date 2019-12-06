@@ -232,8 +232,8 @@ class GuidedOfflineEditingPlugin:
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
         self.connect_signals()
-        self.refresh_data_and_dialog()
-        self.dlg.show()
+        with busy_refreshing(self.refresh_data_and_dialog):
+            self.dlg.show()
         self.dlg.exec_()
         self.disconnect_signals()
 
