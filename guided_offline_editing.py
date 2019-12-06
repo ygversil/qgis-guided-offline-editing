@@ -29,6 +29,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsDataProvider,
     QgsExpressionContextScope,
     QgsExpressionContextUtils,
     QgsOfflineEditing,
@@ -299,58 +300,67 @@ class GuidedOfflineEditingPlugin:
     def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        with busy_refreshing():
-            proj = QgsProject.instance()
-            proj_storage = proj.projectStorage()
-            if (not proj_storage
-                    or proj_storage.type() != PG_PROJECT_STORAGE_TYPE
-                    or proj.baseName() != project_name):
-                self.iface.addProject(build_pg_project_url(
-                    host=self.settings.pg_host,
-                    port=self.settings.pg_port,
-                    dbname=self.settings.pg_dbname,
-                    schema=self.settings.pg_schema,
-                    authcfg=self.settings.pg_authcfg,
-                    sslmode=self.settings.pg_sslmode,
-                    project=project_name
-                ))
-            if not self.dlg.downloadCheckBox.isChecked():
-                return
-            qgz_name = pathlib.Path(
-                '{project_name}_offline.qgz'.format(project_name=project_name)
-            )
-            gpkg_name = pathlib.Path(
-                '{project_name}_offline.gpkg'.format(project_name=project_name)
-            )
-            qgz_path = self.root_path / qgz_name
-            dest_path = self.root_path / gpkg_name
-            with removing(path=qgz_path):
-                with transactional_project(dest_url=str(qgz_path)) as proj:
-                    proj.writeEntryBool('Paths', '/Absolute', False)
-                with transactional_project(
-                    dest_url=build_gpkg_project_url(dest_path,
-                                                    project=project_name)
-                ) as proj:
-                    layer_ids_to_download = [
-                        layer_id
-                        for layer_id, layer in proj.mapLayers().items()
-                        if (
-                            qgis_variable(layer_scope(layer), 'offline') and
-                            qgis_variable(layer_scope(layer), 'offline')
-                            .lower() not in ('no', 'false')
-                        )
-                    ]
-                    extent = self.dlg.selected_extent()
-                    if extent is not None:
-                        self.select_feature_by_extent(proj,
-                                                      layer_ids_to_download,
-                                                      extent)
-                        only_selected = True
-                    else:
-                        only_selected = False
-                    self.convert_layers_to_offline(layer_ids_to_download,
-                                                   dest_path,
-                                                   only_selected=only_selected)
+        project_url = build_pg_project_url(
+            host=self.settings.pg_host,
+            port=self.settings.pg_port,
+            dbname=self.settings.pg_dbname,
+            schema=self.settings.pg_schema,
+            authcfg=self.settings.pg_authcfg,
+            sslmode=self.settings.pg_sslmode,
+            project=project_name
+        )
+        qgz_name = pathlib.Path(
+            '{project_name}.qgz'.format(project_name=project_name)
+        )
+        qgz_path = self.root_path / qgz_name
+        with busy_refreshing(), \
+                transactional_project(src_url=project_url,
+                                      dest_url=str(qgz_path)) as proj:
+            for _, layer in proj.mapLayers().items():
+                if layer.source().startswith(str(proj.homePath())):
+                    layer.setDataSource(
+                        layer.source().replace(proj.homePath().rstrip('/\\'),
+                                               str(self.root_path)),
+                        layer.name(),
+                        layer.dataProvider().name(),
+                        QgsDataProvider.ProviderOptions(),
+                    )
+        with busy_refreshing(), \
+                transactional_project(src_url=str(qgz_path)) as proj:
+            proj.setPresetHomePath('')
+            proj.writeEntryBool('Paths', '/Absolute', False)
+        self.iface.addProject(str(qgz_path))
+        if not self.dlg.downloadCheckBox.isChecked():
+            return
+        gpkg_name = pathlib.Path(
+            '{project_name}_offline.gpkg'.format(project_name=project_name)
+        )
+        dest_path = self.root_path / gpkg_name
+        with removing(path=qgz_path):
+            with transactional_project(
+                dest_url=build_gpkg_project_url(dest_path,
+                                                project=project_name)
+            ) as proj:
+                layer_ids_to_download = [
+                    layer_id
+                    for layer_id, layer in proj.mapLayers().items()
+                    if (
+                        qgis_variable(layer_scope(layer), 'offline') and
+                        qgis_variable(layer_scope(layer), 'offline')
+                        .lower() not in ('no', 'false')
+                    )
+                ]
+                extent = self.dlg.selected_extent()
+                if extent is not None:
+                    self.select_feature_by_extent(proj,
+                                                  layer_ids_to_download,
+                                                  extent)
+                    only_selected = True
+                else:
+                    only_selected = False
+                self.convert_layers_to_offline(layer_ids_to_download,
+                                               dest_path,
+                                               only_selected=only_selected)
         self.done = True
 
     def read_gis_data_home(self):
