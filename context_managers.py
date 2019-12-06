@@ -69,12 +69,16 @@ def removing(path):
 
 
 @contextmanager
-def transactional_project(dest_url=None):
+def transactional_project(src_url=None, dest_url=None):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
 
-    The project is saved to its original location if ``dest_path`` is ``None``,
-    else it is saved to ``dest_path``.
+    If ``src_url`` is ``None``, the returned project is the current one (the
+    one loaded int QGIS interface). Else, the project found at ``src_url`` is
+    returned.
+
+    The project is saved to its original location if ``dest_url`` is ``None``,
+    else it is saved to ``dest_url``.
 
     Implementation detail: after saving the project with ``proj.write()`` (thus
     updating the project file on disk), when the user clicks on the Save icon
@@ -83,7 +87,11 @@ def transactional_project(dest_url=None):
     ``proj.clear()`` and ``proj.read()``.
     """
     try:
-        proj = QgsProject.instance()
+        if src_url:
+            proj = QgsProject()
+            proj.read(src_url)
+        else:
+            proj = QgsProject.instance()
         yield proj
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
