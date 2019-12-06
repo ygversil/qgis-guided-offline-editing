@@ -198,11 +198,8 @@ class GuidedOfflineEditingPlugin:
         # Create the dialog with elements (after translation) and keep
         # reference. Only create GUI ONCE in callback, so that it will only
         # load when the plugin is started
-        self.root_path = qgis_variable(global_scope(), 'gis_data_home')
-        self.root_path = (pathlib.Path(self.root_path) if self.root_path
-                          else None)
-        if (not self.root_path or not self.root_path.exists()
-                or not self.root_path.is_dir()):
+        self.root_path = self.read_gis_data_home()
+        if not self.root_path:
             QMessageBox.critical(
                 self.iface.mainWindow(),
                 self.tr('gis_data_home variable not set or invalid'),
@@ -389,6 +386,14 @@ class GuidedOfflineEditingPlugin:
             self.dlg.tabWidget.setCurrentIndex(0)
         else:
             self.dlg.tabWidget.setCurrentIndex(1)
+
+    def read_gis_data_home(self):
+        """Read global ``gis_data_home`` QGIS variable and return a
+        ``pathlib.Path`` object with it, or ``None`` if it is not valid."""
+        path = qgis_variable(global_scope(), 'gis_data_home')
+        path = pathlib.Path(path) if path else None
+        return (path if path and path.exists() and path.is_dir()
+                else None)
 
     def read_settings(self):
         """Read plugin settings from config file."""
