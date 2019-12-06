@@ -195,9 +195,6 @@ class GuidedOfflineEditingPlugin:
 
     def run(self):
         """Run method that performs all the real work"""
-        # Create the dialog with elements (after translation) and keep
-        # reference. Only create GUI ONCE in callback, so that it will only
-        # load when the plugin is started
         self.root_path = self.read_gis_data_home()
         if not self.root_path:
             QMessageBox.critical(
@@ -212,6 +209,9 @@ class GuidedOfflineEditingPlugin:
                         '#qgis-prerequisites')
             )
             return
+        # Create the dialog with elements (after translation) and keep
+        # reference. Only create GUI ONCE in callback, so that it will only
+        # load when the plugin is started
         if self.first_start is True:
             self.first_start = False
             self.dlg = GuidedOfflineEditingPluginDialog()
