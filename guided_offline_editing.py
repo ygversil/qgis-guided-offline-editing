@@ -22,7 +22,6 @@
  ***************************************************************************/
 """
 
-from collections import namedtuple
 import pathlib
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
@@ -45,22 +44,11 @@ from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
-from .model import OfflineLayerListModel, PostgresProjectListModel
+from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
 from .context_managers import cleanup, removing, transactional_project
 from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
                          build_pg_project_url)
 import os.path
-
-
-Settings = namedtuple('Settings', (
-    'pg_host',
-    'pg_port',
-    'pg_dbname',
-    'pg_schema',
-    'pg_authcfg',
-    'pg_sslmode',
-    'output_crs_id',
-))
 
 
 # Shorter names for these functions

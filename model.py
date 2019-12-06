@@ -22,6 +22,8 @@
  ***************************************************************************/
 """
 
+from collections import namedtuple
+
 from PyQt5.QtCore import QObject, QStringListModel, Qt, pyqtSignal
 from qgis.core import QgsProject
 
@@ -29,6 +31,17 @@ from .db_manager import PostgresProjectDownloader
 
 
 _IS_OFFLINE_EDITABLE = 'isOfflineEditable'
+
+
+Settings = namedtuple('Settings', (
+    'pg_host',
+    'pg_port',
+    'pg_dbname',
+    'pg_schema',
+    'pg_authcfg',
+    'pg_sslmode',
+    'output_crs_id',
+))
 
 
 class PostgresProjectListModel(QObject):
