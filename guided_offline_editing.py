@@ -26,12 +26,14 @@ import pathlib
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsDataProvider,
     QgsExpressionContextScope,
     QgsExpressionContextUtils,
     QgsOfflineEditing,
+    QgsProject,
     QgsRectangle,
     QgsSettings,
 )
@@ -43,15 +45,18 @@ from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
-from .model import OfflineLayerListModel, PostgresProjectListModel
-from .context_managers import cleanup, transactional_project
+from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
+from .context_managers import busy_refreshing, transactional_project
 from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path
 
+PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
+PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
 
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
 layer_scope = QgsExpressionContextUtils.layerScope
+global_scope = QgsExpressionContextUtils.globalScope
 
 
 class GuidedOfflineEditingPlugin:
@@ -192,6 +197,20 @@ class GuidedOfflineEditingPlugin:
 
     def run(self):
         """Run method that performs all the real work"""
+        self.root_path = self.read_gis_data_home()
+        if not self.root_path:
+            QMessageBox.critical(
+                self.iface.mainWindow(),
+                self.tr('gis_data_home variable not set or invalid'),
+                self.tr('You must set the global variable gis_data_home to '
+                        'the path of the folder which contains you GIS '
+                        'data.\n\n'
+                        'For more information, see '
+                        'https://qgis-guided-offline-editing'
+                        '.readthedocs.io/en/latest/admin_guide.html'
+                        '#qgis-prerequisites')
+            )
+            return
         # Create the dialog with elements (after translation) and keep
         # reference. Only create GUI ONCE in callback, so that it will only
         # load when the plugin is started
@@ -201,123 +220,71 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
+        self.done = False
+        self.settings = self.read_settings()
         self.offliner = QgsOfflineEditing()
-        s = QgsSettings()
-        self.pg_host = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
-        self.pg_port = s.value('Plugin-GuidedOfflineEditing/port', 5432)
-        self.pg_authcfg = s.value('Plugin-GuidedOfflineEditing/authcfg',
-                                  'authorg')
-        self.pg_dbname = s.value('Plugin-GuidedOfflineEditing/dbname', 'orgdb')
-        self.pg_schema = s.value('Plugin-GuidedOfflineEditing/schema', 'qgis')
-        self.pg_sslmode = s.value('Plugin-GuidedOfflineEditing/sslmode',
-                                  'disabled')
         self.pg_project_model = PostgresProjectListModel(
-            host=self.pg_host,
-            port=self.pg_port,
-            dbname=self.pg_dbname,
-            schema=self.pg_schema,
-            authcfg=self.pg_authcfg,
-            sslmode=self.pg_sslmode,
+            host=self.settings.pg_host,
+            port=self.settings.pg_port,
+            dbname=self.settings.pg_dbname,
+            schema=self.settings.pg_schema,
+            authcfg=self.settings.pg_authcfg,
+            sslmode=self.settings.pg_sslmode,
         )
-        self.pg_project_model.refresh_data()
-        self.offline_layer_model = OfflineLayerListModel()
-        self.offline_layer_model.refresh_data()
-        output_crs_id = s.value('Projections/projectDefaultCrs', 'EPSG:4326')
-        output_crs = QgsCoordinateReferenceSystem(output_crs_id)
-        original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
-        current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
-        # show the dialog
         self.dlg.set_pg_project_model(self.pg_project_model)
+        self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
-        self.dlg.refresh_pg_project_list()
-        self.dlg.refresh_offline_layer_list()
-        self.dlg.initialize_extent_group_box(original_extent,
-                                             current_extent,
-                                             output_crs,
-                                             self.canvas)
-        self.dlg.update_download_button_state()
-        self.dlg.update_upload_button_state()
-        self.offliner.progressModeSet.connect(
-            self.set_progress_mode
-        )
-        self.offliner.progressStarted.connect(self.progress_dlg.show)
-        self.offliner.layerProgressUpdated.connect(
-            self.progress_dlg.set_progress_label
-        )
-        self.offliner.progressUpdated.connect(
-            self.progress_dlg.set_progress_bar
-        )
-        self.offliner.progressStopped.connect(self.progress_dlg.hide)
-        self.pg_project_model.model_changed.connect(
-            self.dlg.refresh_pg_project_list
-        )
-        self.offline_layer_model.model_changed.connect(
-            self.dlg.refresh_offline_layer_list
-        )
-        self.offline_layer_model.model_changed.connect(
-            self.dlg.update_upload_button_state
-        )
-        self.dlg.pg_project_selection_model().selectionChanged.connect(
-            self.dlg.update_download_button_state
-        )
-        self.dlg.pgProjectDestFileWidget.fileChanged.connect(
-            self.dlg.update_download_button_state
-        )
-        self.dlg.downloadButton.clicked.connect(
-            self.add_pg_layers_and_convert_to_offline
-        )
-        self.dlg.uploadButton.clicked.connect(
-            self.synchronize_offline_layers
-        )
-        if self.offline_layer_model.is_empty():
-            self.dlg.tabWidget.setCurrentIndex(0)
-        else:
-            self.dlg.tabWidget.setCurrentIndex(1)
-        self.dlg.show()
-        # Run the dialog event loop
+        self.connect_signals()
+        with busy_refreshing(self.refresh_data_and_dialog):
+            self.dlg.show()
         self.dlg.exec_()
-        self.offliner.progressModeSet.disconnect(
+        if self.done:
+            self.disconnect_signals()
+
+    # Helper methods below
+
+    def _manage_signals(self, action):
+        """Connect or disconnect all signals."""
+        getattr(self.offliner.progressModeSet, action)(
             self.set_progress_mode
         )
-        self.offliner.progressStarted.disconnect(self.progress_dlg.show)
-        self.offliner.layerProgressUpdated.disconnect(
+        getattr(self.offliner.progressStarted, action)(
+            self.progress_dlg.show
+        )
+        getattr(self.offliner.layerProgressUpdated, action)(
             self.progress_dlg.set_progress_label
         )
-        self.offliner.progressUpdated.disconnect(
+        getattr(self.offliner.progressUpdated, action)(
             self.progress_dlg.set_progress_bar
         )
-        self.offliner.progressStopped.disconnect(self.progress_dlg.hide)
-        self.dlg.pg_project_selection_model().selectionChanged.disconnect(
-            self.dlg.update_download_button_state
+        getattr(self.offliner.progressStopped, action)(
+            self.progress_dlg.hide
         )
-        self.dlg.pgProjectDestFileWidget.fileChanged.disconnect(
-            self.dlg.update_download_button_state
-        )
-        self.dlg.downloadButton.clicked.disconnect(
-            self.add_pg_layers_and_convert_to_offline
-        )
-        self.dlg.uploadButton.clicked.disconnect(
-            self.synchronize_offline_layers
-        )
-        self.pg_project_model.model_changed.disconnect(
+        getattr(self.pg_project_model.model_changed, action)(
             self.dlg.refresh_pg_project_list
         )
-        self.offline_layer_model.model_changed.disconnect(
+        getattr(self.offline_layer_model.model_changed, action)(
             self.dlg.refresh_offline_layer_list
         )
-        self.offline_layer_model.model_changed.disconnect(
+        getattr(self.offline_layer_model.model_changed, action)(
             self.dlg.update_upload_button_state
+        )
+        getattr(self.dlg.downloadCheckBox.toggled, action)(
+            self.dlg.update_extent_group_box_state
+        )
+        getattr(self.dlg.goButton.clicked, action)(
+            self.download_project
+        )
+        getattr(self.dlg.uploadButton.clicked, action)(
+            self.synchronize_offline_layers
         )
 
-    def select_feature_by_extent(self, proj, layer_ids, extent):
-        for layer_id, layer in proj.mapLayers().items():
-            if layer_id not in layer_ids:
-                continue
-            layer.selectByRect(extent)
+    def connect_signals(self):
+        """Connect all signals."""
+        self._manage_signals(action='connect')
 
     def convert_layers_to_offline(self, layer_ids, dest_path,
                                   only_selected=False):
-        dest_path = pathlib.Path(dest_path)
         self.progress_dlg.set_title(self.tr('Downloading layers...'))
         self.offliner.convertToOfflineProject(
             str(dest_path.parent),
@@ -327,52 +294,144 @@ class GuidedOfflineEditingPlugin:
             containerType=QgsOfflineEditing.GPKG
         )
 
-    def add_pg_layers_and_convert_to_offline(self):
+    def disconnect_signals(self):
+        """Disconnect all signals."""
+        self._manage_signals(action='disconnect')
+
+    def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        with cleanup(
-            selections_to_clear=[self.dlg.pg_project_selection_model()],
-            models_to_refresh=[self.offline_layer_model],
-            file_widget_to_clear=self.dlg.pgProjectDestFileWidget,
-        ):
-            self.iface.addProject(build_pg_project_url(
-                host=self.pg_host,
-                port=self.pg_port,
-                dbname=self.pg_dbname,
-                schema=self.pg_schema,
-                authcfg=self.pg_authcfg,
-                sslmode=self.pg_sslmode,
-                project=project_name
-            ))
-            dest_path = self.dlg.selected_destination_path()
-            with transactional_project(
-                dest_url=build_gpkg_project_url(dest_path,
-                                                project=project_name)
-            ) as proj:
+        project_url = build_pg_project_url(
+            host=self.settings.pg_host,
+            port=self.settings.pg_port,
+            dbname=self.settings.pg_dbname,
+            schema=self.settings.pg_schema,
+            authcfg=self.settings.pg_authcfg,
+            sslmode=self.settings.pg_sslmode,
+            project=project_name
+        )
+        qgz_name = pathlib.Path(
+            '{project_name}.qgz'.format(project_name=project_name)
+        )
+        qgz_path = self.root_path / qgz_name
+        current_proj = QgsProject.instance()
+        if (not current_proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
+                                           PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
+                or current_proj.baseName() != project_name):
+            with busy_refreshing(), \
+                    transactional_project(src_url=project_url,
+                                          dest_url=str(qgz_path)) as proj:
+                for layer_id, layer in proj.mapLayers().items():
+                    if layer.source().startswith(str(proj.homePath())):
+                        new_path = layer.source().replace(
+                                proj.homePath().rstrip('/\\'),
+                                str(self.root_path)
+                            )
+                        layer.setDataSource(
+                            layer.source().replace(
+                                proj.homePath().rstrip('/\\'),
+                                str(self.root_path)
+                            ),
+                            layer.name(),
+                            layer.dataProvider().name(),
+                            QgsDataProvider.ProviderOptions(),
+                        )
+            with busy_refreshing(), \
+                    transactional_project(src_url=str(qgz_path)) as proj:
+                proj.setPresetHomePath('')
                 proj.writeEntryBool('Paths', '/Absolute', False)
-            with transactional_project(
-                dest_url=build_gpkg_project_url(dest_path,
-                                                project=project_name)
-            ) as proj:
-                layer_ids_to_download = [
-                    layer_id
-                    for layer_id, layer in proj.mapLayers().items()
-                    if (
-                        qgis_variable(layer_scope(layer), 'offline') and
-                        qgis_variable(layer_scope(layer), 'offline').lower()
-                        not in ('no', 'false')
-                    )
-                ]
-                extent = self.dlg.selected_extent()
-                if extent is not None:
-                    self.select_feature_by_extent(proj, layer_ids_to_download,
-                                                  extent)
-                    only_selected = True
-                else:
-                    only_selected = False
-                self.convert_layers_to_offline(layer_ids_to_download,
-                                               dest_path,
-                                               only_selected=only_selected)
+                proj.writeEntryBool(PROJECT_ENTRY_SCOPE_GUIDED,
+                                    PROJECT_ENTRY_KEY_FROM_POSTGRES,
+                                    True)
+            self.iface.addProject(str(qgz_path))
+        if not self.dlg.downloadCheckBox.isChecked():
+            return
+        gpkg_name = pathlib.Path(
+            '{project_name}_offline.gpkg'.format(project_name=project_name)
+        )
+        gpkg_path = self.root_path / gpkg_name
+        with busy_refreshing(), \
+                transactional_project(
+                    dest_url=build_gpkg_project_url(gpkg_path,
+                                                    project=project_name)
+                ) as proj:
+            layer_ids_to_download = [
+                layer_id
+                for layer_id, layer in proj.mapLayers().items()
+                if (
+                    qgis_variable(layer_scope(layer), 'offline') and
+                    qgis_variable(layer_scope(layer), 'offline')
+                    .lower() not in ('no', 'false')
+                )
+            ]
+            extent = self.dlg.selected_extent()
+            if extent is not None:
+                self.select_feature_by_extent(proj,
+                                              layer_ids_to_download,
+                                              extent)
+                only_selected = True
+            else:
+                only_selected = False
+            self.convert_layers_to_offline(layer_ids_to_download,
+                                           gpkg_path,
+                                           only_selected=only_selected)
+        self.done = True
+
+    def read_gis_data_home(self):
+        """Read global ``gis_data_home`` QGIS variable and return a
+        ``pathlib.Path`` object with it, or ``None`` if it is not valid."""
+        path = qgis_variable(global_scope(), 'gis_data_home')
+        path = pathlib.Path(path) if path else None
+        return (path if path and path.exists() and path.is_dir()
+                else None)
+
+    def read_settings(self):
+        """Read plugin settings from config file."""
+        s = QgsSettings()
+        d = dict()
+        d['pg_host'] = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
+        d['pg_port'] = s.value('Plugin-GuidedOfflineEditing/port', 5432)
+        d['pg_authcfg'] = s.value('Plugin-GuidedOfflineEditing/authcfg',
+                                  'authorg')
+        d['pg_dbname'] = s.value('Plugin-GuidedOfflineEditing/dbname',
+                                 'orgdb')
+        d['pg_schema'] = s.value('Plugin-GuidedOfflineEditing/schema',
+                                 'qgis')
+        d['pg_sslmode'] = s.value('Plugin-GuidedOfflineEditing/sslmode',
+                                  'disabled')
+        d['output_crs_id'] = s.value('Projections/projectDefaultCrs',
+                                     'EPSG:4326')
+        return Settings(**d)
+
+    def refresh_data_and_dialog(self):
+        """Refresh models and update dialog widgets accordingly."""
+        # Init extent widget
+        self.pg_project_model.refresh_data()
+        self.offline_layer_model.refresh_data()
+        output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
+        original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
+        current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
+        self.dlg.initialize_extent_group_box(original_extent,
+                                             current_extent,
+                                             output_crs,
+                                             self.canvas)
+        # Select current project in project list
+        proj = QgsProject.instance()
+        project_index = (self.pg_project_model.index_for_project_name(
+            proj.baseName()
+        ) if proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
+                                PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
+                         else None)
+        # If already offline project, show upload tab
+        tab_index = 0 if self.offline_layer_model.is_empty() else 1
+        self.dlg.update_widgets(project_index_to_select=project_index,
+                                tab_index_to_show=tab_index)
+
+    def select_feature_by_extent(self, proj, layer_ids, extent):
+        for layer_id, layer in proj.mapLayers().items():
+            if layer_id not in layer_ids:
+                continue
+            layer.selectByRect(extent)
 
     def set_progress_mode(self, mode, max_):
         """Update progress dialog information."""
@@ -404,8 +463,7 @@ class GuidedOfflineEditingPlugin:
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        with cleanup(
-                models_to_refresh=[self.offline_layer_model]
-        ):
+        with busy_refreshing():
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
+        self.done = True

@@ -33,9 +33,9 @@ class GuidedOfflineEditingPluginDialogTest(unittest.TestCase):
         """Runs after each test."""
         self.dialog = None
 
-    def test_dialog_download(self):
-        """Check that clicking Download button close window as rejected."""
-        button = self.dialog.downloadButton
+    def test_dialog_go(self):
+        """Check that clicking Go! button close window as rejected."""
+        button = self.dialog.goButton
         button.click()
         result = self.dialog.result()
         self.assertEqual(result, QDialog.Rejected)

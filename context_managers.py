@@ -31,12 +31,14 @@ from qgis.core import Qgis, QgsProject, QgsMessageLog
 
 
 @contextmanager
-def cleanup(selections_to_clear=None, models_to_refresh=None,
-            file_widget_to_clear=None):
-    """Context manager that ensure cleaning actions are taken on exit."""
+def busy_refreshing(refresh_func=None):
+    """Context manager that shows busy cursor on startup and ensures that
+    normal cursor is back on exit. Also ``refresh_func`` is called on exit."""
     try:
         QtWidgets.QApplication.setOverrideCursor(Qt.WaitCursor)
         yield
+        if refresh_func is not None:
+            refresh_func()
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
                                  'Extensions',
@@ -46,24 +48,21 @@ def cleanup(selections_to_clear=None, models_to_refresh=None,
             'Extensions',
             level=Qgis.Critical)
     finally:
-        selections_to_clear = selections_to_clear or []
-        for selection_model in selections_to_clear:
-            selection_model.clearSelection()
-        models_to_refresh = models_to_refresh or []
-        for model in models_to_refresh:
-            model.refresh_data()
-        if file_widget_to_clear is not None:
-            file_widget_to_clear.setFilePath('')
         QtWidgets.QApplication.restoreOverrideCursor()
 
 
 @contextmanager
-def transactional_project(dest_url=None):
+def transactional_project(src_url=None, dest_url=None,
+                          dont_resolve_layers=True):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
 
-    The project is saved to its original location if ``dest_path`` is ``None``,
-    else it is saved to ``dest_path``.
+    If ``src_url`` is ``None``, the returned project is the current one (the
+    one loaded int QGIS interface). Else, the project found at ``src_url`` is
+    returned.
+
+    The project is saved to its original location if ``dest_url`` is ``None``,
+    else it is saved to ``dest_url``.
 
     Implementation detail: after saving the project with ``proj.write()`` (thus
     updating the project file on disk), when the user clicks on the Save icon
@@ -72,7 +71,14 @@ def transactional_project(dest_url=None):
     ``proj.clear()`` and ``proj.read()``.
     """
     try:
-        proj = QgsProject.instance()
+        if src_url:
+            proj = QgsProject()
+            if dont_resolve_layers:
+                proj.read(src_url, QgsProject.FlagDontResolveLayers)
+            else:
+                proj.read(src_url)
+        else:
+            proj = QgsProject.instance()
         yield proj
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),

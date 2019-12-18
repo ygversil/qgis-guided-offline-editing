@@ -26,7 +26,6 @@ import os
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
-from qgis.gui import QgsFileWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the
 # elements from Qt Designer
@@ -46,9 +45,9 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.pgProjectDestFileWidget.setStorageMode(QgsFileWidget.SaveFile)
         self.pg_project_model = None
         self.offline_layer_model = None
+        self.pg_project_selection_model = None
 
     def initialize_extent_group_box(self, original_extent, current_extent,
                                     output_crs, canvas):
@@ -65,14 +64,17 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def refresh_pg_project_list(self):
         self.pgProjectList.setModel(self.pg_project_model.model)
+        self.pg_project_selection_model = self.pgProjectList.selectionModel()
+        self.pg_project_selection_model.selectionChanged.connect(
+            self.update_go_button_state
+        )
 
     def refresh_offline_layer_list(self):
         self.offlineLayerList.setModel(self.offline_layer_model.model)
 
-    def selected_destination_path(self):
-        """Return the selected destination file or ``None`` if no destination
-        file has been selected."""
-        return self.pgProjectDestFileWidget.filePath() or None
+    def select_project_at_index(self, index):
+        """Select the project at given index in project list."""
+        self.pgProjectList.setCurrentIndex(index)
 
     def selected_extent(self):
         """Return the selected extent from where data should be downloaded."""
@@ -85,7 +87,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def selected_pg_project(self):
         """Return the selected project name or ``None`` if no project is
         selected."""
-        selected_rows = self.pg_project_selection_model().selectedRows()
+        selected_rows = self.pg_project_selection_model.selectedRows()
         if selected_rows:
             return self.pg_project_model.project_at_index(selected_rows[0])
         else:
@@ -99,13 +101,19 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Link to the given ``PostgresPorjectListModel`` instance."""
         self.pg_project_model = model
 
-    def update_download_button_state(self):
-        """Set the download button enable or disable depending on UI state."""
-        if (not self.selected_pg_project() or
-                not self.selected_destination_path()):
-            self.downloadButton.setEnabled(False)
+    def update_extent_group_box_state(self):
+        """Set the extent group box enable or disable depending on UI state."""
+        if self.downloadCheckBox.isChecked():
+            self.pgProjectDownloadExtent.setEnabled(True)
         else:
-            self.downloadButton.setEnabled(True)
+            self.pgProjectDownloadExtent.setEnabled(False)
+
+    def update_go_button_state(self):
+        """Set the download button enable or disable depending on UI state."""
+        if not self.selected_pg_project():
+            self.goButton.setEnabled(False)
+        else:
+            self.goButton.setEnabled(True)
 
     def update_upload_button_state(self):
         """Set the upload button enable or disable depending on UI state."""
@@ -113,3 +121,20 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.uploadButton.setEnabled(False)
         else:
             self.uploadButton.setEnabled(True)
+
+    def update_widgets(self, project_index_to_select=None,
+                       tab_index_to_show=0):
+        """Update some widgets state."""
+        if project_index_to_select is not None:
+            self.select_project_at_index(project_index_to_select)
+        self.tabWidget.setCurrentIndex(tab_index_to_show)
+        if (project_index_to_select is None
+                and self.downloadCheckBox.isChecked()):
+            self.downloadCheckBox.setChecked(False)
+        elif (project_index_to_select is not None
+              and tab_index_to_show == 0
+              and not self.downloadCheckBox.isChecked()):
+            self.downloadCheckBox.setChecked(True)
+        self.update_extent_group_box_state()
+        self.update_go_button_state()
+        self.update_upload_button_state()

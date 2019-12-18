@@ -22,6 +22,8 @@
  ***************************************************************************/
 """
 
+from collections import namedtuple
+
 from PyQt5.QtCore import QObject, QStringListModel, Qt, pyqtSignal
 from qgis.core import QgsProject
 
@@ -29,6 +31,17 @@ from .db_manager import PostgresProjectDownloader
 
 
 _IS_OFFLINE_EDITABLE = 'isOfflineEditable'
+
+
+Settings = namedtuple('Settings', (
+    'pg_host',
+    'pg_port',
+    'pg_dbname',
+    'pg_schema',
+    'pg_authcfg',
+    'pg_sslmode',
+    'output_crs_id',
+))
 
 
 class PostgresProjectListModel(QObject):
@@ -63,6 +76,13 @@ class PostgresProjectListModel(QObject):
     def project_at_index(self, index):
         """Return the name of project at given index."""
         return self.model.data(index, Qt.DisplayRole)
+
+    def index_for_project_name(self, project_name):
+        """Return the index of the given name in project list."""
+        indices = self.model.match(self.model.index(0, 0),
+                                   Qt.DisplayRole,
+                                   project_name)
+        return indices[0] if indices else None
 
 
 class OfflineLayerListModel(QObject):
