@@ -11,67 +11,67 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="180"/>
+        <location filename="../guided_offline_editing.py" line="182"/>
         <source>Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="191"/>
+        <location filename="../guided_offline_editing.py" line="193"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="415"/>
+        <location filename="../guided_offline_editing.py" line="439"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="418"/>
+        <location filename="../guided_offline_editing.py" line="442"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="421"/>
+        <location filename="../guided_offline_editing.py" line="445"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="424"/>
+        <location filename="../guided_offline_editing.py" line="448"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="427"/>
+        <location filename="../guided_offline_editing.py" line="451"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="430"/>
+        <location filename="../guided_offline_editing.py" line="454"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="433"/>
+        <location filename="../guided_offline_editing.py" line="457"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="286"/>
+        <location filename="../guided_offline_editing.py" line="288"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="443"/>
+        <location filename="../guided_offline_editing.py" line="467"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="200"/>
+        <location filename="../guided_offline_editing.py" line="202"/>
         <source>gis_data_home variable not set or invalid</source>
         <translation>Variable gis_data_home non définie ou invalide</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="200"/>
+        <location filename="../guided_offline_editing.py" line="202"/>
         <source>You must set the global variable gis_data_home to the path of the folder which contains you GIS data.
 
 For more information, see https://qgis-guided-offline-editing.readthedocs.io/en/latest/admin_guide.html#qgis-prerequisites</source>
