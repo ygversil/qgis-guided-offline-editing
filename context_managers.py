@@ -52,7 +52,8 @@ def busy_refreshing(refresh_func=None):
 
 
 @contextmanager
-def transactional_project(src_url=None, dest_url=None):
+def transactional_project(src_url=None, dest_url=None,
+                          dont_resolve_layers=True):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
 
@@ -72,7 +73,10 @@ def transactional_project(src_url=None, dest_url=None):
     try:
         if src_url:
             proj = QgsProject()
-            proj.read(src_url)
+            if dont_resolve_layers:
+                proj.read(src_url, QgsProject.FlagDontResolveLayers)
+            else:
+                proj.read(src_url)
         else:
             proj = QgsProject.instance()
         yield proj
