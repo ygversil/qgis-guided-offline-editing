@@ -47,10 +47,11 @@ from .guided_offline_editing_progress_dialog import (
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
 from .context_managers import busy_refreshing, transactional_project
-from .db_manager import (PG_PROJECT_STORAGE_TYPE, build_gpkg_project_url,
-                         build_pg_project_url)
+from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path
 
+PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
+PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
 
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
@@ -313,23 +314,36 @@ class GuidedOfflineEditingPlugin:
             '{project_name}.qgz'.format(project_name=project_name)
         )
         qgz_path = self.root_path / qgz_name
-        with busy_refreshing(), \
-                transactional_project(src_url=project_url,
-                                      dest_url=str(qgz_path)) as proj:
-            for _, layer in proj.mapLayers().items():
-                if layer.source().startswith(str(proj.homePath())):
-                    layer.setDataSource(
-                        layer.source().replace(proj.homePath().rstrip('/\\'),
-                                               str(self.root_path)),
-                        layer.name(),
-                        layer.dataProvider().name(),
-                        QgsDataProvider.ProviderOptions(),
-                    )
-        with busy_refreshing(), \
-                transactional_project(src_url=str(qgz_path)) as proj:
-            proj.setPresetHomePath('')
-            proj.writeEntryBool('Paths', '/Absolute', False)
-        self.iface.addProject(str(qgz_path))
+        current_proj = QgsProject.instance()
+        if (not current_proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
+                                           PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
+                or current_proj.baseName() != project_name):
+            with busy_refreshing(), \
+                    transactional_project(src_url=project_url,
+                                          dest_url=str(qgz_path)) as proj:
+                for layer_id, layer in proj.mapLayers().items():
+                    if layer.source().startswith(str(proj.homePath())):
+                        new_path = layer.source().replace(
+                                proj.homePath().rstrip('/\\'),
+                                str(self.root_path)
+                            )
+                        layer.setDataSource(
+                            layer.source().replace(
+                                proj.homePath().rstrip('/\\'),
+                                str(self.root_path)
+                            ),
+                            layer.name(),
+                            layer.dataProvider().name(),
+                            QgsDataProvider.ProviderOptions(),
+                        )
+            with busy_refreshing(), \
+                    transactional_project(src_url=str(qgz_path)) as proj:
+                proj.setPresetHomePath('')
+                proj.writeEntryBool('Paths', '/Absolute', False)
+                proj.writeEntryBool(PROJECT_ENTRY_SCOPE_GUIDED,
+                                    PROJECT_ENTRY_KEY_FROM_POSTGRES,
+                                    True)
+            self.iface.addProject(str(qgz_path))
         if not self.dlg.downloadCheckBox.isChecked():
             return
         gpkg_name = pathlib.Path(
@@ -403,10 +417,10 @@ class GuidedOfflineEditingPlugin:
                                              self.canvas)
         # Select current project in project list
         proj = QgsProject.instance()
-        proj_storage = proj.projectStorage()
         project_index = (self.pg_project_model.index_for_project_name(
             proj.baseName()
-        ) if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE
+        ) if proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
+                                PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
                          else None)
         # If already offline project, show upload tab
         tab_index = 0 if self.offline_layer_model.is_empty() else 1
