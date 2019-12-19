@@ -333,7 +333,7 @@ class GuidedOfflineEditingPlugin:
                                 str(self.root_path)
                             ),
                             layer.name(),
-                            layer.dataProvider().name(),
+                            layer.providerType(),
                             QgsDataProvider.ProviderOptions(),
                         )
             with busy_refreshing(), \
