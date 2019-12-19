@@ -1,0 +1,5 @@
+[flake8]
+exclude =
+    resources.py
+per-file-ignores =
+    help/source/conf.py:E265

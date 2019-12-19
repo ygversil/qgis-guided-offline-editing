@@ -323,10 +323,6 @@ class GuidedOfflineEditingPlugin:
                                           dest_url=str(qgz_path)) as proj:
                 for layer_id, layer in proj.mapLayers().items():
                     if layer.source().startswith(str(proj.homePath())):
-                        new_path = layer.source().replace(
-                                proj.homePath().rstrip('/\\'),
-                                str(self.root_path)
-                            )
                         layer.setDataSource(
                             layer.source().replace(
                                 proj.homePath().rstrip('/\\'),
