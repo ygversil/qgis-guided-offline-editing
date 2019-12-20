@@ -93,7 +93,7 @@ class GuidedOfflineEditingPlugin:
                 QCoreApplication.installTranslator(self.translator)
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Guided Offline Editing')
+        self.menu = self.tr(u'&Guided Editing')
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None

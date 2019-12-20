@@ -74,6 +74,11 @@ For more information, see https://qgis-guided-offline-editing.readthedocs.io/en/
 
 Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthedocs.io/en/latest/admin_guide.html#qgis-prerequisites</translation>
     </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="96"/>
+        <source>&amp;Guided Editing</source>
+        <translation>&amp;Édition assistée</translation>
+    </message>
 </context>
 <context>
     <name>GuidedOfflineEditingPluginDialogBase</name>
@@ -116,6 +121,11 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <location filename="../guided_offline_editing_dialog_base.ui" line="91"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="14"/>
+        <source>Guided Editing</source>
+        <translation>Édition assistée</translation>
     </message>
 </context>
 <context>
