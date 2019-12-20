@@ -458,6 +458,11 @@ class GuidedOfflineEditingPlugin:
             if layer_id not in layer_ids:
                 continue
             layer.selectByRect(extent)
+            log_message('{} selected features for downloading '
+                        'in layer "{}"'.format(
+                            layer.selectedFeatureCount(),
+                            layer.name()
+                        ))
 
     def set_progress_mode(self, mode, max_):
         """Update progress dialog information."""
