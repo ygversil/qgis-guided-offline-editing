@@ -59,14 +59,28 @@
         <widget class="QListView" name="pgProjectList"/>
        </item>
        <item>
-        <widget class="QCheckBox" name="downloadCheckBox">
-         <property name="text">
-          <string>Download offline</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QCheckBox" name="downloadCheckBox">
+           <property name="text">
+            <string>Download offline</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="zoomFullCheckBox">
+           <property name="text">
+            <string>Zoom on project extent after loading</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QLabel" name="pgProjectDownloadExtentLabel">
