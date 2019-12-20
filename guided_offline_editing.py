@@ -405,7 +405,8 @@ class GuidedOfflineEditingPlugin:
         ``pathlib.Path`` object with it, or ``None`` if it is not valid."""
         path = qgis_variable(global_scope(), 'gis_data_home')
         path = pathlib.Path(path) if path else None
-        return (path if path and path.exists() and path.is_dir()
+        return (path if (path and path.exists() and path.is_dir()
+                         and path.is_absolute())
                 else None)
 
     def read_database_settings(self, db_title):
