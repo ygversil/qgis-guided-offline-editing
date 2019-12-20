@@ -10,7 +10,7 @@
 name=Guided Offline Editing
 qgisMinimumVersion=3.10
 description=Extend the built-in Offline Editing plugin providing automated processes
-version=0.6.0-dev
+version=0.6.0-dev1
 author=Yann Voté
 email=ygversil@lilo.org
 
@@ -24,6 +24,9 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 
 # Uncomment the following line and add your changelog:
 changelog=
+  Version 0.6
+  * Allow to configure multiple databases. Each database will have its own menu entry under the "Guided Editing" menu,
+  ====
   Version 0.5
   * Allow not to download project and directly edit in PostgreSQL/Postgis,
   * When project is downloaded offline, enforce to save it in `gis_data_home` folder, and compute filename from project name in PostgreSQL. Thus do not ask anymore user to select destination file. `gis_data_home` must be a QGIS global variable referencing a valid folder. The reason for this is to allow local filesystem layers in shared projects saved in PostgreSQL. Consequently, eash user must have the same folder tree and the same common layers inside `gis_data_home` folder,

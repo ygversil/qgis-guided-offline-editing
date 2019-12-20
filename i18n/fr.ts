@@ -11,73 +11,73 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="182"/>
-        <source>Guided Offline Editing</source>
-        <translation>Édition hors-connexion assistée</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing.py" line="193"/>
+        <location filename="../guided_offline_editing.py" line="202"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="439"/>
+        <location filename="../guided_offline_editing.py" line="447"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="442"/>
+        <location filename="../guided_offline_editing.py" line="450"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="445"/>
+        <location filename="../guided_offline_editing.py" line="453"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="448"/>
+        <location filename="../guided_offline_editing.py" line="456"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="451"/>
+        <location filename="../guided_offline_editing.py" line="459"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="454"/>
+        <location filename="../guided_offline_editing.py" line="462"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="457"/>
+        <location filename="../guided_offline_editing.py" line="465"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="288"/>
+        <location filename="../guided_offline_editing.py" line="298"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="467"/>
+        <location filename="../guided_offline_editing.py" line="475"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="202"/>
+        <location filename="../guided_offline_editing.py" line="211"/>
         <source>gis_data_home variable not set or invalid</source>
         <translation>Variable gis_data_home non définie ou invalide</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="202"/>
+        <location filename="../guided_offline_editing.py" line="211"/>
         <source>You must set the global variable gis_data_home to the path of the folder which contains you GIS data.
 
 For more information, see https://qgis-guided-offline-editing.readthedocs.io/en/latest/admin_guide.html#qgis-prerequisites</source>
         <translation>Vous devez définir la variable globale gis_data_home avec le chemin du dossier contenant vos données SIG.
 
 Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthedocs.io/en/latest/admin_guide.html#qgis-prerequisites</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="96"/>
+        <source>&amp;Guided Editing</source>
+        <translation>&amp;Édition assistée</translation>
     </message>
 </context>
 <context>
@@ -121,6 +121,11 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <location filename="../guided_offline_editing_dialog_base.ui" line="91"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="14"/>
+        <source>Guided Editing</source>
+        <translation>Édition assistée</translation>
     </message>
 </context>
 <context>

@@ -419,8 +419,22 @@ under its profile folder. To find your profile folder, in QGIS, go to
 Then, in the file manager window, navigate to the ``QGIS`` folder, and edit the
 ``QGIS3.ini`` file.
 
-In ``QGIS3.ini``, you need to add a section ``[Plugin-GuidedOfflineEditing]``
-and inside this section you can add the following parameters:
+In ``QGIS3.ini``, you need to add a section ``[Plugin-GuidedOfflineEditing]``.
+Then, inside this section you can configure multiple databases. Each database
+will have its own submenu entry under the :menuselection:`Guided Editing` menu.
+To declare a database, you must prepend the ``databases\<Database Name>\``
+prefix to all its parameters. For example, if you have a database named ``DB
+1``, you will prepend the ``databases\DB%201\`` prefix.
+
+.. note::
+
+       ``QGIS3.ini`` is an ASCII-encoded file which does not tolerate spaces.
+       So you must encode each space character with the ``%20`` code. The same
+       goes for accented characters. For example, if the database name contains
+       a "é" character (e-acute), you must replace all instances of this
+       caracter with it ``%E9`` code.
+
+For each database to be configured, you can provide the following parameters:
 
 * ``host``: hostname of the PostgreSQL server (default: ``localhost``),
 
@@ -437,16 +451,17 @@ and inside this section you can add the following parameters:
 * ``sslmode``: does PostgreSQL connection need SSL? (allowed values:
   ``enabled`` or ``disabled``, default: ``disabled``).
 
-In our We Love Biodiv example, Alice and Bob should add the following lines to
-their respective ``QGIS3.ini`` file.
+In our We Love Biodiv example, there is only one database named *We Love Biodiv
+DB*. Thus Alice and Bob should add the following lines to their respective
+``QGIS3.ini`` file.
 
 .. code-block:: ini
 
    [Plugin-GuidedOfflineEditing]
-   authcfg=wlbauth
-   dbname=wlbdb
-   host=db.priv.welovbiodiv.org
-   schema=qgis
+   databases\We%20Love%20Biodiv%20DB\authcfg=wlbauth
+   databases\We%20Love%20Biodiv%20DB\dbname=wlbdb
+   databases\We%20Love%20Biodiv%20DB\host=db.priv.welovbiodiv.org
+   databases\We%20Love%20Biodiv%20DB\schema=qgis
 
 Going further: deploying configuration in the organization
 ----------------------------------------------------------

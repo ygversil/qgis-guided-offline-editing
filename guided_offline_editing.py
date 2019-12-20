@@ -22,6 +22,7 @@
  ***************************************************************************/
 """
 
+from functools import partial
 import pathlib
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
@@ -35,7 +36,6 @@ from qgis.core import (
     QgsOfflineEditing,
     QgsProject,
     QgsRectangle,
-    QgsSettings,
 )
 
 # Initialize Qt resources from file resources.py
@@ -46,12 +46,17 @@ from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog
 )
 from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
-from .context_managers import busy_refreshing, transactional_project
+from .context_managers import (
+    busy_refreshing,
+    qgis_group_settings,
+    transactional_project,
+)
 from .db_manager import build_gpkg_project_url, build_pg_project_url
 import os.path
 
 PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
 PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
+SETTINGS_GROUP = 'Plugin-GuidedOfflineEditing/databases'
 
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
@@ -88,7 +93,7 @@ class GuidedOfflineEditingPlugin:
                 QCoreApplication.installTranslator(self.translator)
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Guided Offline Editing')
+        self.menu = self.tr(u'&Guided Editing')
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
@@ -110,9 +115,9 @@ class GuidedOfflineEditingPlugin:
                                           message)
 
     def add_action(self,
-                   icon_path,
                    text,
                    callback,
+                   icon_path=None,
                    enabled_flag=True,
                    add_to_menu=True,
                    add_to_toolbar=True,
@@ -157,8 +162,11 @@ class GuidedOfflineEditingPlugin:
             added to self.actions list.
         :rtype: QAction
         """
-        icon = QIcon(icon_path)
-        action = QAction(icon, text, parent)
+        if icon_path:
+            icon = QIcon(icon_path)
+            action = QAction(icon, text, parent)
+        else:
+            action = QAction(text, parent)
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
         if status_tip is not None:
@@ -177,13 +185,14 @@ class GuidedOfflineEditingPlugin:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        icon_path = (':/plugins/guided_offline_editing/icons/'
-                     'guided_offline_editing_copy.png')
-        self.add_action(
-            icon_path,
-            text=self.tr(u'Guided Offline Editing'),
-            callback=self.run,
-            parent=self.iface.mainWindow())
+        with qgis_group_settings(SETTINGS_GROUP) as s:
+            for db_title in s.childGroups():
+                callback = partial(self.run, db_title)
+                self.add_action(
+                    text=db_title,
+                    callback=callback,
+                    parent=self.iface.mainWindow()
+                )
         # will be set False in run()
         self.first_start = True
 
@@ -195,7 +204,7 @@ class GuidedOfflineEditingPlugin:
                 action)
             self.iface.removeToolBarIcon(action)
 
-    def run(self):
+    def run(self, db_title):
         """Run method that performs all the real work"""
         self.root_path = self.read_gis_data_home()
         if not self.root_path:
@@ -220,8 +229,9 @@ class GuidedOfflineEditingPlugin:
             self.progress_dlg = GuidedOfflineEditingPluginProgressDialog(
                 parent=self.iface.mainWindow()
             )
+        self.dlg.set_db_title(db_title)
         self.done = False
-        self.settings = self.read_settings()
+        self.settings = self.read_database_settings(db_title)
         self.offliner = QgsOfflineEditing()
         self.pg_project_model = PostgresProjectListModel(
             host=self.settings.pg_host,
@@ -381,23 +391,25 @@ class GuidedOfflineEditingPlugin:
         return (path if path and path.exists() and path.is_dir()
                 else None)
 
-    def read_settings(self):
+    def read_database_settings(self, db_title):
         """Read plugin settings from config file."""
-        s = QgsSettings()
-        d = dict()
-        d['pg_host'] = s.value('Plugin-GuidedOfflineEditing/host', 'localhost')
-        d['pg_port'] = s.value('Plugin-GuidedOfflineEditing/port', 5432)
-        d['pg_authcfg'] = s.value('Plugin-GuidedOfflineEditing/authcfg',
-                                  'authorg')
-        d['pg_dbname'] = s.value('Plugin-GuidedOfflineEditing/dbname',
-                                 'orgdb')
-        d['pg_schema'] = s.value('Plugin-GuidedOfflineEditing/schema',
-                                 'qgis')
-        d['pg_sslmode'] = s.value('Plugin-GuidedOfflineEditing/sslmode',
-                                  'disabled')
-        d['output_crs_id'] = s.value('Projections/projectDefaultCrs',
-                                     'EPSG:4326')
-        return Settings(**d)
+        with qgis_group_settings(SETTINGS_GROUP) as s:
+            d = dict()
+            d['pg_host'] = s.value('{}/host'.format(db_title),
+                                   'localhost')
+            d['pg_port'] = s.value('{}/port'.format(db_title), 5432)
+            d['pg_authcfg'] = s.value('{}/authcfg'.format(db_title),
+                                      'authorg')
+            d['pg_dbname'] = s.value('{}/dbname'.format(db_title),
+                                     'orgdb')
+            d['pg_schema'] = s.value('{}/schema'.format(db_title),
+                                     'qgis')
+            d['pg_sslmode'] = s.value('{}/sslmode'.format(db_title),
+                                      'disabled')
+            d['output_crs_id'] = s.value('{}/Projections'
+                                         '/projectDefaultCrs'.format(db_title),
+                                         'EPSG:4326')
+            return Settings(**d)
 
     def refresh_data_and_dialog(self):
         """Refresh models and update dialog widgets accordingly."""

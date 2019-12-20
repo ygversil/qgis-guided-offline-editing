@@ -27,7 +27,7 @@ import traceback
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from qgis.core import Qgis, QgsProject, QgsMessageLog
+from qgis.core import Qgis, QgsProject, QgsMessageLog, QgsSettings
 
 
 @contextmanager
@@ -49,6 +49,29 @@ def busy_refreshing(refresh_func=None):
             level=Qgis.Critical)
     finally:
         QtWidgets.QApplication.restoreOverrideCursor()
+
+
+@contextmanager
+def qgis_group_settings(group_prefix):
+    """Context manager returning a ``QgsSettings`` instance ready to read
+    settings within the `group_prefix`` group.
+
+    It ensures that the group is ended on exit.
+    """
+    s = QgsSettings()
+    s.beginGroup(group_prefix)
+    try:
+        yield s
+    except Exception as exc:
+        QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
+                                 'Extensions',
+                                 level=Qgis.Critical)
+        QgsMessageLog.logMessage(
+            'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
+            'Extensions',
+            level=Qgis.Critical)
+    finally:
+        s.endGroup()
 
 
 @contextmanager

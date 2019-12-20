@@ -93,6 +93,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             return None
 
+    def set_db_title(self, db_title):
+        """Set the DB Title label."""
+        self.dbTitleLabel.setText(db_title)
+
     def set_offline_layer_model(self, model):
         """Link to the given ``OfflineLayerListModel`` instance."""
         self.offline_layer_model = model
