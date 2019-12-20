@@ -32,7 +32,7 @@ from .utils import log_exception, log_message
 
 
 @contextmanager
-def busy_refreshing(refresh_func=None):
+def busy_refreshing(iface, refresh_func=None):
     """Context manager that shows busy cursor on startup and ensures that
     normal cursor is back on exit. Also ``refresh_func`` is called on exit."""
     try:
@@ -41,13 +41,13 @@ def busy_refreshing(refresh_func=None):
         if refresh_func is not None:
             refresh_func()
     except Exception as exc:
-        log_exception(exc, level='Critical')
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
     finally:
         QtWidgets.QApplication.restoreOverrideCursor()
 
 
 @contextmanager
-def qgis_group_settings(group_prefix):
+def qgis_group_settings(iface, group_prefix):
     """Context manager returning a ``QgsSettings`` instance ready to read
     settings within the `group_prefix`` group.
 
@@ -58,13 +58,13 @@ def qgis_group_settings(group_prefix):
     try:
         yield s
     except Exception as exc:
-        log_exception(exc, level='Warning')
+        log_exception(exc, level='Warning', feedback=True, iface=iface)
     finally:
         s.endGroup()
 
 
 @contextmanager
-def transactional_project(src_url=None, dest_url=None,
+def transactional_project(iface, src_url=None, dest_url=None,
                           dont_resolve_layers=True):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
@@ -93,7 +93,7 @@ def transactional_project(src_url=None, dest_url=None,
             proj = QgsProject.instance()
         yield proj
     except Exception as exc:
-        log_exception(exc, level='Critical')
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
     finally:
         if not dest_url:
             project_saved = proj.write()
@@ -101,7 +101,7 @@ def transactional_project(src_url=None, dest_url=None,
             project_saved = proj.write(dest_url)
         if not project_saved:
             log_message('Project has not been saved after transaction.',
-                        level='Warning')
+                        level='Warning', feedback=True, iface=iface)
         # XXX: better way to avoid warning if the user click save ?
         proj.clear()
         if not dest_url:

@@ -185,7 +185,7 @@ class GuidedOfflineEditingPlugin:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        with qgis_group_settings(SETTINGS_GROUP) as s:
+        with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
             for db_title in s.childGroups():
                 callback = partial(self.run, db_title)
                 self.add_action(
@@ -245,7 +245,7 @@ class GuidedOfflineEditingPlugin:
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
         self.connect_signals()
-        with busy_refreshing(self.refresh_data_and_dialog):
+        with busy_refreshing(self.iface, self.refresh_data_and_dialog):
             self.dlg.show()
         self.dlg.exec_()
         if self.done:
@@ -328,8 +328,8 @@ class GuidedOfflineEditingPlugin:
         if (not current_proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
                                            PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
                 or current_proj.baseName() != project_name):
-            with busy_refreshing(), \
-                    transactional_project(src_url=project_url,
+            with busy_refreshing(self.iface), \
+                    transactional_project(self.iface, src_url=project_url,
                                           dest_url=str(qgz_path)) as proj:
                 for layer_id, layer in proj.mapLayers().items():
                     if layer.source().startswith(str(proj.homePath())):
@@ -342,8 +342,9 @@ class GuidedOfflineEditingPlugin:
                             layer.providerType(),
                             QgsDataProvider.ProviderOptions(),
                         )
-            with busy_refreshing(), \
-                    transactional_project(src_url=str(qgz_path)) as proj:
+            with busy_refreshing(self.iface), \
+                    transactional_project(self.iface,
+                                          src_url=str(qgz_path)) as proj:
                 proj.setPresetHomePath('')
                 proj.writeEntryBool('Paths', '/Absolute', False)
                 proj.writeEntryBool(PROJECT_ENTRY_SCOPE_GUIDED,
@@ -356,8 +357,9 @@ class GuidedOfflineEditingPlugin:
             '{project_name}_offline.gpkg'.format(project_name=project_name)
         )
         gpkg_path = self.root_path / gpkg_name
-        with busy_refreshing(), \
+        with busy_refreshing(self.iface), \
                 transactional_project(
+                    self.iface,
                     dest_url=build_gpkg_project_url(gpkg_path,
                                                     project=project_name)
                 ) as proj:
@@ -393,7 +395,7 @@ class GuidedOfflineEditingPlugin:
 
     def read_database_settings(self, db_title):
         """Read plugin settings from config file."""
-        with qgis_group_settings(SETTINGS_GROUP) as s:
+        with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
             d = dict()
             d['pg_host'] = s.value('{}/host'.format(db_title),
                                    'localhost')
@@ -471,7 +473,7 @@ class GuidedOfflineEditingPlugin:
     def synchronize_offline_layers(self):
         """Send edited data from offline layers to postgres and convert the
         project back to offline."""
-        with busy_refreshing():
+        with busy_refreshing(self.iface):
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
         self.done = True

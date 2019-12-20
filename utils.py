@@ -27,13 +27,29 @@ import traceback
 from qgis.core import Qgis, QgsMessageLog
 
 
-def log_exception(err, level='Info'):
-    """Output the given exception in QGIS logs using the given level."""
-    log_message(str(err), level=level)
+def log_exception(err, level='Info', feedback=False, iface=None, duration=5):
+    """Output the given exception in QGIS logs using the given level.
+
+    If ``feedback`` is ``True``, then ``iface`` must reference a valid
+    ``QgisInterface`` instance so that the message can be shown in the message
+    bar in QGIS interface.
+    """
+    log_message(str(err), level=level, feedback=feedback, iface=iface,
+                duration=duration)
     log_message(traceback.format_exc(), level=level)
 
 
-def log_message(msg, level='Info'):
-    """Output the given message in QGIS logs using the given level."""
-    QgsMessageLog.logMessage(msg, 'GuidedOfflineEditing',
-                             level=getattr(Qgis, level))
+def log_message(msg, level='Info', feedback=False, iface=None,
+                duration=5):
+    """Output the given message in QGIS logs using the given level.
+
+    If ``feedback`` is ``True``, then ``iface`` must reference a valid
+    ``QgisInterface`` instance so that the message can be shown in the message
+    bar in QGIS interface.
+    """
+    level = getattr(Qgis, level)
+    QgsMessageLog.logMessage(msg, 'GuidedOfflineEditing', level=level)
+    if feedback:
+        assert iface is not None
+        iface.messageBar().pushMessage('GuidedOfflineEditing', msg,
+                                       level=level, duration=duration)
