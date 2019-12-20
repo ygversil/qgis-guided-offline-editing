@@ -364,6 +364,8 @@ class GuidedOfflineEditingPlugin:
                                     PROJECT_ENTRY_KEY_FROM_POSTGRES,
                                     True)
             self.iface.addProject(str(qgz_path))
+            if self.dlg.zoomFullCheckBox.isChecked():
+                self.iface.zoomFull()
         if not self.dlg.downloadCheckBox.isChecked():
             return
         gpkg_name = pathlib.Path(
