@@ -23,9 +23,10 @@
 """
 
 from functools import partial
+import os.path
 import pathlib
 
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import (
@@ -38,22 +39,19 @@ from qgis.core import (
     QgsRectangle,
 )
 
-# Initialize Qt resources from file resources.py
-from .resources import *  # noqa
-# Import the code for the dialog
-from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
-from .guided_offline_editing_progress_dialog import (
-    GuidedOfflineEditingPluginProgressDialog
-)
-from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
 from .context_managers import (
     busy_refreshing,
     qgis_group_settings,
     transactional_project,
 )
 from .db_manager import build_gpkg_project_url, build_pg_project_url
+from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
+from .guided_offline_editing_progress_dialog import (
+    GuidedOfflineEditingPluginProgressDialog,
+)
+from .resources import *  # noqa
+from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
 from .utils import log_message
-import os.path
 
 PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
 PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
