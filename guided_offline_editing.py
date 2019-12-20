@@ -52,6 +52,7 @@ from .context_managers import (
     transactional_project,
 )
 from .db_manager import build_gpkg_project_url, build_pg_project_url
+from .utils import log_message
 import os.path
 
 PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
@@ -186,7 +187,11 @@ class GuidedOfflineEditingPlugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
-            for db_title in s.childGroups():
+            db_titles = s.childGroups()
+            if not db_titles:
+                log_message(self.tr('No database configured'), level='Warning',
+                            feedback=True, iface=self.iface, duration=3)
+            for db_title in db_titles:
                 callback = partial(self.run, db_title)
                 self.add_action(
                     text=db_title,
@@ -206,6 +211,7 @@ class GuidedOfflineEditingPlugin:
 
     def run(self, db_title):
         """Run method that performs all the real work"""
+        log_message('Running plugin with database "{}"'.format(db_title))
         self.root_path = self.read_gis_data_home()
         if not self.root_path:
             QMessageBox.critical(
@@ -333,6 +339,15 @@ class GuidedOfflineEditingPlugin:
                                           dest_url=str(qgz_path)) as proj:
                 for layer_id, layer in proj.mapLayers().items():
                     if layer.source().startswith(str(proj.homePath())):
+                        new_source = layer.source().replace(
+                            proj.homePath().rstrip('/\\'),
+                            str(self.root_path)
+                        )
+                        log_message('Updating layer source: {} -> {}'.format(
+                            layer.source(),
+                            new_source,
+                        ),
+                                    level='Info')
                         layer.setDataSource(
                             layer.source().replace(
                                 proj.homePath().rstrip('/\\'),
