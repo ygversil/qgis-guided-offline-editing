@@ -110,9 +110,9 @@ class GuidedOfflineEditingPlugin:
                                           message)
 
     def add_action(self,
-                   icon_path,
                    text,
                    callback,
+                   icon_path=None,
                    enabled_flag=True,
                    add_to_menu=True,
                    add_to_toolbar=True,
@@ -157,8 +157,11 @@ class GuidedOfflineEditingPlugin:
             added to self.actions list.
         :rtype: QAction
         """
-        icon = QIcon(icon_path)
-        action = QAction(icon, text, parent)
+        if icon_path:
+            icon = QIcon(icon_path)
+            action = QAction(icon, text, parent)
+        else:
+            action = QAction(text, parent)
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
         if status_tip is not None:
