@@ -41,11 +41,11 @@ def busy_refreshing(refresh_func=None):
             refresh_func()
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
-                                 'Extensions',
+                                 'GuidedOfflineEditing',
                                  level=Qgis.Critical)
         QgsMessageLog.logMessage(
             'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-            'Extensions',
+            'GuidedOfflineEditing',
             level=Qgis.Critical)
     finally:
         QtWidgets.QApplication.restoreOverrideCursor()
@@ -64,11 +64,11 @@ def qgis_group_settings(group_prefix):
         yield s
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
-                                 'Extensions',
+                                 'GuidedOfflineEditing',
                                  level=Qgis.Critical)
         QgsMessageLog.logMessage(
             'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-            'Extensions',
+            'GuidedOfflineEditing',
             level=Qgis.Critical)
     finally:
         s.endGroup()
@@ -105,11 +105,11 @@ def transactional_project(src_url=None, dest_url=None,
         yield proj
     except Exception as exc:
         QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
-                                 'Extensions',
+                                 'GuidedOfflineEditing',
                                  level=Qgis.Critical)
         QgsMessageLog.logMessage(
             'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-            'Extensions',
+            'GuidedOfflineEditing',
             level=Qgis.Critical)
     finally:
         if not dest_url:
@@ -119,11 +119,11 @@ def transactional_project(src_url=None, dest_url=None,
         if not project_saved:
             QgsMessageLog.logMessage('GuidedOfflineEditing: project has not '
                                      'been saved after transaction.',
-                                     'Extensions',
+                                     'GuidedOfflineEditing',
                                      level=Qgis.Warning)
             QgsMessageLog.logMessage(
                 'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-                'Extensions',
+                'GuidedOfflineEditing',
                 level=Qgis.Warning)
         # XXX: better way to avoid warning if the user click save ?
         proj.clear()
