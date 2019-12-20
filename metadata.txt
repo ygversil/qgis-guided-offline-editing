@@ -10,7 +10,7 @@
 name=Guided Offline Editing
 qgisMinimumVersion=3.10
 description=Extend the built-in Offline Editing plugin providing automated processes
-version=0.6.0-dev3
+version=0.6.0-dev4
 author=Yann Voté
 email=ygversil@lilo.org
 
@@ -27,6 +27,7 @@ changelog=
   Version 0.6
   * Allow to configure multiple databases. Each database will have its own menu entry under the "Guided Editing" menu,
   * Improved logging and user feedback,
+  * Zoom on project extent after loading,
   ====
   Version 0.5
   * Allow not to download project and directly edit in PostgreSQL/Postgis,

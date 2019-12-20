@@ -16,37 +16,37 @@
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="463"/>
+        <location filename="../guided_offline_editing.py" line="465"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="466"/>
+        <location filename="../guided_offline_editing.py" line="468"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="469"/>
+        <location filename="../guided_offline_editing.py" line="471"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="472"/>
+        <location filename="../guided_offline_editing.py" line="474"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="475"/>
+        <location filename="../guided_offline_editing.py" line="477"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="478"/>
+        <location filename="../guided_offline_editing.py" line="480"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="481"/>
+        <location filename="../guided_offline_editing.py" line="483"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
@@ -56,7 +56,7 @@
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="491"/>
+        <location filename="../guided_offline_editing.py" line="493"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
@@ -93,12 +93,12 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="132"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="146"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="109"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="123"/>
         <source>Offline layers</source>
         <translation>Couches hors-connexions</translation>
     </message>
@@ -108,7 +108,7 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="88"/>
         <source>Extent to download</source>
         <translation>Emprise à télécharger</translation>
     </message>
@@ -118,12 +118,12 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <translation>Sélectionner le projet sur lequel travailler</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="64"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="66"/>
         <source>Download offline</source>
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="91"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="105"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
     </message>
@@ -131,6 +131,11 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <location filename="../guided_offline_editing_dialog_base.ui" line="14"/>
         <source>Guided Editing</source>
         <translation>Édition assistée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="76"/>
+        <source>Zoom on project extent after loading</source>
+        <translation>Zoom sur le projet après chargement</translation>
     </message>
 </context>
 <context>
