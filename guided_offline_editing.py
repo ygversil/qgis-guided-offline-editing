@@ -424,17 +424,15 @@ class GuidedOfflineEditingPlugin:
                                      'qgis')
             d['pg_sslmode'] = s.value('{}/sslmode'.format(db_title),
                                       'disabled')
-            d['output_crs_id'] = s.value('{}/Projections'
-                                         '/projectDefaultCrs'.format(db_title),
-                                         'EPSG:4326')
             return Settings(**d)
 
     def refresh_data_and_dialog(self):
         """Refresh models and update dialog widgets accordingly."""
+        proj = QgsProject.instance()
         # Init extent widget
         self.pg_project_model.refresh_data()
         self.offline_layer_model.refresh_data()
-        output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
+        output_crs = QgsCoordinateReferenceSystem(proj.crs())
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         self.dlg.initialize_extent_group_box(original_extent,
@@ -442,7 +440,6 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         # Select current project in project list
-        proj = QgsProject.instance()
         project_index = (self.pg_project_model.index_for_project_name(
             proj.baseName()
         ) if proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
