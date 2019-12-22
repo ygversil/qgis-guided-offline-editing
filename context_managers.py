@@ -97,6 +97,7 @@ def transactional_project(iface, src_url=None, dest_url=None,
     finally:
         if not dest_url:
             project_saved = proj.write()
+            dest_url = proj.fileName()
         else:
             project_saved = proj.write(dest_url)
         if not project_saved:
@@ -104,7 +105,4 @@ def transactional_project(iface, src_url=None, dest_url=None,
                         level='Warning', feedback=True, iface=iface)
         # XXX: better way to avoid warning if the user click save ?
         proj.clear()
-        if not dest_url:
-            proj.read(proj.fileName())
-        else:
-            proj.read(dest_url)
+        proj.read(dest_url)
