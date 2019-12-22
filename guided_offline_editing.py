@@ -39,6 +39,7 @@ from qgis.core import (
     QgsOfflineEditing,
     QgsProject,
     QgsRectangle,
+    QgsVectorLayer,
 )
 
 from .context_managers import (
@@ -366,6 +367,16 @@ class GuidedOfflineEditingPlugin:
                                     PROJECT_ENTRY_KEY_FROM_POSTGRES,
                                     True)
             self.iface.addProject(str(qgz_path))
+            with busy_refreshing(self.iface), \
+                    transactional_project(self.iface) as proj:
+                rel_mgr = proj.relationManager()
+                for relation in rel_mgr.discoverRelations(
+                    rel_mgr.relations(),
+                    (layer for _, layer in proj.mapLayers().items()
+                     if isinstance(layer, QgsVectorLayer)
+                     and layer.dataProvider().name() == 'postgres')
+                ):
+                    rel_mgr.addRelation(relation)
             if self.dlg.zoomFullCheckBox.isChecked():
                 self.iface.zoomFull()
         if not self.dlg.downloadCheckBox.isChecked():
