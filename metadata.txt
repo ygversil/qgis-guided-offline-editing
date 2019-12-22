@@ -29,6 +29,7 @@ changelog=
   * Improved logging and user feedback,
   * Zoom on project extent after loading,
   * bugfix: download extent not in correct projection,
+  * workaround: relations are missing from downloaded project. Note: this bug is inherent to QGIS, so this is just a workaround that discovers all relations again when project has been downloaded.
   ====
   Version 0.5
   * Allow not to download project and directly edit in PostgreSQL/Postgis,
