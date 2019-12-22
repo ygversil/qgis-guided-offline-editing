@@ -31,9 +31,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
     QgsDataProvider,
     QgsExpressionContextScope,
     QgsExpressionContextUtils,
+    QgsGeometry,
     QgsOfflineEditing,
     QgsProject,
     QgsRectangle,
@@ -387,11 +389,12 @@ class GuidedOfflineEditingPlugin:
                     .lower() not in ('no', 'false')
                 )
             ]
-            extent = self.dlg.selected_extent()
+            extent, extent_crs_id = self.dlg.selected_extent()
             if extent is not None:
                 self.select_feature_by_extent(proj,
                                               layer_ids_to_download,
-                                              extent)
+                                              extent,
+                                              extent_crs_id)
                 only_selected = True
             else:
                 only_selected = False
@@ -424,17 +427,15 @@ class GuidedOfflineEditingPlugin:
                                      'qgis')
             d['pg_sslmode'] = s.value('{}/sslmode'.format(db_title),
                                       'disabled')
-            d['output_crs_id'] = s.value('{}/Projections'
-                                         '/projectDefaultCrs'.format(db_title),
-                                         'EPSG:4326')
             return Settings(**d)
 
     def refresh_data_and_dialog(self):
         """Refresh models and update dialog widgets accordingly."""
+        proj = QgsProject.instance()
         # Init extent widget
         self.pg_project_model.refresh_data()
         self.offline_layer_model.refresh_data()
-        output_crs = QgsCoordinateReferenceSystem(self.settings.output_crs_id)
+        output_crs = QgsCoordinateReferenceSystem(proj.crs())
         original_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         current_extent = QgsRectangle(0.0, 0.0, 0.0, 0.0)
         self.dlg.initialize_extent_group_box(original_extent,
@@ -442,7 +443,6 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         # Select current project in project list
-        proj = QgsProject.instance()
         project_index = (self.pg_project_model.index_for_project_name(
             proj.baseName()
         ) if proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
@@ -453,10 +453,25 @@ class GuidedOfflineEditingPlugin:
         self.dlg.update_widgets(project_index_to_select=project_index,
                                 tab_index_to_show=tab_index)
 
-    def select_feature_by_extent(self, proj, layer_ids, extent):
+    def select_feature_by_extent(self, proj, layer_ids, extent, extent_crs_id):
         for layer_id, layer in proj.mapLayers().items():
             if layer_id not in layer_ids:
                 continue
+            layer_crs_id = layer.sourceCrs().authid()
+            if extent_crs_id != layer_crs_id:
+                geom = QgsGeometry.fromRect(extent)
+                extent_crs = QgsCoordinateReferenceSystem(extent_crs_id)
+                layer_crs = QgsCoordinateReferenceSystem(layer_crs_id)
+                tr = QgsCoordinateTransform(extent_crs, layer_crs, proj)
+                transform_res = geom.transform(tr)
+                if transform_res != 0:
+                    log_message('Unable to reproject extent from CRS "{}" '
+                                'to CRS "{}"'.format(
+                                    extent_crs_id,
+                                    layer_crs_id
+                                ), level='Warning')
+                else:
+                    extent = geom.boundingBox()
             layer.selectByRect(extent)
             log_message('{} selected features for downloading '
                         'in layer "{}"'.format(

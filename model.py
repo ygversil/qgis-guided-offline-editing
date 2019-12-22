@@ -40,7 +40,6 @@ Settings = namedtuple('Settings', (
     'pg_schema',
     'pg_authcfg',
     'pg_sslmode',
-    'output_crs_id',
 ))
 
 
