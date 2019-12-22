@@ -77,12 +77,14 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pgProjectList.setCurrentIndex(index)
 
     def selected_extent(self):
-        """Return the selected extent from where data should be downloaded."""
+        """Return a 2-uple ``(rect, crs_id)`` where ``rect`` is the selected
+        extent from where data should be downloaded, and ``crs_id`` is the
+        EPSG identifier of this rectangle's CRS."""
         extent = self.pgProjectDownloadExtent.outputExtent()
         if extent.area() == 0.0:
-            return None
+            return None, None
         else:
-            return extent
+            return extent, self.pgProjectDownloadExtent.outputCrs().authid()
 
     def selected_pg_project(self):
         """Return the selected project name or ``None`` if no project is
