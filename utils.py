@@ -53,3 +53,17 @@ def log_message(msg, level='Info', feedback=False, iface=None,
         assert iface is not None
         iface.messageBar().pushMessage('GuidedOfflineEditing', msg,
                                        level=level, duration=duration)
+
+
+def path_relative_to(path, parent):
+    """Return a version of ``path`` (a filesystem path) relative to ``parent``,
+    that is the relative sub-path of ``path`` without ``parent``.
+
+    Return ``None`` if ``path`` is not a relative path to ``parent``.
+
+    ``path`` and ``parent`` must be Python ``pathlib.Path`` objects.
+    """
+    try:
+        return path.relative_to(parent)
+    except ValueError:
+        return None
