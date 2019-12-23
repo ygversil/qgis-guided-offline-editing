@@ -28,7 +28,7 @@ import pathlib
 
 from PyQt5.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QMessageBox
+from PyQt5.QtWidgets import QAction
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
@@ -96,6 +96,8 @@ class GuidedOfflineEditingPlugin:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Guided Editing')
+        # Read config and variables
+        self.root_path = self.read_gis_data_home()
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
@@ -213,20 +215,6 @@ class GuidedOfflineEditingPlugin:
     def run(self, db_title):
         """Run method that performs all the real work"""
         log_message('Running plugin with database "{}"'.format(db_title))
-        self.root_path = self.read_gis_data_home()
-        if not self.root_path:
-            QMessageBox.critical(
-                self.iface.mainWindow(),
-                self.tr('gis_data_home variable not set or invalid'),
-                self.tr('You must set the global variable gis_data_home to '
-                        'the path of the folder which contains you GIS '
-                        'data.\n\n'
-                        'For more information, see '
-                        'https://qgis-guided-offline-editing'
-                        '.readthedocs.io/en/latest/admin_guide.html'
-                        '#qgis-prerequisites')
-            )
-            return
         # Create the dialog with elements (after translation) and keep
         # reference. Only create GUI ONCE in callback, so that it will only
         # load when the plugin is started
