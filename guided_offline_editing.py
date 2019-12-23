@@ -57,6 +57,8 @@ from .resources import *  # noqa
 from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
 from .utils import log_message, path_relative_to
 
+
+PATH_PREFIX = ':gisdatahome:'
 PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
 PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
 SETTINGS_GROUP = 'Plugin-GuidedOfflineEditing/databases'
@@ -252,7 +254,7 @@ class GuidedOfflineEditingPlugin:
                         iface=self.iface,
                     )
                     break
-                prefixed_path = ':gisdatahome:{}'.format(str(rel_path))
+                prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
                 log_message(
                     'Rewriting layer path: {} -> {}'.format(layer_path,
                                                             prefixed_path),
