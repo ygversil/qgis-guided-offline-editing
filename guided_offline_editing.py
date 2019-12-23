@@ -41,7 +41,6 @@ from qgis.core import (
     QgsPathResolver,
     QgsProject,
     QgsRectangle,
-    QgsVectorLayer,
 )
 
 from .context_managers import (
@@ -371,7 +370,7 @@ class GuidedOfflineEditingPlugin:
     def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        project_url = build_pg_project_url(
+        self.iface.addProject(build_pg_project_url(
             host=self.settings.pg_host,
             port=self.settings.pg_port,
             dbname=self.settings.pg_dbname,
@@ -379,64 +378,18 @@ class GuidedOfflineEditingPlugin:
             authcfg=self.settings.pg_authcfg,
             sslmode=self.settings.pg_sslmode,
             project=project_name
-        )
+        ))
+        if self.dlg.zoomFullCheckBox.isChecked():
+            self.iface.zoomFull()
+        if not self.dlg.downloadCheckBox.isChecked():
+            return
         qgz_name = pathlib.Path(
             '{project_name}.qgz'.format(project_name=project_name)
         )
-        qgz_path = self.root_path / qgz_name
-        current_proj = QgsProject.instance()
-        if (not current_proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
-                                           PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
-                or current_proj.baseName() != project_name):
-            with busy_refreshing(self.iface), \
-                    transactional_project(self.iface, src_url=project_url,
-                                          dest_url=str(qgz_path)) as proj:
-                for layer_id, layer in proj.mapLayers().items():
-                    if layer.source().startswith(str(proj.homePath())):
-                        new_source = layer.source().replace(
-                            proj.homePath().rstrip('/\\'),
-                            str(self.root_path)
-                        )
-                        log_message('Updating layer source: {} -> {}'.format(
-                            layer.source(),
-                            new_source,
-                        ),
-                                    level='Info')
-                        layer.setDataSource(
-                            layer.source().replace(
-                                proj.homePath().rstrip('/\\'),
-                                str(self.root_path)
-                            ),
-                            layer.name(),
-                            layer.providerType(),
-                            QgsDataProvider.ProviderOptions(),
-                        )
-            with busy_refreshing(self.iface), \
-                    transactional_project(self.iface,
-                                          src_url=str(qgz_path)) as proj:
-                proj.setPresetHomePath('')
-                proj.writeEntryBool('Paths', '/Absolute', False)
-                proj.writeEntryBool(PROJECT_ENTRY_SCOPE_GUIDED,
-                                    PROJECT_ENTRY_KEY_FROM_POSTGRES,
-                                    True)
-            self.iface.addProject(str(qgz_path))
-            with busy_refreshing(self.iface), \
-                    transactional_project(self.iface) as proj:
-                rel_mgr = proj.relationManager()
-                for relation in rel_mgr.discoverRelations(
-                    rel_mgr.relations(),
-                    (layer for _, layer in proj.mapLayers().items()
-                     if isinstance(layer, QgsVectorLayer)
-                     and layer.dataProvider().name() == 'postgres')
-                ):
-                    rel_mgr.addRelation(relation)
-            if self.dlg.zoomFullCheckBox.isChecked():
-                self.iface.zoomFull()
-        if not self.dlg.downloadCheckBox.isChecked():
-            return
         gpkg_name = pathlib.Path(
             '{project_name}_offline.gpkg'.format(project_name=project_name)
         )
+        qgz_path = self.root_path / qgz_name
         gpkg_path = self.root_path / gpkg_name
         with busy_refreshing(self.iface), \
                 transactional_project(
