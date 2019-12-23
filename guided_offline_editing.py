@@ -202,6 +202,11 @@ class GuidedOfflineEditingPlugin:
                     callback=callback,
                     parent=self.iface.mainWindow()
                 )
+            self.add_action(
+                text=self.tr('Prepare and save project for guided editing'),
+                callback=self.prepare_project,
+                parent=self.iface.mainWindow()
+            )
         # will be set False in run()
         self.first_start = True
 
