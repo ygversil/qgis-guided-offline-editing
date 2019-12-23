@@ -515,6 +515,14 @@ class GuidedOfflineEditingPlugin:
         self.dlg.update_widgets(project_index_to_select=project_index,
                                 tab_index_to_show=tab_index)
 
+    def replace_prefix(self, path):
+        """Replace ``:gisdatahome:`` prefix with path stored in
+        ``gis_data_home`` global variable."""
+        if PATH_PREFIX not in path:
+            return path
+        rel_path = Path(path.replace(PATH_PREFIX, ''))
+        return str(self.root_path / rel_path)
+
     def select_feature_by_extent(self, proj, layer_ids, extent, extent_crs_id):
         for layer_id, layer in proj.mapLayers().items():
             if layer_id not in layer_ids:
