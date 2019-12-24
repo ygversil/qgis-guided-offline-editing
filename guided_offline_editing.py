@@ -49,7 +49,11 @@ from .context_managers import (
     removing,
     transactional_project,
 )
-from .db_manager import build_gpkg_project_url, build_pg_project_url
+from .db_manager import (
+    PG_PROJECT_STORAGE_TYPE,
+    build_gpkg_project_url,
+    build_pg_project_url,
+)
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog,
@@ -60,8 +64,6 @@ from .utils import log_message, path_relative_to
 
 
 PATH_PREFIX = ':gisdatahome:'
-PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
-PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
 SETTINGS_GROUP = 'Plugin-GuidedOfflineEditing/databases'
 
 # Shorter names for these functions
@@ -470,10 +472,10 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         # Select current project in project list
+        proj_storage = proj.projectStorage()
         project_index = (self.pg_project_model.index_for_project_name(
             proj.baseName()
-        ) if proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
-                                PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
+        ) if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE
                          else None)
         # If already offline project, show upload tab
         tab_index = 0 if self.offline_layer_model.is_empty() else 1
