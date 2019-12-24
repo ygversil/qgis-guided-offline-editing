@@ -293,6 +293,10 @@ class GuidedOfflineEditingPlugin:
             )
         self.dlg.set_db_title(db_title)
         self.done = False
+        if not self.root_path:
+            self.dlg.disable_download_check_box()
+        else:
+            self.dlg.enable_download_check_box()
         self.settings = self.read_database_settings(db_title)
         self.offliner = QgsOfflineEditing()
         self.pg_project_model = PostgresProjectListModel(
