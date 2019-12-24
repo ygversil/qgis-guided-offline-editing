@@ -483,8 +483,11 @@ class GuidedOfflineEditingPlugin:
                          else None)
         # If already offline project, show upload tab
         tab_index = 0 if self.offline_layer_model.is_empty() else 1
+        # Allow downloading or not
+        allow_download = True if self.root_path else False
         self.dlg.update_widgets(project_index_to_select=project_index,
-                                tab_index_to_show=tab_index)
+                                tab_index_to_show=tab_index,
+                                allow_download=allow_download)
 
     def replace_prefix(self, path):
         """Replace ``:gisdatahome:`` prefix with path stored in
