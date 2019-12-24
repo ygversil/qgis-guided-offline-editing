@@ -104,7 +104,8 @@ class GuidedOfflineEditingPlugin:
         self.menu = self.tr(u'&Guided Editing')
         # Read config and variables and set up env
         self.root_path = self.read_gis_data_home()
-        QgsPathResolver.setPathPreprocessor(self.replace_prefix)
+        if self.root_path:
+            QgsPathResolver.setPathPreprocessor(self.replace_prefix)
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
