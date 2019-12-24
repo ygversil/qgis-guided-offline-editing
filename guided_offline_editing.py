@@ -46,6 +46,7 @@ from qgis.core import (
 from .context_managers import (
     busy_refreshing,
     qgis_group_settings,
+    removing,
     transactional_project,
 )
 from .db_manager import build_gpkg_project_url, build_pg_project_url
@@ -391,33 +392,42 @@ class GuidedOfflineEditingPlugin:
         )
         qgz_path = self.root_path / qgz_name
         gpkg_path = self.root_path / gpkg_name
-        with busy_refreshing(self.iface), \
-                transactional_project(
-                    self.iface,
-                    dest_url=build_gpkg_project_url(gpkg_path,
-                                                    project=project_name)
-                ) as proj:
-            layer_ids_to_download = [
-                layer_id
-                for layer_id, layer in proj.mapLayers().items()
-                if (
-                    qgis_variable(layer_scope(layer), 'offline') and
-                    qgis_variable(layer_scope(layer), 'offline')
-                    .lower() not in ('no', 'false')
-                )
-            ]
-            extent, extent_crs_id = self.dlg.selected_extent()
-            if extent is not None:
-                self.select_feature_by_extent(proj,
-                                              layer_ids_to_download,
-                                              extent,
-                                              extent_crs_id)
-                only_selected = True
-            else:
-                only_selected = False
-            self.convert_layers_to_offline(layer_ids_to_download,
-                                           gpkg_path,
-                                           only_selected=only_selected)
+        with removing(self.iface, path=qgz_path):
+            # Save the project to a .qgz file first, with relative paths for
+            # layers. Then convert layers to offline in a .gpkg. Save
+            # project into this .gpkg. And finally delete the .qgz.
+            with busy_refreshing(self.iface), \
+                    transactional_project(self.iface,
+                                          dest_url=str(qgz_path)) as proj:
+                proj.writeEntryBool('Paths', '/Absolute', False)
+                proj.setAutoTransaction(False)
+            with busy_refreshing(self.iface), \
+                    transactional_project(
+                        self.iface,
+                        dest_url=build_gpkg_project_url(gpkg_path,
+                                                        project=project_name)
+                    ) as proj:
+                layer_ids_to_download = [
+                    layer_id
+                    for layer_id, layer in proj.mapLayers().items()
+                    if (
+                        qgis_variable(layer_scope(layer), 'offline') and
+                        qgis_variable(layer_scope(layer), 'offline')
+                        .lower() not in ('no', 'false')
+                    )
+                ]
+                extent, extent_crs_id = self.dlg.selected_extent()
+                if extent is not None:
+                    self.select_feature_by_extent(proj,
+                                                  layer_ids_to_download,
+                                                  extent,
+                                                  extent_crs_id)
+                    only_selected = True
+                else:
+                    only_selected = False
+                self.convert_layers_to_offline(layer_ids_to_download,
+                                               gpkg_path,
+                                               only_selected=only_selected)
         self.done = True
 
     def read_gis_data_home(self):
