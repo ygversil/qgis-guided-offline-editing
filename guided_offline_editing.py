@@ -23,12 +23,13 @@
 """
 
 from functools import partial
+from pathlib import Path
 import os.path
 import pathlib
 
 from PyQt5.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QMessageBox
+from PyQt5.QtWidgets import QAction
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
@@ -37,27 +38,32 @@ from qgis.core import (
     QgsExpressionContextUtils,
     QgsGeometry,
     QgsOfflineEditing,
+    QgsPathResolver,
     QgsProject,
     QgsRectangle,
-    QgsVectorLayer,
 )
 
 from .context_managers import (
     busy_refreshing,
     qgis_group_settings,
+    removing,
     transactional_project,
 )
-from .db_manager import build_gpkg_project_url, build_pg_project_url
+from .db_manager import (
+    PG_PROJECT_STORAGE_TYPE,
+    build_gpkg_project_url,
+    build_pg_project_url,
+)
 from .guided_offline_editing_dialog import GuidedOfflineEditingPluginDialog
 from .guided_offline_editing_progress_dialog import (
     GuidedOfflineEditingPluginProgressDialog,
 )
 from .resources import *  # noqa
 from .model import OfflineLayerListModel, PostgresProjectListModel, Settings
-from .utils import log_message
+from .utils import log_message, path_relative_to
 
-PROJECT_ENTRY_SCOPE_GUIDED = 'GuidedOfflineEditingPlugin'
-PROJECT_ENTRY_KEY_FROM_POSTGRES = '/FromPostgres'
+
+PATH_PREFIX = ':gisdatahome:'
 SETTINGS_GROUP = 'Plugin-GuidedOfflineEditing/databases'
 
 # Shorter names for these functions
@@ -96,6 +102,10 @@ class GuidedOfflineEditingPlugin:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Guided Editing')
+        # Read config and variables and set up env
+        self.root_path = self.read_gis_data_home()
+        if self.root_path:
+            QgsPathResolver.setPathPreprocessor(self.replace_prefix)
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
@@ -199,6 +209,11 @@ class GuidedOfflineEditingPlugin:
                     callback=callback,
                     parent=self.iface.mainWindow()
                 )
+            self.add_action(
+                text=self.tr('Prepare and save project for guided editing'),
+                callback=self.prepare_project,
+                parent=self.iface.mainWindow()
+            )
         # will be set False in run()
         self.first_start = True
 
@@ -210,23 +225,64 @@ class GuidedOfflineEditingPlugin:
                 action)
             self.iface.removeToolBarIcon(action)
 
+    def prepare_project(self):
+        """Prepare project for guided editing and save it into PostgreSQL.
+
+        Actual tasks that are done here:
+
+        * for each local filesystem layer, rewrite its path with
+          ``:gisdatahome:`` prefix,
+        """
+        with busy_refreshing(self.iface), \
+                transactional_project(self.iface) as proj:
+            for _, layer in proj.mapLayers().items():
+                layer_path = Path(layer.source())
+                if not layer_path.is_file():
+                    continue
+                if not self.root_path:
+                    log_message(
+                        self.tr('gis_data_home global variable not set. '
+                                'Unable to rewrite path for local layers.'),
+                        level='Warning',
+                        feedback=True,
+                        iface=self.iface,
+                    )
+                    break
+                rel_path = path_relative_to(layer_path, self.root_path)
+                if not rel_path:
+                    log_message(
+                        self.tr('You have local layers outside '
+                                'gis_data_home folder. Unable to rewrite '
+                                'path for those.'),
+                        level='Warning',
+                        feedback=True,
+                        iface=self.iface,
+                    )
+                    break
+                prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
+                log_message(
+                    'Rewriting layer path: {} -> {}'.format(layer_path,
+                                                            prefixed_path),
+                    level='Info',
+                )
+                layer.setDataSource(
+                    prefixed_path,
+                    layer.name(),
+                    layer.providerType(),
+                    QgsDataProvider.ProviderOptions()
+                )
+            else:
+                log_message(
+                    self.tr('Successfully prepared project.'),
+                    level='Success',
+                    feedback=True,
+                    iface=self.iface,
+                    duration=3
+                )
+
     def run(self, db_title):
         """Run method that performs all the real work"""
         log_message('Running plugin with database "{}"'.format(db_title))
-        self.root_path = self.read_gis_data_home()
-        if not self.root_path:
-            QMessageBox.critical(
-                self.iface.mainWindow(),
-                self.tr('gis_data_home variable not set or invalid'),
-                self.tr('You must set the global variable gis_data_home to '
-                        'the path of the folder which contains you GIS '
-                        'data.\n\n'
-                        'For more information, see '
-                        'https://qgis-guided-offline-editing'
-                        '.readthedocs.io/en/latest/admin_guide.html'
-                        '#qgis-prerequisites')
-            )
-            return
         # Create the dialog with elements (after translation) and keep
         # reference. Only create GUI ONCE in callback, so that it will only
         # load when the plugin is started
@@ -238,6 +294,10 @@ class GuidedOfflineEditingPlugin:
             )
         self.dlg.set_db_title(db_title)
         self.done = False
+        if not self.root_path:
+            self.dlg.disable_download_check_box()
+        else:
+            self.dlg.enable_download_check_box()
         self.settings = self.read_database_settings(db_title)
         self.offliner = QgsOfflineEditing()
         self.pg_project_model = PostgresProjectListModel(
@@ -318,7 +378,7 @@ class GuidedOfflineEditingPlugin:
     def download_project(self):
         """Prepare the project for offline editing."""
         project_name = self.dlg.selected_pg_project()
-        project_url = build_pg_project_url(
+        self.iface.addProject(build_pg_project_url(
             host=self.settings.pg_host,
             port=self.settings.pg_port,
             dbname=self.settings.pg_dbname,
@@ -326,92 +386,55 @@ class GuidedOfflineEditingPlugin:
             authcfg=self.settings.pg_authcfg,
             sslmode=self.settings.pg_sslmode,
             project=project_name
-        )
+        ))
+        if self.dlg.zoomFullCheckBox.isChecked():
+            self.iface.zoomFull()
+        if not self.dlg.downloadCheckBox.isChecked():
+            return
         qgz_name = pathlib.Path(
             '{project_name}.qgz'.format(project_name=project_name)
         )
-        qgz_path = self.root_path / qgz_name
-        current_proj = QgsProject.instance()
-        if (not current_proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
-                                           PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
-                or current_proj.baseName() != project_name):
-            with busy_refreshing(self.iface), \
-                    transactional_project(self.iface, src_url=project_url,
-                                          dest_url=str(qgz_path)) as proj:
-                for layer_id, layer in proj.mapLayers().items():
-                    if layer.source().startswith(str(proj.homePath())):
-                        new_source = layer.source().replace(
-                            proj.homePath().rstrip('/\\'),
-                            str(self.root_path)
-                        )
-                        log_message('Updating layer source: {} -> {}'.format(
-                            layer.source(),
-                            new_source,
-                        ),
-                                    level='Info')
-                        layer.setDataSource(
-                            layer.source().replace(
-                                proj.homePath().rstrip('/\\'),
-                                str(self.root_path)
-                            ),
-                            layer.name(),
-                            layer.providerType(),
-                            QgsDataProvider.ProviderOptions(),
-                        )
-            with busy_refreshing(self.iface), \
-                    transactional_project(self.iface,
-                                          src_url=str(qgz_path)) as proj:
-                proj.setPresetHomePath('')
-                proj.writeEntryBool('Paths', '/Absolute', False)
-                proj.writeEntryBool(PROJECT_ENTRY_SCOPE_GUIDED,
-                                    PROJECT_ENTRY_KEY_FROM_POSTGRES,
-                                    True)
-            self.iface.addProject(str(qgz_path))
-            with busy_refreshing(self.iface), \
-                    transactional_project(self.iface) as proj:
-                rel_mgr = proj.relationManager()
-                for relation in rel_mgr.discoverRelations(
-                    rel_mgr.relations(),
-                    (layer for _, layer in proj.mapLayers().items()
-                     if isinstance(layer, QgsVectorLayer)
-                     and layer.dataProvider().name() == 'postgres')
-                ):
-                    rel_mgr.addRelation(relation)
-            if self.dlg.zoomFullCheckBox.isChecked():
-                self.iface.zoomFull()
-        if not self.dlg.downloadCheckBox.isChecked():
-            return
         gpkg_name = pathlib.Path(
             '{project_name}_offline.gpkg'.format(project_name=project_name)
         )
+        qgz_path = self.root_path / qgz_name
         gpkg_path = self.root_path / gpkg_name
-        with busy_refreshing(self.iface), \
-                transactional_project(
-                    self.iface,
-                    dest_url=build_gpkg_project_url(gpkg_path,
-                                                    project=project_name)
-                ) as proj:
-            layer_ids_to_download = [
-                layer_id
-                for layer_id, layer in proj.mapLayers().items()
-                if (
-                    qgis_variable(layer_scope(layer), 'offline') and
-                    qgis_variable(layer_scope(layer), 'offline')
-                    .lower() not in ('no', 'false')
-                )
-            ]
-            extent, extent_crs_id = self.dlg.selected_extent()
-            if extent is not None:
-                self.select_feature_by_extent(proj,
-                                              layer_ids_to_download,
-                                              extent,
-                                              extent_crs_id)
-                only_selected = True
-            else:
-                only_selected = False
-            self.convert_layers_to_offline(layer_ids_to_download,
-                                           gpkg_path,
-                                           only_selected=only_selected)
+        with removing(self.iface, path=qgz_path):
+            # Save the project to a .qgz file first, with relative paths for
+            # layers. Then convert layers to offline in a .gpkg. Save
+            # project into this .gpkg. And finally delete the .qgz.
+            with busy_refreshing(self.iface), \
+                    transactional_project(self.iface,
+                                          dest_url=str(qgz_path)) as proj:
+                proj.writeEntryBool('Paths', '/Absolute', False)
+                proj.setAutoTransaction(False)
+            with busy_refreshing(self.iface), \
+                    transactional_project(
+                        self.iface,
+                        dest_url=build_gpkg_project_url(gpkg_path,
+                                                        project=project_name)
+                    ) as proj:
+                layer_ids_to_download = [
+                    layer_id
+                    for layer_id, layer in proj.mapLayers().items()
+                    if (
+                        qgis_variable(layer_scope(layer), 'offline') and
+                        qgis_variable(layer_scope(layer), 'offline')
+                        .lower() not in ('no', 'false')
+                    )
+                ]
+                extent, extent_crs_id = self.dlg.selected_extent()
+                if extent is not None:
+                    self.select_feature_by_extent(proj,
+                                                  layer_ids_to_download,
+                                                  extent,
+                                                  extent_crs_id)
+                    only_selected = True
+                else:
+                    only_selected = False
+                self.convert_layers_to_offline(layer_ids_to_download,
+                                               gpkg_path,
+                                               only_selected=only_selected)
         self.done = True
 
     def read_gis_data_home(self):
@@ -454,15 +477,26 @@ class GuidedOfflineEditingPlugin:
                                              output_crs,
                                              self.canvas)
         # Select current project in project list
+        proj_storage = proj.projectStorage()
         project_index = (self.pg_project_model.index_for_project_name(
             proj.baseName()
-        ) if proj.readBoolEntry(PROJECT_ENTRY_SCOPE_GUIDED,
-                                PROJECT_ENTRY_KEY_FROM_POSTGRES)[0]
+        ) if proj_storage and proj_storage.type() == PG_PROJECT_STORAGE_TYPE
                          else None)
         # If already offline project, show upload tab
         tab_index = 0 if self.offline_layer_model.is_empty() else 1
+        # Allow downloading or not
+        allow_download = True if self.root_path else False
         self.dlg.update_widgets(project_index_to_select=project_index,
-                                tab_index_to_show=tab_index)
+                                tab_index_to_show=tab_index,
+                                allow_download=allow_download)
+
+    def replace_prefix(self, path):
+        """Replace ``:gisdatahome:`` prefix with path stored in
+        ``gis_data_home`` global variable."""
+        if PATH_PREFIX not in path:
+            return path
+        rel_path = Path(path.replace(PATH_PREFIX, ''))
+        return str(self.root_path / rel_path)
 
     def select_feature_by_extent(self, proj, layer_ids, extent, extent_crs_id):
         for layer_id, layer in proj.mapLayers().items():

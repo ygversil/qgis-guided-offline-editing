@@ -64,6 +64,17 @@ def qgis_group_settings(iface, group_prefix):
 
 
 @contextmanager
+def removing(iface, path):
+    """Context manager that ensure given path is deleted on exit."""
+    try:
+        yield
+    except Exception as exc:
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
+    finally:
+        path.unlink(missing_ok=True)
+
+
+@contextmanager
 def transactional_project(iface, src_url=None, dest_url=None,
                           dont_resolve_layers=True):
     """Context manager returning a ``QgsProject`` instance and saves it on exit

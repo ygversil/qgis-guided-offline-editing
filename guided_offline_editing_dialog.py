@@ -49,6 +49,18 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.offline_layer_model = None
         self.pg_project_selection_model = None
 
+    def disable_download_check_box(self):
+        """Disable download check box and show hint."""
+        self.downloadCheckBox.setChecked(False)
+        self.downloadCheckBox.setEnabled(False)
+        self.setGisDataHomeLabel.show()
+
+    def enable_download_check_box(self):
+        """Enable download check box and hide hint."""
+        self.setGisDataHomeLabel.hide()
+        self.downloadCheckBox.setEnabled(True)
+        self.downloadCheckBox.setChecked(False)
+
     def initialize_extent_group_box(self, original_extent, current_extent,
                                     output_crs, canvas):
         self.pgProjectDownloadExtent.setOriginalExtent(original_extent,
@@ -129,7 +141,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.uploadButton.setEnabled(True)
 
     def update_widgets(self, project_index_to_select=None,
-                       tab_index_to_show=0):
+                       tab_index_to_show=0, allow_download=True):
         """Update some widgets state."""
         if project_index_to_select is not None:
             self.select_project_at_index(project_index_to_select)
@@ -139,7 +151,8 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.downloadCheckBox.setChecked(False)
         elif (project_index_to_select is not None
               and tab_index_to_show == 0
-              and not self.downloadCheckBox.isChecked()):
+              and not self.downloadCheckBox.isChecked()
+              and allow_download):
             self.downloadCheckBox.setChecked(True)
         self.update_extent_group_box_state()
         self.update_go_button_state()
