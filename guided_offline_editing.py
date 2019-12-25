@@ -326,22 +326,9 @@ class GuidedOfflineEditingPlugin:
         """Disconnect all signals."""
         self._manage_signals(action='disconnect')
 
-    def load_project(self):
-        """Load selected project and download it if asked."""
+    def download_project(self):
+        """Download selected project to convert it offline."""
         project_name = self.dlg.selected_pg_project()
-        self.iface.addProject(build_pg_project_url(
-            host=self.settings.pg_host,
-            port=self.settings.pg_port,
-            dbname=self.settings.pg_dbname,
-            schema=self.settings.pg_schema,
-            authcfg=self.settings.pg_authcfg,
-            sslmode=self.settings.pg_sslmode,
-            project=project_name
-        ))
-        if self.dlg.zoomFullCheckBox.isChecked():
-            self.iface.zoomFull()
-        if not self.dlg.downloadCheckBox.isChecked():
-            return
         qgz_name = pathlib.Path(
             '{project_name}.qgz'.format(project_name=project_name)
         )
@@ -386,6 +373,23 @@ class GuidedOfflineEditingPlugin:
                 self.convert_layers_to_offline(layer_ids_to_download,
                                                gpkg_path,
                                                only_selected=only_selected)
+
+    def load_project(self):
+        """Load selected project and download it if asked."""
+        project_name = self.dlg.selected_pg_project()
+        self.iface.addProject(build_pg_project_url(
+            host=self.settings.pg_host,
+            port=self.settings.pg_port,
+            dbname=self.settings.pg_dbname,
+            schema=self.settings.pg_schema,
+            authcfg=self.settings.pg_authcfg,
+            sslmode=self.settings.pg_sslmode,
+            project=project_name
+        ))
+        if self.dlg.zoomFullCheckBox.isChecked():
+            self.iface.zoomFull()
+        if self.dlg.downloadCheckBox.isChecked():
+            self.download_project()
         self.done = True
 
     def prepare_project(self):
