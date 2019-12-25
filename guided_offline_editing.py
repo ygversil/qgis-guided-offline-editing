@@ -231,61 +231,6 @@ class GuidedOfflineEditingPlugin:
                 action)
             self.iface.removeToolBarIcon(action)
 
-    def prepare_project(self):
-        """Prepare project for guided editing and save it into PostgreSQL.
-
-        Actual tasks that are done here:
-
-        * for each local filesystem layer, rewrite its path with
-          ``:gisdatahome:`` prefix,
-        """
-        with busy_refreshing(self.iface), \
-                transactional_project(self.iface) as proj:
-            for _, layer in proj.mapLayers().items():
-                layer_path = Path(layer.source())
-                if not layer_path.is_file():
-                    continue
-                if not self.root_path:
-                    log_message(
-                        self.tr('gis_data_home global variable not set. '
-                                'Unable to rewrite path for local layers.'),
-                        level='Warning',
-                        feedback=True,
-                        iface=self.iface,
-                    )
-                    break
-                rel_path = path_relative_to(layer_path, self.root_path)
-                if not rel_path:
-                    log_message(
-                        self.tr('You have local layers outside '
-                                'gis_data_home folder. Unable to rewrite '
-                                'path for those.'),
-                        level='Warning',
-                        feedback=True,
-                        iface=self.iface,
-                    )
-                    break
-                prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
-                log_message(
-                    'Rewriting layer path: {} -> {}'.format(layer_path,
-                                                            prefixed_path),
-                    level='Info',
-                )
-                layer.setDataSource(
-                    prefixed_path,
-                    layer.name(),
-                    layer.providerType(),
-                    QgsDataProvider.ProviderOptions()
-                )
-            else:
-                log_message(
-                    self.tr('Successfully prepared project.'),
-                    level='Success',
-                    feedback=True,
-                    iface=self.iface,
-                    duration=3
-                )
-
     def run(self, db_title):
         """Run method that performs all the real work"""
         log_message('Running plugin with database "{}"'.format(db_title))
@@ -442,6 +387,61 @@ class GuidedOfflineEditingPlugin:
                                                gpkg_path,
                                                only_selected=only_selected)
         self.done = True
+
+    def prepare_project(self):
+        """Prepare project for guided editing and save it into PostgreSQL.
+
+        Actual tasks that are done here:
+
+        * for each local filesystem layer, rewrite its path with
+          ``:gisdatahome:`` prefix,
+        """
+        with busy_refreshing(self.iface), \
+                transactional_project(self.iface) as proj:
+            for _, layer in proj.mapLayers().items():
+                layer_path = Path(layer.source())
+                if not layer_path.is_file():
+                    continue
+                if not self.root_path:
+                    log_message(
+                        self.tr('gis_data_home global variable not set. '
+                                'Unable to rewrite path for local layers.'),
+                        level='Warning',
+                        feedback=True,
+                        iface=self.iface,
+                    )
+                    break
+                rel_path = path_relative_to(layer_path, self.root_path)
+                if not rel_path:
+                    log_message(
+                        self.tr('You have local layers outside '
+                                'gis_data_home folder. Unable to rewrite '
+                                'path for those.'),
+                        level='Warning',
+                        feedback=True,
+                        iface=self.iface,
+                    )
+                    break
+                prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
+                log_message(
+                    'Rewriting layer path: {} -> {}'.format(layer_path,
+                                                            prefixed_path),
+                    level='Info',
+                )
+                layer.setDataSource(
+                    prefixed_path,
+                    layer.name(),
+                    layer.providerType(),
+                    QgsDataProvider.ProviderOptions()
+                )
+            else:
+                log_message(
+                    self.tr('Successfully prepared project.'),
+                    level='Success',
+                    feedback=True,
+                    iface=self.iface,
+                    duration=3
+                )
 
     def read_gis_data_home(self):
         """Read global ``gis_data_home`` QGIS variable and return a
