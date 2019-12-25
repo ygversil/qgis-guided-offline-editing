@@ -337,6 +337,14 @@ Everything else is specific to Bob:
 A common folder hierarchy and a variable
 ----------------------------------------
 
+.. note::
+
+       You do not need these if you don't have local layers and if you do not
+       intend to use projects locally. For example if all layers are remote
+       (say, all vector layers are in PostgreSQL/Postgis and raster layers come
+       from WMS/WMTS) and if you don't plan to use offline projects, then you
+       do not need to set the ``gis_data_home`` variable.
+
 A QGIS project may contains at the same time:
 
 * PostgreSQL layers to edit and,
