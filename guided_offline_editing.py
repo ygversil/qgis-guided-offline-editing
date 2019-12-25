@@ -557,4 +557,14 @@ class GuidedOfflineEditingPlugin:
         with busy_refreshing(self.iface):
             self.progress_dlg.set_title(self.tr('Uploading layers...'))
             self.offliner.synchronize()
+        project_name = QgsProject.instance().baseName()
+        self.iface.addProject(build_pg_project_url(
+            host=self.settings.pg_host,
+            port=self.settings.pg_port,
+            dbname=self.settings.pg_dbname,
+            schema=self.settings.pg_schema,
+            authcfg=self.settings.pg_authcfg,
+            sslmode=self.settings.pg_sslmode,
+            project=project_name
+        ))
         self.done = True
