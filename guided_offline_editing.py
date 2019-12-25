@@ -132,7 +132,7 @@ class GuidedOfflineEditingPlugin:
                    icon_path=None,
                    enabled_flag=True,
                    add_to_menu=True,
-                   add_to_toolbar=True,
+                   add_to_toolbar=False,
                    status_tip=None,
                    whats_this=None,
                    parent=None):
@@ -157,7 +157,7 @@ class GuidedOfflineEditingPlugin:
         :type add_to_menu: bool
 
         :param add_to_toolbar: Flag indicating whether the action should also
-            be added to the toolbar. Defaults to True.
+            be added to the toolbar. Defaults to False.
         :type add_to_toolbar: bool
 
         :param status_tip: Optional text to show in a popup when mouse pointer
@@ -217,7 +217,8 @@ class GuidedOfflineEditingPlugin:
                 icon_path=':/plugins/guided_offline_editing/icons/'
                 'guided_editing_prepare.png',
                 callback=self.prepare_project,
-                parent=self.iface.mainWindow()
+                parent=self.iface.mainWindow(),
+                add_to_toolbar=True,
             )
         # will be set False in run()
         self.first_start = True
