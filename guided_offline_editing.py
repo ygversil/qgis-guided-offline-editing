@@ -376,16 +376,20 @@ class GuidedOfflineEditingPlugin:
 
     def load_project(self):
         """Load selected project and download it if asked."""
+        proj = QgsProject.instance()
+        proj_storage = proj.projectStorage()
         project_name = self.dlg.selected_pg_project()
-        self.iface.addProject(build_pg_project_url(
-            host=self.settings.pg_host,
-            port=self.settings.pg_port,
-            dbname=self.settings.pg_dbname,
-            schema=self.settings.pg_schema,
-            authcfg=self.settings.pg_authcfg,
-            sslmode=self.settings.pg_sslmode,
-            project=project_name
-        ))
+        if (not proj_storage or proj_storage.type() != PG_PROJECT_STORAGE_TYPE
+                or proj.baseName() != project_name):
+            self.iface.addProject(build_pg_project_url(
+                host=self.settings.pg_host,
+                port=self.settings.pg_port,
+                dbname=self.settings.pg_dbname,
+                schema=self.settings.pg_schema,
+                authcfg=self.settings.pg_authcfg,
+                sslmode=self.settings.pg_sslmode,
+                project=project_name
+            ))
         if self.dlg.downloadCheckBox.isChecked():
             self.download_project()
         if self.dlg.zoomFullCheckBox.isChecked():
