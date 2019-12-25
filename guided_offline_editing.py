@@ -197,6 +197,8 @@ class GuidedOfflineEditingPlugin:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        icon_path = (':/plugins/guided_offline_editing/icons/'
+                     'guided_offline_editing_copy.png')
         with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
             db_titles = s.childGroups()
             if not db_titles:
@@ -206,11 +208,14 @@ class GuidedOfflineEditingPlugin:
                 callback = partial(self.run, db_title)
                 self.add_action(
                     text=db_title,
+                    icon_path=icon_path,
                     callback=callback,
                     parent=self.iface.mainWindow()
                 )
             self.add_action(
                 text=self.tr('Prepare and save project for guided editing'),
+                icon_path=':/plugins/guided_offline_editing/icons/'
+                'guided_editing_prepare.png',
                 callback=self.prepare_project,
                 parent=self.iface.mainWindow()
             )
