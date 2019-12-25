@@ -100,9 +100,6 @@
            <property name="text">
             <string>Zoom on project extent after loading</string>
            </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
           </widget>
          </item>
         </layout>
