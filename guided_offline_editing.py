@@ -386,10 +386,10 @@ class GuidedOfflineEditingPlugin:
             sslmode=self.settings.pg_sslmode,
             project=project_name
         ))
-        if self.dlg.zoomFullCheckBox.isChecked():
-            self.iface.zoomFull()
         if self.dlg.downloadCheckBox.isChecked():
             self.download_project()
+        if self.dlg.zoomFullCheckBox.isChecked():
+            self.iface.zoomFull()
         self.done = True
 
     def prepare_project(self):
