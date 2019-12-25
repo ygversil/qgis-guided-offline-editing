@@ -301,7 +301,7 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_extent_group_box_state
         )
         getattr(self.dlg.goButton.clicked, action)(
-            self.download_project
+            self.load_project
         )
         getattr(self.dlg.uploadButton.clicked, action)(
             self.synchronize_offline_layers
@@ -326,8 +326,8 @@ class GuidedOfflineEditingPlugin:
         """Disconnect all signals."""
         self._manage_signals(action='disconnect')
 
-    def download_project(self):
-        """Prepare the project for offline editing."""
+    def load_project(self):
+        """Load selected project and download it if asked."""
         project_name = self.dlg.selected_pg_project()
         self.iface.addProject(build_pg_project_url(
             host=self.settings.pg_host,
