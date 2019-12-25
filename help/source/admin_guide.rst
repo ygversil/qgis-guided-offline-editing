@@ -345,8 +345,8 @@ A QGIS project may contains at the same time:
 
 When such a project needs to be shared across multiple computers and multiple
 users, it is challenging to have a problem-free case, and often users will see
-the ":guilabel:`Layer not found`" dialog and are asked to provide another path
-for each layer.
+the ":guilabel:`Layer not found`" dialog and will be asked to provide another
+path for each layer.
 
 To address this situation, we need precision and strictness. First, a **common
 folder tree** is needed.
