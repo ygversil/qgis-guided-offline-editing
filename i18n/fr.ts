@@ -11,82 +11,82 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="216"/>
+        <location filename="../guided_offline_editing.py" line="229"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="545"/>
+        <location filename="../guided_offline_editing.py" line="536"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="548"/>
+        <location filename="../guided_offline_editing.py" line="539"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="551"/>
+        <location filename="../guided_offline_editing.py" line="542"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="554"/>
+        <location filename="../guided_offline_editing.py" line="545"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="557"/>
+        <location filename="../guided_offline_editing.py" line="548"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="560"/>
+        <location filename="../guided_offline_editing.py" line="551"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="563"/>
+        <location filename="../guided_offline_editing.py" line="554"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="354"/>
+        <location filename="../guided_offline_editing.py" line="371"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="573"/>
+        <location filename="../guided_offline_editing.py" line="564"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="99"/>
+        <location filename="../guided_offline_editing.py" line="104"/>
         <source>&amp;Guided Editing</source>
         <translation>&amp;Édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="196"/>
+        <location filename="../guided_offline_editing.py" line="205"/>
         <source>No database configured</source>
         <translation>Aucune base de données configurée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="205"/>
+        <location filename="../guided_offline_editing.py" line="215"/>
         <source>Prepare and save project for guided editing</source>
         <translation>Préparer et sauvegarder le projet pour édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="246"/>
+        <location filename="../guided_offline_editing.py" line="259"/>
         <source>You have local layers outside gis_data_home folder. Unable to rewrite path for those.</source>
         <translation>Des couches locales existent en dehors du dossier gis_data_home. Impossible de réécrire leur chemin.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="268"/>
+        <location filename="../guided_offline_editing.py" line="281"/>
         <source>Successfully prepared project.</source>
         <translation>Projet préparé avec succès.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="236"/>
+        <location filename="../guided_offline_editing.py" line="249"/>
         <source>gis_data_home global variable not set. Unable to rewrite path for local layers.</source>
         <translation>La variable globale gis_data_home n&apos;est pas définie. Impossible de réécrire les chemins des couches locales.</translation>
     </message>
@@ -99,12 +99,12 @@
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="146"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="171"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="123"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="148"/>
         <source>Offline layers</source>
         <translation>Couches hors-connexions</translation>
     </message>
@@ -114,7 +114,7 @@
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="88"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="113"/>
         <source>Extent to download</source>
         <translation>Emprise à télécharger</translation>
     </message>
@@ -129,7 +129,7 @@
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="105"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="130"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
     </message>
@@ -139,9 +139,14 @@
         <translation>Édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="76"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="101"/>
         <source>Zoom on project extent after loading</source>
         <translation>Zoom sur le projet après chargement</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="81"/>
+        <source>(set global variable gis_data_home to allow download)</source>
+        <translation>(définir la variable globale gis_data_home pour accéder au téléchargement)</translation>
     </message>
 </context>
 <context>
