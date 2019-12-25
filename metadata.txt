@@ -29,6 +29,7 @@ changelog=
   * Allow to configure multiple databases. Each database will have its own menu entry under the "Guided Editing" menu,
   * Improved logging and user feedback,
   * Zoom on project extent after loading,
+  * Load project from PostgreSQL after synchronizing offline project (do not keep offline project open),
   * bugfix: download extent not in correct projection,
   ====
   Version 0.5
