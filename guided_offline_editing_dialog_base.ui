@@ -145,7 +145,7 @@
        <item>
         <widget class="QLabel" name="offlineLayerlabel">
          <property name="text">
-          <string>Offline layers</string>
+          <string>Layers to be synchronized</string>
          </property>
         </widget>
        </item>

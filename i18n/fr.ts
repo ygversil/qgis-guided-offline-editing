@@ -104,11 +104,6 @@
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="148"/>
-        <source>Offline layers</source>
-        <translation>Couches hors-connexions</translation>
-    </message>
-    <message>
         <location filename="../guided_offline_editing_dialog_base.ui" line="27"/>
         <source>Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
@@ -147,6 +142,11 @@
         <location filename="../guided_offline_editing_dialog_base.ui" line="81"/>
         <source>(set global variable gis_data_home to allow download)</source>
         <translation>(définir la variable globale gis_data_home pour accéder au téléchargement)</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="148"/>
+        <source>Layers to be synchronized</source>
+        <translation>Couches qui seront synchronisées</translation>
     </message>
 </context>
 <context>
