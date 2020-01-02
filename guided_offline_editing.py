@@ -105,6 +105,9 @@ class GuidedOfflineEditingPlugin:
         # Read config and variables and set up env
         self.root_path = self.read_gis_data_home()
         if self.root_path:
+            log_message('Adding path preprocessor to replace :gisdatahome: '
+                        'prefix with: "{}"'.format(self.root_path),
+                        level='Info')
             QgsPathResolver.setPathPreprocessor(self.replace_prefix)
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
