@@ -71,7 +71,10 @@ def removing(iface, path):
     except Exception as exc:
         log_exception(exc, level='Critical', feedback=True, iface=iface)
     finally:
-        path.unlink(missing_ok=True)
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
 
 
 @contextmanager
