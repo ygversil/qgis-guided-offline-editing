@@ -23,15 +23,16 @@
 """
 
 from contextlib import contextmanager
-import traceback
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from qgis.core import Qgis, QgsProject, QgsMessageLog
+from qgis.core import QgsProject, QgsSettings
+
+from .utils import log_exception, log_message
 
 
 @contextmanager
-def busy_refreshing(refresh_func=None):
+def busy_refreshing(iface, refresh_func=None):
     """Context manager that shows busy cursor on startup and ensures that
     normal cursor is back on exit. Also ``refresh_func`` is called on exit."""
     try:
@@ -40,19 +41,44 @@ def busy_refreshing(refresh_func=None):
         if refresh_func is not None:
             refresh_func()
     except Exception as exc:
-        QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
-                                 'Extensions',
-                                 level=Qgis.Critical)
-        QgsMessageLog.logMessage(
-            'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-            'Extensions',
-            level=Qgis.Critical)
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
     finally:
         QtWidgets.QApplication.restoreOverrideCursor()
 
 
 @contextmanager
-def transactional_project(src_url=None, dest_url=None,
+def qgis_group_settings(iface, group_prefix):
+    """Context manager returning a ``QgsSettings`` instance ready to read
+    settings within the `group_prefix`` group.
+
+    It ensures that the group is ended on exit.
+    """
+    s = QgsSettings()
+    s.beginGroup(group_prefix)
+    try:
+        yield s
+    except Exception as exc:
+        log_exception(exc, level='Warning', feedback=True, iface=iface)
+    finally:
+        s.endGroup()
+
+
+@contextmanager
+def removing(iface, path):
+    """Context manager that ensure given path is deleted on exit."""
+    try:
+        yield
+    except Exception as exc:
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
+    finally:
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+
+
+@contextmanager
+def transactional_project(iface, src_url=None, dest_url=None,
                           dont_resolve_layers=True):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
     if no error occured.
@@ -81,30 +107,16 @@ def transactional_project(src_url=None, dest_url=None,
             proj = QgsProject.instance()
         yield proj
     except Exception as exc:
-        QgsMessageLog.logMessage('GuidedOfflineEditing: {}'.format(str(exc)),
-                                 'Extensions',
-                                 level=Qgis.Critical)
-        QgsMessageLog.logMessage(
-            'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-            'Extensions',
-            level=Qgis.Critical)
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
     finally:
         if not dest_url:
             project_saved = proj.write()
+            dest_url = proj.fileName()
         else:
             project_saved = proj.write(dest_url)
         if not project_saved:
-            QgsMessageLog.logMessage('GuidedOfflineEditing: project has not '
-                                     'been saved after transaction.',
-                                     'Extensions',
-                                     level=Qgis.Warning)
-            QgsMessageLog.logMessage(
-                'GuidedOfflineEditing: {}'.format(traceback.format_exc()),
-                'Extensions',
-                level=Qgis.Warning)
+            log_message('Project has not been saved after transaction.',
+                        level='Warning', feedback=True, iface=iface)
         # XXX: better way to avoid warning if the user click save ?
         proj.clear()
-        if not dest_url:
-            proj.read(proj.fileName())
-        else:
-            proj.read(dest_url)
+        proj.read(dest_url)

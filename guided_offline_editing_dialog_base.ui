@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Guided Offline Editing</string>
+   <string>Guided Editing</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -59,14 +59,50 @@
         <widget class="QListView" name="pgProjectList"/>
        </item>
        <item>
-        <widget class="QCheckBox" name="downloadCheckBox">
-         <property name="text">
-          <string>Download offline</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QCheckBox" name="downloadCheckBox">
+           <property name="text">
+            <string>Download offline</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="setGisDataHomeLabel">
+           <property name="font">
+            <font>
+             <pointsize>7</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>(set global variable gis_data_home to allow download)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="zoomFullCheckBox">
+           <property name="text">
+            <string>Zoom on project extent after loading</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QLabel" name="pgProjectDownloadExtentLabel">
@@ -106,7 +142,7 @@
        <item>
         <widget class="QLabel" name="offlineLayerlabel">
          <property name="text">
-          <string>Offline layers</string>
+          <string>Layers to be synchronized</string>
          </property>
         </widget>
        </item>

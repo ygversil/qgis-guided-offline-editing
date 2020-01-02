@@ -11,73 +11,84 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="182"/>
-        <source>Guided Offline Editing</source>
-        <translation>Édition hors-connexion assistée</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing.py" line="193"/>
+        <location filename="../guided_offline_editing.py" line="232"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="439"/>
+        <location filename="../guided_offline_editing.py" line="547"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="442"/>
+        <location filename="../guided_offline_editing.py" line="550"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="445"/>
+        <location filename="../guided_offline_editing.py" line="553"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="448"/>
+        <location filename="../guided_offline_editing.py" line="556"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="451"/>
+        <location filename="../guided_offline_editing.py" line="559"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="454"/>
+        <location filename="../guided_offline_editing.py" line="562"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="457"/>
+        <location filename="../guided_offline_editing.py" line="565"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="288"/>
+        <location filename="../guided_offline_editing.py" line="319"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="467"/>
+        <location filename="../guided_offline_editing.py" line="575"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="202"/>
-        <source>gis_data_home variable not set or invalid</source>
-        <translation>Variable gis_data_home non définie ou invalide</translation>
+        <location filename="../guided_offline_editing.py" line="104"/>
+        <source>&amp;Guided Editing</source>
+        <translation>&amp;Édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="202"/>
-        <source>You must set the global variable gis_data_home to the path of the folder which contains you GIS data.
-
-For more information, see https://qgis-guided-offline-editing.readthedocs.io/en/latest/admin_guide.html#qgis-prerequisites</source>
-        <translation>Vous devez définir la variable globale gis_data_home avec le chemin du dossier contenant vos données SIG.
-
-Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthedocs.io/en/latest/admin_guide.html#qgis-prerequisites</translation>
+        <location filename="../guided_offline_editing.py" line="208"/>
+        <source>No database configured</source>
+        <translation>Aucune base de données configurée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="218"/>
+        <source>Prepare and save project for guided editing</source>
+        <translation>Préparer et sauvegarder le projet pour édition assistée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="427"/>
+        <source>You have local layers outside gis_data_home folder. Unable to rewrite path for those.</source>
+        <translation>Des couches locales existent en dehors du dossier gis_data_home. Impossible de réécrire leur chemin.</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="449"/>
+        <source>Successfully prepared project.</source>
+        <translation>Projet préparé avec succès.</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing.py" line="417"/>
+        <source>gis_data_home global variable not set. Unable to rewrite path for local layers.</source>
+        <translation>La variable globale gis_data_home n&apos;est pas définie. Impossible de réécrire les chemins des couches locales.</translation>
     </message>
 </context>
 <context>
@@ -88,14 +99,9 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="132"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="168"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
-    </message>
-    <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="109"/>
-        <source>Offline layers</source>
-        <translation>Couches hors-connexions</translation>
     </message>
     <message>
         <location filename="../guided_offline_editing_dialog_base.ui" line="27"/>
@@ -103,7 +109,7 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="74"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="110"/>
         <source>Extent to download</source>
         <translation>Emprise à télécharger</translation>
     </message>
@@ -113,14 +119,34 @@ Pour plus d&apos;informations, voir https://qgis-guided-offline-editing.readthed
         <translation>Sélectionner le projet sur lequel travailler</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="64"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="66"/>
         <source>Download offline</source>
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="91"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="127"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="14"/>
+        <source>Guided Editing</source>
+        <translation>Édition assistée</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="101"/>
+        <source>Zoom on project extent after loading</source>
+        <translation>Zoom sur le projet après chargement</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="81"/>
+        <source>(set global variable gis_data_home to allow download)</source>
+        <translation>(définir la variable globale gis_data_home pour accéder au téléchargement)</translation>
+    </message>
+    <message>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="145"/>
+        <source>Layers to be synchronized</source>
+        <translation>Couches qui seront synchronisées</translation>
     </message>
 </context>
 <context>

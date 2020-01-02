@@ -49,6 +49,18 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.offline_layer_model = None
         self.pg_project_selection_model = None
 
+    def disable_download_check_box(self):
+        """Disable download check box and show hint."""
+        self.downloadCheckBox.setChecked(False)
+        self.downloadCheckBox.setEnabled(False)
+        self.setGisDataHomeLabel.show()
+
+    def enable_download_check_box(self):
+        """Enable download check box and hide hint."""
+        self.setGisDataHomeLabel.hide()
+        self.downloadCheckBox.setEnabled(True)
+        self.downloadCheckBox.setChecked(False)
+
     def initialize_extent_group_box(self, original_extent, current_extent,
                                     output_crs, canvas):
         self.pgProjectDownloadExtent.setOriginalExtent(original_extent,
@@ -77,12 +89,14 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pgProjectList.setCurrentIndex(index)
 
     def selected_extent(self):
-        """Return the selected extent from where data should be downloaded."""
+        """Return a 2-uple ``(rect, crs_id)`` where ``rect`` is the selected
+        extent from where data should be downloaded, and ``crs_id`` is the
+        EPSG identifier of this rectangle's CRS."""
         extent = self.pgProjectDownloadExtent.outputExtent()
         if extent.area() == 0.0:
-            return None
+            return None, None
         else:
-            return extent
+            return extent, self.pgProjectDownloadExtent.outputCrs().authid()
 
     def selected_pg_project(self):
         """Return the selected project name or ``None`` if no project is
@@ -92,6 +106,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             return self.pg_project_model.project_at_index(selected_rows[0])
         else:
             return None
+
+    def set_db_title(self, db_title):
+        """Set the DB Title label."""
+        self.dbTitleLabel.setText(db_title)
 
     def set_offline_layer_model(self, model):
         """Link to the given ``OfflineLayerListModel`` instance."""
@@ -123,7 +141,7 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.uploadButton.setEnabled(True)
 
     def update_widgets(self, project_index_to_select=None,
-                       tab_index_to_show=0):
+                       tab_index_to_show=0, allow_download=True):
         """Update some widgets state."""
         if project_index_to_select is not None:
             self.select_project_at_index(project_index_to_select)
@@ -133,7 +151,8 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.downloadCheckBox.setChecked(False)
         elif (project_index_to_select is not None
               and tab_index_to_show == 0
-              and not self.downloadCheckBox.isChecked()):
+              and not self.downloadCheckBox.isChecked()
+              and allow_download):
             self.downloadCheckBox.setChecked(True)
         self.update_extent_group_box_state()
         self.update_go_button_state()
