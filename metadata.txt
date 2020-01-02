@@ -31,6 +31,7 @@ changelog=
   * Zoom on project extent after loading,
   * Load project from PostgreSQL after synchronizing offline project (do not keep offline project open),
   * bugfix: download extent not in correct projection,
+  * bugfix: remove code that was only Python 3.8 compatible,
   ====
   Version 0.5
   * Allow not to download project and directly edit in PostgreSQL/Postgis,
