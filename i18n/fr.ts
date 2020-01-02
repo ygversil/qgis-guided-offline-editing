@@ -11,52 +11,52 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="229"/>
+        <location filename="../guided_offline_editing.py" line="232"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="544"/>
+        <location filename="../guided_offline_editing.py" line="547"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="547"/>
+        <location filename="../guided_offline_editing.py" line="550"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="550"/>
+        <location filename="../guided_offline_editing.py" line="553"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="553"/>
+        <location filename="../guided_offline_editing.py" line="556"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="556"/>
+        <location filename="../guided_offline_editing.py" line="559"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="559"/>
+        <location filename="../guided_offline_editing.py" line="562"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="562"/>
+        <location filename="../guided_offline_editing.py" line="565"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="316"/>
+        <location filename="../guided_offline_editing.py" line="319"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="572"/>
+        <location filename="../guided_offline_editing.py" line="575"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
@@ -66,27 +66,27 @@
         <translation>&amp;Édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="205"/>
+        <location filename="../guided_offline_editing.py" line="208"/>
         <source>No database configured</source>
         <translation>Aucune base de données configurée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="215"/>
+        <location filename="../guided_offline_editing.py" line="218"/>
         <source>Prepare and save project for guided editing</source>
         <translation>Préparer et sauvegarder le projet pour édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="424"/>
+        <location filename="../guided_offline_editing.py" line="427"/>
         <source>You have local layers outside gis_data_home folder. Unable to rewrite path for those.</source>
         <translation>Des couches locales existent en dehors du dossier gis_data_home. Impossible de réécrire leur chemin.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="446"/>
+        <location filename="../guided_offline_editing.py" line="449"/>
         <source>Successfully prepared project.</source>
         <translation>Projet préparé avec succès.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="414"/>
+        <location filename="../guided_offline_editing.py" line="417"/>
         <source>gis_data_home global variable not set. Unable to rewrite path for local layers.</source>
         <translation>La variable globale gis_data_home n&apos;est pas définie. Impossible de réécrire les chemins des couches locales.</translation>
     </message>
