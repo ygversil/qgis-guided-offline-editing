@@ -22,16 +22,20 @@
  ***************************************************************************/
 """
 
-import os
+from pathlib import Path
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the
 # elements from Qt Designer
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'guided_offline_editing_dialog_base.ui'
-), resource_suffix='')
+_PLUGIN_PATH = Path(__file__).parent
+FORM_CLASS, _ = uic.loadUiType(
+    _PLUGIN_PATH / 'guided_offline_editing_dialog_base.ui',
+    from_imports=True,
+    resource_suffix='',
+    import_from=_PLUGIN_PATH.name
+)
 
 
 class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
