@@ -31,6 +31,8 @@ from PyQt5.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 from qgis.core import (
+    QgsApplication,
+    QgsAuthMethodConfig,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsDataProvider,
@@ -215,7 +217,7 @@ class GuidedOfflineEditingPlugin:
                     callback=callback,
                     parent=self.iface.mainWindow()
                 )
-            self.add_action(
+            self.prepare_action = self.add_action(
                 text=self.tr('Prepare and save project for guided editing'),
                 icon_path=':/plugins/guided_offline_editing/icons/'
                 'guided_editing_prepare.png',
@@ -223,6 +225,8 @@ class GuidedOfflineEditingPlugin:
                 parent=self.iface.mainWindow(),
                 add_to_toolbar=True,
             )
+            self.update_prepare_action()
+            self.iface.projectRead.connect(self.update_prepare_action)
         # will be set False in run()
         self.first_start = True
 
@@ -265,6 +269,11 @@ class GuidedOfflineEditingPlugin:
         self.dlg.set_pg_project_model(self.pg_project_model)
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
+        auth_mgr = QgsApplication.authManager()
+        auth_config = QgsAuthMethodConfig()
+        auth_mgr.loadAuthenticationConfig(self.settings.pg_authcfg,
+                                          auth_config, True)
+        self.dlg.set_username(auth_config.config('username'))
         self.connect_signals()
         with busy_refreshing(self.iface, self.refresh_data_and_dialog):
             self.dlg.show()
@@ -585,3 +594,13 @@ class GuidedOfflineEditingPlugin:
             project=project_name
         ))
         self.done = True
+
+    def update_prepare_action(self):
+        """Enable or disable prepare action in menu depending on project
+        state."""
+        proj = QgsProject.instance()
+        proj_storage = proj.projectStorage()
+        if not proj_storage or proj_storage.type() != PG_PROJECT_STORAGE_TYPE:
+            self.prepare_action.setEnabled(False)
+        else:
+            self.prepare_action.setEnabled(True)
