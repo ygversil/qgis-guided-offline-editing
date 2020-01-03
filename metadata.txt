@@ -24,6 +24,9 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 
 # Uncomment the following line and add your changelog:
 changelog=
+  Version 0.7
+  * Enable or disable `Prepare` action in menu depending on current project state. This action is used to replace local layer paths with `:gisdatahome:` prefix so that these layers can be opened on any installation where the `gis_data_home` global variable is set. The `Prepare` action is enabled if current project is saved into PostgreSQL, and disabled if not,
+  ====
   Version 0.6
   * Truely allow mixing Postigs and local layers in a project saved into PostgreSQL. This comes at a cost: project must be saved using a specific action that will rewrite all local paths with a :gisdatahome: prefix,
   * Allow to configure multiple databases. Each database will have its own menu entry under the "Guided Editing" menu,
