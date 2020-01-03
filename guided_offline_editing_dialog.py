@@ -119,6 +119,10 @@ class GuidedOfflineEditingPluginDialog(QtWidgets.QDialog, FORM_CLASS):
         """Link to the given ``PostgresPorjectListModel`` instance."""
         self.pg_project_model = model
 
+    def set_username(self, username):
+        """Set the username label."""
+        self.usernameLabel.setText(username)
+
     def update_extent_group_box_state(self):
         """Set the extent group box enable or disable depending on UI state."""
         if self.downloadCheckBox.isChecked():
