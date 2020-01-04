@@ -42,6 +42,7 @@ from qgis.core import (
     QgsOfflineEditing,
     QgsPathResolver,
     QgsProject,
+    QgsProjectBadLayerHandler,
     QgsRectangle,
 )
 
@@ -49,6 +50,7 @@ from .context_managers import (
     busy_refreshing,
     qgis_group_settings,
     removing,
+    temporary_connect_signal_slot,
     transactional_project,
 )
 from .db_manager import (
@@ -105,6 +107,7 @@ class GuidedOfflineEditingPlugin:
         self.actions = []
         self.menu = self.tr(u'&Guided Editing')
         # Read config and variables and set up env
+        self.bad_layer_handlers = QgsProjectBadLayerHandler()
         self.root_path = self.read_gis_data_home()
         if self.root_path:
             log_message('Adding path preprocessor to replace :gisdatahome: '
@@ -416,52 +419,60 @@ class GuidedOfflineEditingPlugin:
         * for each local filesystem layer, rewrite its path with
           ``:gisdatahome:`` prefix,
         """
-        with busy_refreshing(self.iface), \
-                transactional_project(self.iface) as proj:
-            for _, layer in proj.mapLayers().items():
-                layer_path = Path(layer.source())
-                if not layer_path.is_file():
-                    continue
-                if not self.root_path:
+        with busy_refreshing(self.iface):
+            unused_proj = QgsProject.instance()  # Needed to connect signal
+            with temporary_connect_signal_slot(
+                self.iface,
+                unused_proj.writeMapLayer,
+                self.set_prefixed_datasource_in_layer_node
+            ), \
+                    transactional_project(self.iface) as proj:
+                for _, layer in proj.mapLayers().items():
+                    layer_path = Path(layer.source())
+                    if not layer_path.is_file():
+                        continue
+                    if not self.root_path:
+                        log_message(
+                            self.tr(
+                                'gis_data_home global variable not set. '
+                                'Unable to rewrite path for local layers.'
+                            ),
+                            level='Warning',
+                            feedback=True,
+                            iface=self.iface,
+                        )
+                        break
+                    rel_path = path_relative_to(layer_path, self.root_path)
+                    if not rel_path:
+                        log_message(
+                            self.tr('You have local layers outside '
+                                    'gis_data_home folder. Unable to rewrite '
+                                    'path for those.'),
+                            level='Warning',
+                            feedback=True,
+                            iface=self.iface,
+                        )
+                        break
+                    prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
                     log_message(
-                        self.tr('gis_data_home global variable not set. '
-                                'Unable to rewrite path for local layers.'),
-                        level='Warning',
+                        'Rewriting layer path: {} -> {}'.format(layer_path,
+                                                                prefixed_path),
+                        level='Info',
+                    )
+                    layer.setDataSource(
+                        prefixed_path,
+                        layer.name(),
+                        layer.providerType(),
+                        QgsDataProvider.ProviderOptions()
+                    )
+                else:
+                    log_message(
+                        self.tr('Successfully prepared project.'),
+                        level='Success',
                         feedback=True,
                         iface=self.iface,
+                        duration=3
                     )
-                    break
-                rel_path = path_relative_to(layer_path, self.root_path)
-                if not rel_path:
-                    log_message(
-                        self.tr('You have local layers outside '
-                                'gis_data_home folder. Unable to rewrite '
-                                'path for those.'),
-                        level='Warning',
-                        feedback=True,
-                        iface=self.iface,
-                    )
-                    break
-                prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
-                log_message(
-                    'Rewriting layer path: {} -> {}'.format(layer_path,
-                                                            prefixed_path),
-                    level='Info',
-                )
-                layer.setDataSource(
-                    prefixed_path,
-                    layer.name(),
-                    layer.providerType(),
-                    QgsDataProvider.ProviderOptions()
-                )
-            else:
-                log_message(
-                    self.tr('Successfully prepared project.'),
-                    level='Success',
-                    feedback=True,
-                    iface=self.iface,
-                    duration=3
-                )
 
     def read_gis_data_home(self):
         """Read global ``gis_data_home`` QGIS variable and return a
@@ -549,6 +560,17 @@ class GuidedOfflineEditingPlugin:
                             layer.selectedFeatureCount(),
                             layer.name()
                         ))
+
+    def set_prefixed_datasource_in_layer_node(self, layer, layer_elem, doc):
+        """Slot to be connected to a ``QgsProject.writeMapLayer`` signal and
+        that writes layer source with ``:gisdatahome:`` prefix in
+        ``<datasource>`` tag in project XML.
+        """
+        if PATH_PREFIX in layer.source():
+            log_message('Saving path in project XML: {}'.format(
+                layer.source()
+            ), level='Info')
+            self.bad_layer_handlers.setDataSource(layer_elem, layer.source())
 
     def set_progress_mode(self, mode, max_):
         """Update progress dialog information."""
