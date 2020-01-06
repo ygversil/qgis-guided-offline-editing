@@ -3,10 +3,9 @@ Administrator Guide
 ===================
 
 This administrator guide will demonstrate how to prepare a project to be used
-with the Guided Offline Editing QGIS plugin. It will focus on the prior steps,
-before the plugin can be used. It will guide you through the preparation
-process, from modifying a PostgreSQL database so that it can be used with the
-plugin, to creating a to-be-offline-edited project.
+with the Guided Offline Editing QGIS plugin. It will guide you through the
+prior steps, from modifying a PostgreSQL database so that it can be used with
+the plugin, to creating a to-be-offline-edited project.
 
 
 Example context: collecting data about wetlands
@@ -334,86 +333,6 @@ Everything else is specific to Bob:
 * :guilabel:`Username` and :guilabel:`Password`: Bob's credentials to connect to
   ``wlbdb`` PostgreSQL database.
 
-A common folder hierarchy and a variable
-----------------------------------------
-
-.. note::
-
-       You do not need these if you don't have local layers and if you do not
-       intend to use projects locally. For example if all layers are remote
-       (say, all vector layers are in PostgreSQL/Postgis and raster layers come
-       from WMS/WMTS) and if you don't plan to use offline projects, then you
-       do not need to set the ``gis_data_home`` variable.
-
-A QGIS project may contains at the same time:
-
-* PostgreSQL layers to edit and,
-
-* local filesystem layers (for example rasters for your country or state).
-
-When such a project needs to be shared across multiple computers and multiple
-users, it is challenging to have a problem-free case, and often users will see
-the ":guilabel:`Layer not found`" dialog and will be asked to provide another
-path for each layer.
-
-To address this situation, we need precision and strictness. First, a **common
-folder tree** is needed.
-
-*Each user must choose a specific folder* where this common tree will land. For
-example it might be ``/home/alice/gis`` for Alice and
-``/home/bob/Documents/QGIS`` for Bob (yes, they both use Linux, like everyone
-in the World, isn't it?).
-
-Under this folder, common layers must share the same path. For example, the
-official raster for your country, saved as ``official_raster.gpkg`` (yes,
-rasters are saved in GeoPackage, but this is the case everywhere, isn't it?),
-must be present on both Alice and Bob's computers in the same ``ref`` subfolder
-(yes, for reference data, as usual) (:numref:`common_folder_tree`).
-
-.. _common_folder_tree:
-
-.. figure:: ./_static/img/guided_offline_editing_admin_guide_common_folder_tree.png
-   :width: 500px
-   :align: center
-   :alt: Common folder tree for common layers
-
-   Common folder tree for common layers
-
-Each project should be saved at the top level of this tree, so that relative
-paths do not contains parent folders. In other words, projects should be at the
-top level while layers can be in subfolders.
-
-But other problems arise when saving a project in PostgreSQL: we cannot save
-paths as relative. Sounds sensible: what is the relative path to a PostgreSQL
-table? Furthermore, we cannot set the :guilabel:`Project home` property in the
-:guilabel:`Project properties` dialog, because in one case it would be
-``/home/alice/gis`` and in the other case it would be
-``/home/bob/Documents/QGIS``.
-
-To work around this issue, the plugin asks each user to **set a global QGIS
-variable**, named :guilabel:`gis_data_home`, whose value is *the absolute path
-to the top-level folder of the common hierarchy*, namely ``/home/alice/gis``
-for Alice and ``/home/bob/Documents/QGIS`` for Bob. To do so, go to
-:menuselection:`Settings --> Options` and switch to the :guilabel:`Variables`
-tab. Click on the :guilabel:`+` button to add a variable and name it
-``gis_data_home``. Give it the correct value, the correct path and validate
-(:numref:`gis_data_home_variable`).
-
-.. _gis_data_home_variable:
-
-.. figure:: ./_static/img/qgis_global_properties_data_home_variable.png
-   :width: 500px
-   :align: center
-   :alt: gid_data_home global QGIS variable
-
-   gis_data_home global QGIS variable
-
-Thanks to this variable, when the plugins converts a project for offline
-edition, it first saves the project in the :guilabel:`gis_data_home` folder and
-convert all paths to relative. In this way, all local layers are found *under*
-the project, and their relative paths will begin with `./`, so this will work
-on all computers, provided that the folder tree are the same.
-
 Plugin configuration
 --------------------
 
@@ -489,6 +408,96 @@ See
 https://docs.qgis.org/testing/en/docs/user_manual/introduction/qgis_configuration.html?highlight=organization#deploying-qgis-within-an-organization
 for more information about deploying common QGIS configuration inside an
 organization.
+
+
+Dealing with local files and offline edition
+============================================
+
+This section discuss two last prerequisites, having a common folder hierarchy
+and setting the ``gis_data_home`` global variable. Both are needed if you have
+local layers or if you want to allow your projects to be downloaded for offline
+edition.
+
+You can skip this section if you don't have local layers and if you do not want
+the projects to be used locally. For example if all layers are remote (say, all
+vector layers are in PostgreSQL/Postgis and raster layers come from WMS/WMTS)
+and if you WAN connection is fast enough so that you do not need to download
+projects offline, then you do not need to set the ``gis_data_home`` variable.
+
+The problem
+-----------
+
+A QGIS project may contains at the same time:
+
+* PostgreSQL layers to edit and,
+
+* local filesystem layers (for example rasters for your country or state).
+
+When such a project needs to be shared across multiple computers and multiple
+users, it is challenging to have a problem-free case, and often users will see
+the ":guilabel:`Layer not found`" dialog and will be asked to provide another
+path for each layer.
+
+A solution: a common folder hierarchy and a variable
+----------------------------------------------------
+
+To address this situation, we need precision and strictness. First, a **common
+folder tree** is needed.
+
+*Each user must choose a specific folder* where this common tree will land. For
+example it might be ``/home/alice/gis`` for Alice and
+``/home/bob/Documents/QGIS`` for Bob (yes, they both use Linux, like everyone
+in the World, isn't it?).
+
+Under this folder, common layers must share the same path. For example, the
+official raster for your country, saved as ``official_raster.gpkg`` (yes,
+rasters are saved in GeoPackage, but this is the case everywhere, isn't it?),
+must be present on both Alice and Bob's computers in the same ``ref`` subfolder
+(yes, for reference data, as usual) (:numref:`common_folder_tree`).
+
+.. _common_folder_tree:
+
+.. figure:: ./_static/img/guided_offline_editing_admin_guide_common_folder_tree.png
+   :width: 500px
+   :align: center
+   :alt: Common folder tree for common layers
+
+   Common folder tree for common layers
+
+Each project should be saved at the top level of this tree, so that relative
+paths do not contains parent folders. In other words, projects should be at the
+top level while layers can be in subfolders.
+
+But other problems arise when saving a project in PostgreSQL: we cannot save
+paths as relative. Sounds sensible: what is the relative path to a PostgreSQL
+table? Furthermore, we cannot set the :guilabel:`Project home` property in the
+:guilabel:`Project properties` dialog, because in one case it would be
+``/home/alice/gis`` and in the other case it would be
+``/home/bob/Documents/QGIS``.
+
+To work around this issue, the plugin asks each user to **set a global QGIS
+variable**, named :guilabel:`gis_data_home`, whose value is *the absolute path
+to the top-level folder of the common hierarchy*, namely ``/home/alice/gis``
+for Alice and ``/home/bob/Documents/QGIS`` for Bob. To do so, go to
+:menuselection:`Settings --> Options` and switch to the :guilabel:`Variables`
+tab. Click on the :guilabel:`+` button to add a variable and name it
+``gis_data_home``. Give it the correct value, the correct path and validate
+(:numref:`gis_data_home_variable`).
+
+.. _gis_data_home_variable:
+
+.. figure:: ./_static/img/qgis_global_properties_data_home_variable.png
+   :width: 500px
+   :align: center
+   :alt: gid_data_home global QGIS variable
+
+   gis_data_home global QGIS variable
+
+Thanks to this variable, when the plugins converts a project for offline
+edition, it first saves the project in the :guilabel:`gis_data_home` folder and
+convert all paths to relative. In this way, all local layers are found *under*
+the project, and their relative paths will begin with `./`, so this will work
+on all computers, provided that the folder tree are the same.
 
 
 Preparing the project
