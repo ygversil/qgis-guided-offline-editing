@@ -3,10 +3,9 @@ Administrator Guide
 ===================
 
 This administrator guide will demonstrate how to prepare a project to be used
-with the Guided Offline Editing QGIS plugin. It will focus on the prior steps,
-before the plugin can be used. It will guide you through the preparation
-process, from modifying a PostgreSQL database so that it can be used with the
-plugin, to creating a to-be-offline-edited project.
+with the Guided Offline Editing QGIS plugin. It will guide you through the
+prior steps, from modifying a PostgreSQL database so that it can be used with
+the plugin, to creating a to-be-offline-edited project.
 
 
 Example context: collecting data about wetlands
