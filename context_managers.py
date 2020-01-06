@@ -78,6 +78,20 @@ def removing(iface, path):
 
 
 @contextmanager
+def temporary_connect_signal_slot(iface, signal, slot):
+    """Context manager that connects the given PyQt signal to given slot on
+    enter and ensure it is disconnected on exit.
+    """
+    try:
+        signal.connect(slot)
+        yield
+    except Exception as exc:
+        log_exception(exc, level='Critical', feedback=True, iface=iface)
+    finally:
+        signal.disconnect(slot)
+
+
+@contextmanager
 def transactional_project(iface, src_url=None, dest_url=None,
                           dont_resolve_layers=True):
     """Context manager returning a ``QgsProject`` instance and saves it on exit
