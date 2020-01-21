@@ -26,6 +26,7 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 changelog=
   Version 0.8
   * Projects are now sorted alphabetically,
+  * Bugfix: "Prepare" action is disabled when blank project is created,
   * bugfix: GeoPackage layers do not get :gisdatahome: prefix when preparing project,
   ====
   Version 0.7
