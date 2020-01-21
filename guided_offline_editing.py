@@ -428,8 +428,9 @@ class GuidedOfflineEditingPlugin:
             ), \
                     transactional_project(self.iface) as proj:
                 for _, layer in proj.mapLayers().items():
-                    layer_path = Path(layer.source())
-                    if not layer_path.is_file():
+                    layer_source = layer.source()
+                    layer_path = Path(layer_source)
+                    if not Path(layer_source.split('|')[0]).is_file():
                         continue
                     if not self.root_path:
                         log_message(
