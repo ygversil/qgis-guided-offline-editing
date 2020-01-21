@@ -25,6 +25,7 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 # Uncomment the following line and add your changelog:
 changelog=
   Version 0.8
+  * Projects are now sorted alphabetically,
   * bugfix: GeoPackage layers do not get :gisdatahome: prefix when preparing project,
   ====
   Version 0.7
