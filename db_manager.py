@@ -92,4 +92,4 @@ class PostgresProjectDownloader(Callable):
     def __call__(self):
         pg_pstore = (QgsApplication.projectStorageRegistry().
                      projectStorageFromType(PG_PROJECT_STORAGE_TYPE))
-        yield from pg_pstore.listProjects(self.url)
+        yield from sorted(pg_pstore.listProjects(self.url))
