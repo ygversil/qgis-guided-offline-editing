@@ -230,6 +230,7 @@ class GuidedOfflineEditingPlugin:
             )
             self.update_prepare_action()
             self.iface.projectRead.connect(self.update_prepare_action)
+            self.iface.newProjectCreated.connect(self.update_prepare_action)
         # will be set False in run()
         self.first_start = True
 
