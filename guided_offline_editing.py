@@ -431,8 +431,11 @@ class GuidedOfflineEditingPlugin:
                 for _, layer in proj.mapLayers().items():
                     layer_source = layer.source()
                     layer_path = Path(layer_source)
-                    if (layer_source.startswith('?query=') or
-                            not Path(layer_source.split('|')[0]).is_file()):
+                    try:
+                        is_file = Path(layer_source.split('|')[0]).is_file()
+                    except OSError:
+                        is_file = False
+                    if layer_source.startswith('?query=') or not is_file:
                         continue
                     if not self.root_path:
                         log_message(
