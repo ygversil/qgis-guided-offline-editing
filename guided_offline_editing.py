@@ -466,7 +466,8 @@ class GuidedOfflineEditingPlugin:
                             iface=self.iface,
                         )
                         break
-                    prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
+                    prefixed_path = '{}{}'.format(PATH_PREFIX,
+                                                  rel_path.as_posix())
                     log_message(
                         'Rewriting layer path: {} -> {}'.format(layer_path,
                                                                 prefixed_path),
