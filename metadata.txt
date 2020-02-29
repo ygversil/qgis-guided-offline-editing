@@ -24,6 +24,15 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 
 # Uncomment the following line and add your changelog:
 changelog=
+  Version 0.8.2 - Bugfix
+  * Bugfix: OSError on Windows when project has PostgreSQL layers,
+  * bugfix: Projects cannot be opened under Linux when they have been saved under Windows because of backslashes in layer paths,
+  * Bugfix: duplicated menus created on plugin upgrade,
+  * Bugfix: projects list and offline layers list are not read-only.
+  ====
+  Version 0.8.1 - Bugfix
+  * Bugfix: OSError when project has virtual layers
+  ====
   Version 0.8
   * Projects are now sorted alphabetically,
   * Bugfix: "Prepare" action is disabled when blank project is created,
