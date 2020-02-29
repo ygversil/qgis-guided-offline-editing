@@ -207,6 +207,13 @@ class GuidedOfflineEditingPlugin:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         icon_path = (':/plugins/guided_offline_editing/icons/'
                      'guided_offline_editing_copy.png')
+        # Clear actions before creating them dynamically
+        plugin_action = [
+            action for action in self.iface.databaseMenu().actions()
+            if action.text() == self.menu
+        ][0]
+        plugin_action.menu().clear()
+        # Create menu actions by reading settings
         with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
             db_titles = s.childGroups()
             if not db_titles:
