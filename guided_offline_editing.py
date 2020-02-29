@@ -208,11 +208,12 @@ class GuidedOfflineEditingPlugin:
         icon_path = (':/plugins/guided_offline_editing/icons/'
                      'guided_offline_editing_copy.png')
         # Clear actions before creating them dynamically
-        plugin_action = [
+        plugin_actions = [
             action for action in self.iface.databaseMenu().actions()
             if action.text() == self.menu
-        ][0]
-        plugin_action.menu().clear()
+        ]
+        if plugin_actions:
+            plugin_actions[0].menu().clear()
         # Create menu actions by reading settings
         with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
             db_titles = s.childGroups()
