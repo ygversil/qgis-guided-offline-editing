@@ -11,52 +11,52 @@
 <context>
     <name>GuidedOfflineEditingPlugin</name>
     <message>
-        <location filename="../guided_offline_editing.py" line="240"/>
+        <location filename="../guided_offline_editing.py" line="248"/>
         <source>&amp;Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="581"/>
+        <location filename="../guided_offline_editing.py" line="592"/>
         <source>%v / %m features copied</source>
         <translation>%v / %m entités copiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="584"/>
+        <location filename="../guided_offline_editing.py" line="595"/>
         <source>%v / %m features processed</source>
         <translation>%v / %m entitées traitées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="587"/>
+        <location filename="../guided_offline_editing.py" line="598"/>
         <source>%v / %m fields added</source>
         <translation>%v / %m champs ajoutés</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="590"/>
+        <location filename="../guided_offline_editing.py" line="601"/>
         <source>%v / %m features added</source>
         <translation>%v / %m entités ajoutées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="593"/>
+        <location filename="../guided_offline_editing.py" line="604"/>
         <source>%v / %m features removed</source>
         <translation>%v / %m entités supprimées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="596"/>
+        <location filename="../guided_offline_editing.py" line="607"/>
         <source>%v / %m feature updates</source>
         <translation>%v / %m entités modifiées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="599"/>
+        <location filename="../guided_offline_editing.py" line="610"/>
         <source>%v / %m feature geometry updates</source>
         <translation>%v / %m géométries modifées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="332"/>
+        <location filename="../guided_offline_editing.py" line="340"/>
         <source>Downloading layers...</source>
         <translation>Téléchargement des couches...</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="609"/>
+        <location filename="../guided_offline_editing.py" line="620"/>
         <source>Uploading layers...</source>
         <translation>Téléversement des couches...</translation>
     </message>
@@ -66,27 +66,27 @@
         <translation>&amp;Édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="213"/>
+        <location filename="../guided_offline_editing.py" line="221"/>
         <source>No database configured</source>
         <translation>Aucune base de données configurée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="223"/>
+        <location filename="../guided_offline_editing.py" line="231"/>
         <source>Prepare and save project for guided editing</source>
         <translation>Préparer et sauvegarder le projet pour édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="450"/>
+        <location filename="../guided_offline_editing.py" line="461"/>
         <source>You have local layers outside gis_data_home folder. Unable to rewrite path for those.</source>
         <translation>Des couches locales existent en dehors du dossier gis_data_home. Impossible de réécrire leur chemin.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="472"/>
+        <location filename="../guided_offline_editing.py" line="483"/>
         <source>Successfully prepared project.</source>
         <translation>Projet préparé avec succès.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing.py" line="438"/>
+        <location filename="../guided_offline_editing.py" line="449"/>
         <source>gis_data_home global variable not set. Unable to rewrite path for local layers.</source>
         <translation>La variable globale gis_data_home n&apos;est pas définie. Impossible de réécrire les chemins des couches locales.</translation>
     </message>
@@ -99,17 +99,17 @@
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="148"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="155"/>
         <source>Upload</source>
         <translation>Téléverser</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="166"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="173"/>
         <source>Guided Offline Editing</source>
         <translation>Édition hors-connexion assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="90"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="94"/>
         <source>Extent to download</source>
         <translation>Emprise à télécharger</translation>
     </message>
@@ -119,12 +119,12 @@
         <translation>Sélectionner le projet sur lequel travailler</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="46"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="50"/>
         <source>Download offline</source>
         <translation>Télécharger hors-connexion</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="107"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="111"/>
         <source>Go!</source>
         <translation>C&apos;est parti !</translation>
     </message>
@@ -134,32 +134,32 @@
         <translation>Édition assistée</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="81"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="85"/>
         <source>Zoom on project extent after loading</source>
         <translation>Zoom sur le projet après chargement</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="61"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="65"/>
         <source>(set global variable gis_data_home to allow download)</source>
         <translation>(définir la variable globale gis_data_home pour accéder au téléchargement)</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="125"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="129"/>
         <source>Layers to be synchronized</source>
         <translation>Couches qui seront synchronisées</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="194"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="201"/>
         <source>Important! </source>
         <translation>Important ! </translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="207"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="214"/>
         <source>The following user will be logged as having made the modifications. Please switch profile if this is not you.</source>
         <translation>L&apos;utilisateur.trice suivant.e sera enregistré.e comme l&apos;auteur.e des modifications. Veuillez changer de profil si ce n&apos;est pas vous.</translation>
     </message>
     <message>
-        <location filename="../guided_offline_editing_dialog_base.ui" line="243"/>
+        <location filename="../guided_offline_editing_dialog_base.ui" line="250"/>
         <source>username</source>
         <translation>nom_utilisateur</translation>
     </message>

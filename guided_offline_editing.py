@@ -207,6 +207,14 @@ class GuidedOfflineEditingPlugin:
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         icon_path = (':/plugins/guided_offline_editing/icons/'
                      'guided_offline_editing_copy.png')
+        # Clear actions before creating them dynamically
+        plugin_actions = [
+            action for action in self.iface.databaseMenu().actions()
+            if action.text() == self.menu
+        ]
+        if plugin_actions:
+            plugin_actions[0].menu().clear()
+        # Create menu actions by reading settings
         with qgis_group_settings(self.iface, SETTINGS_GROUP) as s:
             db_titles = s.childGroups()
             if not db_titles:
@@ -431,8 +439,11 @@ class GuidedOfflineEditingPlugin:
                 for _, layer in proj.mapLayers().items():
                     layer_source = layer.source()
                     layer_path = Path(layer_source)
-                    if (layer_source.startswith('?query=') or
-                            not Path(layer_source.split('|')[0]).is_file()):
+                    try:
+                        is_file = Path(layer_source.split('|')[0]).is_file()
+                    except OSError:
+                        is_file = False
+                    if layer_source.startswith('?query=') or not is_file:
                         continue
                     if not self.root_path:
                         log_message(
@@ -456,7 +467,8 @@ class GuidedOfflineEditingPlugin:
                             iface=self.iface,
                         )
                         break
-                    prefixed_path = '{}{}'.format(PATH_PREFIX, str(rel_path))
+                    prefixed_path = '{}{}'.format(PATH_PREFIX,
+                                                  rel_path.as_posix())
                     log_message(
                         'Rewriting layer path: {} -> {}'.format(layer_path,
                                                                 prefixed_path),
