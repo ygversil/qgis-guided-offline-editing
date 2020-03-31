@@ -31,8 +31,6 @@ from PyQt5.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 from qgis.core import (
-    QgsApplication,
-    QgsAuthMethodConfig,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsDataProvider,
@@ -44,6 +42,7 @@ from qgis.core import (
     QgsProject,
     QgsProjectBadLayerHandler,
     QgsRectangle,
+    QgsVectorLayer,
 )
 
 from .context_managers import (
@@ -72,7 +71,6 @@ SETTINGS_GROUP = 'Plugin-GuidedOfflineEditing/databases'
 
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
-layer_scope = QgsExpressionContextUtils.layerScope
 global_scope = QgsExpressionContextUtils.globalScope
 
 
@@ -231,7 +229,7 @@ class GuidedOfflineEditingPlugin:
             self.prepare_action = self.add_action(
                 text=self.tr('Prepare and save project for guided editing'),
                 icon_path=':/plugins/guided_offline_editing/icons/'
-                'guided_editing_prepare.png',
+                'save_project_to_postgres.png',
                 callback=self.prepare_project,
                 parent=self.iface.mainWindow(),
                 add_to_toolbar=True,
@@ -281,11 +279,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.set_pg_project_model(self.pg_project_model)
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
-        auth_mgr = QgsApplication.authManager()
-        auth_config = QgsAuthMethodConfig()
-        auth_mgr.loadAuthenticationConfig(self.settings.pg_authcfg,
-                                          auth_config, True)
-        self.dlg.set_username(auth_config.config('username'))
         self.connect_signals()
         with busy_refreshing(self.iface, self.refresh_data_and_dialog):
             self.dlg.show()
@@ -325,6 +318,9 @@ class GuidedOfflineEditingPlugin:
             self.dlg.update_extent_group_box_state
         )
         getattr(self.dlg.goButton.clicked, action)(
+            self.load_project
+        )
+        getattr(self.dlg.pgProjectList.doubleClicked, action)(
             self.load_project
         )
         getattr(self.dlg.uploadButton.clicked, action)(
@@ -379,11 +375,10 @@ class GuidedOfflineEditingPlugin:
                 layer_ids_to_download = [
                     layer_id
                     for layer_id, layer in proj.mapLayers().items()
-                    if (
-                        qgis_variable(layer_scope(layer), 'offline') and
-                        qgis_variable(layer_scope(layer), 'offline')
-                        .lower() not in ('no', 'false')
-                    )
+                    if (isinstance(layer, QgsVectorLayer) and
+                        layer.dataProvider().storageType().lower().startswith(
+                            'postgresql'
+                        ))
                 ]
                 extent, extent_crs_id = self.dlg.selected_extent()
                 if extent is not None:
