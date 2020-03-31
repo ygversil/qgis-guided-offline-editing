@@ -321,5 +321,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pgProjectList</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>GuidedOfflineEditingPluginDialogBase</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>374</x>
+     <y>143</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>374</x>
+     <y>279</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
