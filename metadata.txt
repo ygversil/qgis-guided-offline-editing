@@ -26,6 +26,7 @@ repository=https://github.com/ygversil/qgis-guided-offline-editing
 changelog=
   Version 0.9.0
   * Feature: double-click on a project loads it.
+  * Feature (or regression ?): automatically detect which layers to download offline. Currently, these are *PostgreSQL vector layers*. So it is not needed anymore to set an `offline` variable on each layer to be downloaded.
   ====
   Version 0.8.2 - Bugfix
   * Bugfix: OSError on Windows when project has PostgreSQL layers,
