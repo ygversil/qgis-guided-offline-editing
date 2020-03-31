@@ -31,8 +31,6 @@ from PyQt5.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 from qgis.core import (
-    QgsApplication,
-    QgsAuthMethodConfig,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsDataProvider,
@@ -281,11 +279,6 @@ class GuidedOfflineEditingPlugin:
         self.dlg.set_pg_project_model(self.pg_project_model)
         self.offline_layer_model = OfflineLayerListModel()
         self.dlg.set_offline_layer_model(self.offline_layer_model)
-        auth_mgr = QgsApplication.authManager()
-        auth_config = QgsAuthMethodConfig()
-        auth_mgr.loadAuthenticationConfig(self.settings.pg_authcfg,
-                                          auth_config, True)
-        self.dlg.set_username(auth_config.config('username'))
         self.connect_signals()
         with busy_refreshing(self.iface, self.refresh_data_and_dialog):
             self.dlg.show()
