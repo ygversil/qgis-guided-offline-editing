@@ -725,37 +725,6 @@ your users.
 
    Configure attributes form for a layer
 
-Set variables for the plugin
-----------------------------
-
-The last step is to indicate to the plugin what layers should be downloaded
-offline. You may not want to download all layer from a project. For example,
-you may have basemap layer in WMS, and such a layer should not be downloaded
-for offline edition.
-
-This is simply a matter of setting a variable in each layer to be downloaded.
-Go to the layer :guilabel:`Properties` (double-click on the layer in the
-legend, or right-click the layer and select :guilabel:`Properties`) and switch
-to the :guilabel:`Variables` tab.
-
-Click on the :guilabel:`+` button at the bottom of the dialog to add a variable:
-
-* name it **offline**,
-
-* give it value **enabled** (or **true**, or **yes**).
-
-Do this for each relevant layer, and that's it! Now the Guided Offline Editing
-plugin will recognize this layer as a to-be-offline-edited layer.
-
-.. _qgis_layer_properties_offline_variable:
-
-.. figure:: ./_static/img/qgis_layer_properties_offline_variable.png
-   :width: 400px
-   :align: center
-   :alt: Add offline variable on a layer
-
-   Add offline variable on a layer
-
 
 Done !
 ======
