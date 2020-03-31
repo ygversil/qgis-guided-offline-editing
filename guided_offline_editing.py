@@ -42,6 +42,7 @@ from qgis.core import (
     QgsProject,
     QgsProjectBadLayerHandler,
     QgsRectangle,
+    QgsVectorLayer,
 )
 
 from .context_managers import (
@@ -70,7 +71,6 @@ SETTINGS_GROUP = 'Plugin-GuidedOfflineEditing/databases'
 
 # Shorter names for these functions
 qgis_variable = QgsExpressionContextScope.variable
-layer_scope = QgsExpressionContextUtils.layerScope
 global_scope = QgsExpressionContextUtils.globalScope
 
 
@@ -375,11 +375,10 @@ class GuidedOfflineEditingPlugin:
                 layer_ids_to_download = [
                     layer_id
                     for layer_id, layer in proj.mapLayers().items()
-                    if (
-                        qgis_variable(layer_scope(layer), 'offline') and
-                        qgis_variable(layer_scope(layer), 'offline')
-                        .lower() not in ('no', 'false')
-                    )
+                    if (isinstance(layer, QgsVectorLayer) and
+                        layer.dataProvider().storageType().lower().startswith(
+                            'postgresql'
+                        ))
                 ]
                 extent, extent_crs_id = self.dlg.selected_extent()
                 if extent is not None:
