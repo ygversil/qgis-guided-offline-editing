@@ -3,6 +3,6 @@
         <file>icons/guided_offline_editing_copy.png</file>
         <file>icons/offline_editing_copy.png</file>
         <file>icons/offline_editing_sync.png</file>
-        <file>icons/guided_editing_prepare.png</file>
+        <file>icons/save_project_to_postgres.png</file>
     </qresource>
 </RCC>

@@ -229,7 +229,7 @@ class GuidedOfflineEditingPlugin:
             self.prepare_action = self.add_action(
                 text=self.tr('Prepare and save project for guided editing'),
                 icon_path=':/plugins/guided_offline_editing/icons/'
-                'guided_editing_prepare.png',
+                'save_project_to_postgres.png',
                 callback=self.prepare_project,
                 parent=self.iface.mainWindow(),
                 add_to_toolbar=True,
