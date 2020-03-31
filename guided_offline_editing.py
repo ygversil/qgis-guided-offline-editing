@@ -327,6 +327,9 @@ class GuidedOfflineEditingPlugin:
         getattr(self.dlg.goButton.clicked, action)(
             self.load_project
         )
+        getattr(self.dlg.pgProjectList.doubleClicked, action)(
+            self.load_project
+        )
         getattr(self.dlg.uploadButton.clicked, action)(
             self.synchronize_offline_layers
         )
